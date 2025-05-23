@@ -8,13 +8,13 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class Ps_kycsecureupload extends Module
+class Pskyc extends Module
 {
     protected $config_form = false;
 
     public function __construct()
     {
-        $this->name = 'ps_kycsecureupload';
+        $this->name = 'pskyc';
         $this->tab = 'administration';
         $this->version = '0.0.1';
         $this->author = 'Valentin Chmara';
@@ -41,7 +41,7 @@ class Ps_kycsecureupload extends Module
      */
     public function install()
     {
-        Configuration::updateValue('PS_KYCSECUREUPLOAD_LIVE_MODE', false);
+        Configuration::updateValue('PSKYC_LIVE_MODE', false);
 
         include(dirname(__FILE__).'/sql/install.php');
 
@@ -57,7 +57,7 @@ class Ps_kycsecureupload extends Module
 
     public function uninstall()
     {
-        Configuration::deleteByName('PS_KYCSECUREUPLOAD_LIVE_MODE');
+        Configuration::deleteByName('PSKYC_LIVE_MODE');
 
         include(dirname(__FILE__).'/sql/uninstall.php');
 
@@ -72,7 +72,7 @@ class Ps_kycsecureupload extends Module
         /**
          * If values have been submitted in the form, process.
          */
-        if (((bool)Tools::isSubmit('submitPs_kycsecureuploadModule')) == true) {
+        if (((bool)Tools::isSubmit('submitPskycModule')) == true) {
             $this->postProcess();
         }
 
@@ -97,7 +97,7 @@ class Ps_kycsecureupload extends Module
         $helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG', 0);
 
         $helper->identifier = $this->identifier;
-        $helper->submit_action = 'submitPs_kycsecureuploadModule';
+        $helper->submit_action = 'submitPskycModule';
         $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false)
             .'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
         $helper->token = Tools::getAdminTokenLite('AdminModules');
@@ -126,7 +126,7 @@ class Ps_kycsecureupload extends Module
                     array(
                         'type' => 'switch',
                         'label' => $this->l('Live mode'),
-                        'name' => 'PS_KYCSECUREUPLOAD_LIVE_MODE',
+                        'name' => 'PSKYC_LIVE_MODE',
                         'is_bool' => true,
                         'desc' => $this->l('Use this module in live mode'),
                         'values' => array(
@@ -147,12 +147,12 @@ class Ps_kycsecureupload extends Module
                         'type' => 'text',
                         'prefix' => '<i class="icon icon-envelope"></i>',
                         'desc' => $this->l('Enter a valid email address'),
-                        'name' => 'PS_KYCSECUREUPLOAD_ACCOUNT_EMAIL',
+                        'name' => 'PSKYC_ACCOUNT_EMAIL',
                         'label' => $this->l('Email'),
                     ),
                     array(
                         'type' => 'password',
-                        'name' => 'PS_KYCSECUREUPLOAD_ACCOUNT_PASSWORD',
+                        'name' => 'PSKYC_ACCOUNT_PASSWORD',
                         'label' => $this->l('Password'),
                     ),
                 ),
@@ -169,9 +169,9 @@ class Ps_kycsecureupload extends Module
     protected function getConfigFormValues()
     {
         return array(
-            'PS_KYCSECUREUPLOAD_LIVE_MODE' => Configuration::get('PS_KYCSECUREUPLOAD_LIVE_MODE', true),
-            'PS_KYCSECUREUPLOAD_ACCOUNT_EMAIL' => Configuration::get('PS_KYCSECUREUPLOAD_ACCOUNT_EMAIL', 'contact@prestashop.com'),
-            'PS_KYCSECUREUPLOAD_ACCOUNT_PASSWORD' => Configuration::get('PS_KYCSECUREUPLOAD_ACCOUNT_PASSWORD', null),
+            'PSKYC_LIVE_MODE' => Configuration::get('PSKYC_LIVE_MODE', true),
+            'PSKYC_ACCOUNT_EMAIL' => Configuration::get('PSKYC_ACCOUNT_EMAIL', 'contact@prestashop.com'),
+            'PSKYC_ACCOUNT_PASSWORD' => Configuration::get('PSKYC_ACCOUNT_PASSWORD', null),
         );
     }
 

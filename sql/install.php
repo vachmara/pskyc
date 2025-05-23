@@ -5,9 +5,9 @@
  */
 $sql = array();
 
-$sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ps_kycsecureupload` (
-    `id_ps_kycsecureupload` int(11) NOT NULL AUTO_INCREMENT,
-    PRIMARY KEY  (`id_ps_kycsecureupload`)
+$sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'pskyc` (
+    `id_pskyc` int(11) NOT NULL AUTO_INCREMENT,
+    PRIMARY KEY  (`id_pskyc`)
 ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
 
 foreach ($sql as $query) {
