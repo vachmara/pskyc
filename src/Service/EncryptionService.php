@@ -1,10 +1,6 @@
 <?php
 namespace PrestaShop\Module\Pskyc\Service;
 
-if (!defined('_PS_VERSION_')) {
-    exit;
-}
-
 /**
  * EncryptionService class for AES-256-CBC encryption, decryption, and secure file handling.
  *

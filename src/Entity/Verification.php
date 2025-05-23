@@ -13,7 +13,7 @@ if (!defined('_PS_VERSION_')) {
  * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks()
  */
-class PskycVerification
+class Verification
 {
     public const STATUS_PENDING        = 'pending';
     public const STATUS_UNDER_REVIEW   = 'under_review';

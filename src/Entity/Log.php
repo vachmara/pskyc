@@ -13,7 +13,7 @@ if (!defined('_PS_VERSION_')) {
  * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks()
  */
-class PskycLog
+class Log
 {
     /**
      * @var int
