@@ -11,6 +11,9 @@
  */
 $sql = array();
 
+Db::getInstance()->execute('DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'kyc_documents`');
+Db::getInstance()->execute('DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'kyc_verifications`');
+
 foreach ($sql as $query) {
     if (Db::getInstance()->execute($query) == false) {
         return false;
