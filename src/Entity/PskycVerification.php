@@ -1,39 +1,20 @@
 <?php
 namespace PrestaShop\Module\Pskyc\Entity;
 
+use DateTime;
+use Doctrine\ORM\Mapping as ORM;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
 /**
- * Class representing a KYC verification request.
- *
- * @property int         $id_kyc_verification Verification ID (PK)
- * @property int         $id_customer         Customer ID (FK)
- * @property string      $status              Verification status
- * @property string|null $admin_note          Admin note (HTML)
- * @property string      $date_submitted      Submission date/time
- * @property string|null $date_validated      Validation date/time
- * @property string|null $date_expiry         Expiry date/time
+ * @ORM\Table(name="kyc_verification")
+ * @ORM\Entity()
+ * @ORM\HasLifecycleCallbacks()
  */
-class PskycVerification extends \ObjectModel
+class PskycVerification
 {
-    /** @var int Verification ID (PK) */
-    public $id_kyc_verification;
-    /** @var int Customer ID (FK) */
-    public $id_customer;
-    /** @var string Verification status */
-    public $status = self::STATUS_PENDING;
-    /** @var string|null Admin note (HTML) */
-    public $admin_note;
-    /** @var string Submission date/time */
-    public $date_submitted;
-    /** @var string|null Validation date/time */
-    public $date_validated;
-    /** @var string|null Expiry date/time */
-    public $date_expiry;
-
-    // --- statuses
     public const STATUS_PENDING        = 'pending';
     public const STATUS_UNDER_REVIEW   = 'under_review';
     public const STATUS_APPROVED       = 'approved';
@@ -41,16 +22,122 @@ class PskycVerification extends \ObjectModel
     public const STATUS_EXPIRED        = 'expired';
     public const STATUS_MORE_INFO      = 'requested_more_info';
 
-    public static $definition = [
-        'table'   => 'kyc_verification',
-        'primary' => 'id_kyc_verification',
-        'fields'  => [
-            'id_customer'    => ['type' => self::TYPE_INT,    'validate' => 'isUnsignedId', 'required' => true],
-            'status'         => ['type' => self::TYPE_STRING, 'validate' => 'isGenericName', 'size' => 32],
-            'admin_note'     => ['type' => self::TYPE_HTML,   'validate' => 'isCleanHtml'],
-            'date_submitted' => ['type' => self::TYPE_DATE,   'validate' => 'isDate'],
-            'date_validated' => ['type' => self::TYPE_DATE,   'validate' => 'isDate', 'required' => false],
-            'date_expiry'    => ['type' => self::TYPE_DATE,   'validate' => 'isDate', 'required' => false],
-        ],
-    ];
+    /**
+     * @var int
+     * @ORM\Id
+     * @ORM\Column(name="id_kyc_verification", type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
+
+    /**
+     * @var int
+     * @ORM\Column(name="id_customer", type="integer")
+     */
+    private $customerId;
+
+    /**
+     * @var string
+     * @ORM\Column(name="status", type="string", length=32)
+     */
+    private $status = self::STATUS_PENDING;
+
+    /**
+     * @var string|null
+     * @ORM\Column(name="admin_note", type="text", nullable=true)
+     */
+    private $adminNote;
+
+    /**
+     * @var DateTime
+     * @ORM\Column(name="date_submitted", type="datetime")
+     */
+    private $dateSubmitted;
+
+    /**
+     * @var DateTime|null
+     * @ORM\Column(name="date_validated", type="datetime", nullable=true)
+     */
+    private $dateValidated;
+
+    /**
+     * @var DateTime|null
+     * @ORM\Column(name="date_expiry", type="datetime", nullable=true)
+     */
+    private $dateExpiry;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getCustomerId(): int
+    {
+        return $this->customerId;
+    }
+    public function setCustomerId(int $id): self
+    {
+        $this->customerId = $id;
+        return $this;
+    }
+
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+    public function setStatus(string $status): self
+    {
+        $this->status = $status;
+        return $this;
+    }
+
+    public function getAdminNote(): ?string
+    {
+        return $this->adminNote;
+    }
+    public function setAdminNote(?string $note): self
+    {
+        $this->adminNote = $note;
+        return $this;
+    }
+
+    public function getDateSubmitted(): DateTime
+    {
+        return $this->dateSubmitted;
+    }
+    public function setDateSubmitted(DateTime $date): self
+    {
+        $this->dateSubmitted = $date;
+        return $this;
+    }
+
+    public function getDateValidated(): ?DateTime
+    {
+        return $this->dateValidated;
+    }
+    public function setDateValidated(?DateTime $date): self
+    {
+        $this->dateValidated = $date;
+        return $this;
+    }
+
+    public function getDateExpiry(): ?DateTime
+    {
+        return $this->dateExpiry;
+    }
+    public function setDateExpiry(?DateTime $date): self
+    {
+        $this->dateExpiry = $date;
+        return $this;
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function setDefaultDateSubmitted(): void
+    {
+        if ($this->getDateSubmitted() === null) {
+            $this->setDateSubmitted(new DateTime('now'));
+        }
+    }
 }

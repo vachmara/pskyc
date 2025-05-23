@@ -1,65 +1,202 @@
 <?php
 namespace PrestaShop\Module\Pskyc\Entity;
 
+use DateTime;
+use Doctrine\ORM\Mapping as ORM;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
 /**
- * Class representing a KYC document upload.
- *
- * @property int    $id_kyc_document      Document ID (PK)
- * @property int    $id_kyc_verification  Related verification ID (FK)
- * @property string $type                 Document type (ID, proof_of_address, etc)
- * @property string $filename             Encrypted filename on disk
- * @property int    $filesize             Size in bytes
- * @property string $mime                 Mime type
- * @property string $sha256               SHA-256 hash (hex)
- * @property bool   $encrypted            Is file encrypted
- * @property string $iv                   Initialization vector (hex)
- * @property string $date_uploaded        Upload date/time
- * @property string $expires_at           Expiry date/time (nullable)
+ * @ORM\Table(name="kyc_document")
+ * @ORM\Entity()
+ * @ORM\HasLifecycleCallbacks()
  */
-class PskycDocument extends \ObjectModel
+class PskycDocument
 {
-    /** @var int Document ID (PK) */
-    public $id_kyc_document;
-    /** @var int Related verification ID (FK) */
-    public $id_kyc_verification;
-    /** @var string Document type (ID, proof_of_address, etc) */
-    public $type;
-    /** @var string Encrypted filename on disk */
-    public $filename;
-    /** @var int Size in bytes */
-    public $filesize;
-    /** @var string Mime type */
-    public $mime;
-    /** @var string SHA-256 hash (hex) */
-    public $sha256;
-    /** @var bool Is file encrypted */
-    public $encrypted = true;
-    /** @var string Initialization vector (hex) */
-    public $iv;
-    /** @var string Upload date/time */
-    public $date_uploaded;
-    /** @var string|null Expiry date/time */
-    public $expires_at;
+    /**
+     * @var int
+     * @ORM\Id
+     * @ORM\Column(name="id_kyc_document", type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
 
-    public static $definition = [
-        'table'   => 'kyc_document',
-        'primary' => 'id_kyc_document',
-        'fields'  => [
-            'id_kyc_verification' => ['type' => self::TYPE_INT,    'validate' => 'isUnsignedId', 'required' => true],
-            'type'                => ['type' => self::TYPE_STRING, 'validate' => 'isGenericName', 'size' => 64],
-            'filename'            => ['type' => self::TYPE_STRING, 'validate' => 'isFileName', 'size' => 255],
-            'filesize'            => ['type' => self::TYPE_INT,    'validate' => 'isUnsignedInt'],
-            'mime'                => ['type' => self::TYPE_STRING, 'validate' => 'isCleanHtml', 'size' => 128],
-            // SHA-256 is 64 hex chars, IV is 32 hex chars (not SHA1)
-            'sha256'              => ['type' => self::TYPE_STRING, 'validate' => 'isAnything', 'size' => 64],
-            'encrypted'           => ['type' => self::TYPE_BOOL,   'validate' => 'isBool'],
-            'iv'                  => ['type' => self::TYPE_STRING, 'validate' => 'isAnything', 'size' => 32],
-            'date_uploaded'       => ['type' => self::TYPE_DATE,   'validate' => 'isDate'],
-            'expires_at'          => ['type' => self::TYPE_DATE,   'validate' => 'isDate', 'required' => false],
-        ],
-    ];
+    /**
+     * @var int
+     * @ORM\Column(name="id_kyc_verification", type="integer")
+     */
+    private $kycVerificationId;
+
+    /**
+     * @var string
+     * @ORM\Column(name="type", type="string", length=64)
+     */
+    private $type;
+
+    /**
+     * @var string
+     * @ORM\Column(name="filename", type="string", length=255)
+     */
+    private $filename;
+
+    /**
+     * @var int
+     * @ORM\Column(name="filesize", type="integer")
+     */
+    private $filesize;
+
+    /**
+     * @var string
+     * @ORM\Column(name="mime", type="string", length=128)
+     */
+    private $mime;
+
+    /**
+     * @var string
+     * @ORM\Column(name="sha256", type="string", length=64)
+     */
+    private $sha256;
+
+    /**
+     * @var bool
+     * @ORM\Column(name="encrypted", type="boolean")
+     */
+    private $encrypted = true;
+
+    /**
+     * @var string
+     * @ORM\Column(name="iv", type="string", length=32)
+     */
+    private $iv;
+
+    /**
+     * @var DateTime
+     * @ORM\Column(name="date_uploaded", type="datetime")
+     */
+    private $dateUploaded;
+
+    /**
+     * @var DateTime|null
+     * @ORM\Column(name="expires_at", type="datetime", nullable=true)
+     */
+    private $expiresAt;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getKycVerificationId(): int
+    {
+        return $this->kycVerificationId;
+    }
+    public function setKycVerificationId(int $id): self
+    {
+        $this->kycVerificationId = $id;
+        return $this;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
+    }
+    public function setType(string $type): self
+    {
+        $this->type = $type;
+        return $this;
+    }
+
+    public function getFilename(): string
+    {
+        return $this->filename;
+    }
+    public function setFilename(string $filename): self
+    {
+        $this->filename = $filename;
+        return $this;
+    }
+
+    public function getFilesize(): int
+    {
+        return $this->filesize;
+    }
+    public function setFilesize(int $filesize): self
+    {
+        $this->filesize = $filesize;
+        return $this;
+    }
+
+    public function getMime(): string
+    {
+        return $this->mime;
+    }
+    public function setMime(string $mime): self
+    {
+        $this->mime = $mime;
+        return $this;
+    }
+
+    public function getSha256(): string
+    {
+        return $this->sha256;
+    }
+    public function setSha256(string $sha256): self
+    {
+        $this->sha256 = $sha256;
+        return $this;
+    }
+
+    public function isEncrypted(): bool
+    {
+        return $this->encrypted;
+    }
+    public function setEncrypted(bool $encrypted): self
+    {
+        $this->encrypted = $encrypted;
+        return $this;
+    }
+
+    public function getIv(): string
+    {
+        return $this->iv;
+    }
+    public function setIv(string $iv): self
+    {
+        $this->iv = $iv;
+        return $this;
+    }
+
+    public function getDateUploaded(): DateTime
+    {
+        return $this->dateUploaded;
+    }
+    public function setDateUploaded(DateTime $date): self
+    {
+        $this->dateUploaded = $date;
+        return $this;
+    }
+
+    public function getExpiresAt(): ?DateTime
+    {
+        return $this->expiresAt;
+    }
+    public function setExpiresAt(?DateTime $date): self
+    {
+        $this->expiresAt = $date;
+        return $this;
+    }
+
+    /**
+     * @ORM\PrePersist
+     * @ORM\PreUpdate
+     */
+    public function updateTimestamps(): void
+    {
+        $now = new DateTime('now');
+        if ($this->getDateUploaded() === null) {
+            $this->setDateUploaded($now);
+        }
+    }
 }
