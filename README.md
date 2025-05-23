@@ -35,7 +35,7 @@ Open source, GDPR-compliant KYC document verification for PrestaShop.
 PRs welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## Development
-
+<!--
 ### Requirements
 
 This module requires: 
@@ -62,7 +62,7 @@ This module requires:
    ```sh
    pnpm run dev
    ```
-
+--> 
 ## License
 
 MIT License. See [LICENSE.md](LICENSE.md) for details.
