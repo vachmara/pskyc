@@ -1,0 +1,68 @@
+# KYC Secure Upload (PrestaShop Module)
+
+Open source, GDPR-compliant KYC document verification for PrestaShop.
+
+- Proof of identity (ID)
+- Proof of address (utility bill, bank statement, etc.)
+- Secure file upload
+
+## Features
+
+- [ ] Secure KYC file uploads (ID, proof of address)
+- [ ] End-to-end file encryption (OpenSSL)
+- [ ] Front-office upload & status tracking
+- [ ] Back-office admin panel: validation, logs, messaging
+- [ ] Automated email notifications (status updates, rejections, deletions)
+- [ ] Order blocking for sensitive products until KYC is validated
+- [ ] Easy installation, configuration, and uninstall
+- [ ] Multi-language ready
+
+## Installation
+
+1. Download the latest release ZIP
+2. Upload to your PrestaShop back office (Modules > Module Manager > Upload)
+3. Configure in the modules section
+
+## Security
+
+- Files are stored encrypted with OpenSSL (`AES-256-CBC`)
+- Keys and IV managed securely
+- .htaccess restricts direct access
+- GDPR retention and deletion supported
+
+## Contribution
+
+PRs welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## Development
+
+### Requirements
+
+This module requires: 
+- [Node.js](https://nodejs.org/) (for build tools)
+- [PNPM](https://pnpm.io/) (for package management)
+- [Composer](https://getcomposer.org/) (for PHP dependencies)
+- [Vite](https://vitejs.dev/) (for building and bundling CSS, TypeScript, and other frontend assets)
+
+### Setup
+
+1. Install PHP dependencies:
+   ```sh
+   composer install
+   ```
+2. Install Node.js dependencies:
+   ```sh
+   pnpm install
+   ```
+3. Build frontend assets with Vite:
+   ```sh
+   pnpm run build
+   ```
+   For development with hot reload:
+   ```sh
+   pnpm run dev
+   ```
+
+## License
+
+MIT License. See [LICENSE.md](LICENSE.md) for details.

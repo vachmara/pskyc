@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+	<name>ps_kycsecureupload</name>
+	<displayName><![CDATA[KYC Secure Upload]]></displayName>
+	<version><![CDATA[0.0.1]]></version>
+	<description><![CDATA[Open source KYC document verification and encrypted storage for PrestaShop. GDPR compliant.]]></description>
+	<author><![CDATA[Valentin Chmara]]></author>
+	<tab><![CDATA[administration]]></tab>
+	<is_configurable>1</is_configurable>
+	<need_instance>1</need_instance>
+</module>
