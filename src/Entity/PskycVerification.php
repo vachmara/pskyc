@@ -5,27 +5,32 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+/**
+ * Class representing a KYC verification request.
+ *
+ * @property int         $id_kyc_verification Verification ID (PK)
+ * @property int         $id_customer         Customer ID (FK)
+ * @property string      $status              Verification status
+ * @property string|null $admin_note          Admin note (HTML)
+ * @property string      $date_submitted      Submission date/time
+ * @property string|null $date_validated      Validation date/time
+ * @property string|null $date_expiry         Expiry date/time
+ */
 class PskycVerification extends \ObjectModel
 {
-    /** @var int */
+    /** @var int Verification ID (PK) */
     public $id_kyc_verification;
-
-    /** @var int */
+    /** @var int Customer ID (FK) */
     public $id_customer;
-
-    /** @var string */
+    /** @var string Verification status */
     public $status = self::STATUS_PENDING;
-
-    /** @var string|null */
+    /** @var string|null Admin note (HTML) */
     public $admin_note;
-
-    /** @var string */
+    /** @var string Submission date/time */
     public $date_submitted;
-
-    /** @var string|null */
+    /** @var string|null Validation date/time */
     public $date_validated;
-
-    /** @var string|null */
+    /** @var string|null Expiry date/time */
     public $date_expiry;
 
     // --- statuses
