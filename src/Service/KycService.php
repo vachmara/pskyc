@@ -4,7 +4,7 @@ namespace PrestaShop\Module\Pskyc\Service;
 use PrestaShop\Module\Pskyc\Entity\PskycVerification;
 use PrestaShop\Module\Pskyc\Entity\PskycDocument;
 use PrestaShop\Module\Pskyc\Entity\PskycLog;
-use PrestaShop\Module\Pskyc\Helper\EncryptionHelper;
+use PrestaShop\Module\Pskyc\Service\EncryptionService;
 use Context;
 use Tools;
 use Db;
@@ -52,8 +52,8 @@ class KycService
             if ($content === false) {
                 throw new \RuntimeException('Failed to read uploaded file.');
             }
-            $iv = EncryptionHelper::generateIv();
-            $encrypted = EncryptionHelper::encrypt($content, $this->encryptionKey, $iv);
+            $iv = EncryptionService::generateIv();
+            $encrypted = EncryptionService::encrypt($content, $this->encryptionKey, $iv);
 
             $filename = uniqid('kyc_', true).'.enc';
             $path = $this->storagePath.$filename;
@@ -67,7 +67,7 @@ class KycService
             $doc->filename = $filename;
             $doc->filesize = $file['size'];
             $doc->mime = $file['type'];
-            $doc->sha256 = EncryptionHelper::sha256($content);
+            $doc->sha256 = EncryptionService::sha256($content);
             $doc->iv = $iv;
             $doc->encrypted = true;
             $doc->date_uploaded = date('Y-m-d H:i:s');
@@ -87,7 +87,8 @@ class KycService
      */
     public function approve(int $idVerification, string $note = ''): void
     {
-        $verification = new PskycVerification($idVerification);
+        $verification = new PskycVerification();
+        $verification->id_kyc_verification = $idVerification;
         $verification->status = PskycVerification::STATUS_APPROVED;
         $verification->admin_note = $note;
         $verification->date_validated = date('Y-m-d H:i:s');
