@@ -16,7 +16,7 @@ class Pskyc extends Module
     {
         $this->name = 'pskyc';
         $this->tab = 'administration';
-        $this->version = '0.0.1';
+        $this->version = '0.1.0';
         $this->author = 'Valentin Chmara';
         $this->need_instance = 1;
 
@@ -41,9 +41,16 @@ class Pskyc extends Module
      */
     public function install()
     {
-        Configuration::updateValue('PSKYC_LIVE_MODE', false);
+        // default config
+        Configuration::updateValue('PSKYC_RETENTION_DAYS', 365);
+        Configuration::updateValue('PSKYC_ALLOWED_CATEGORIES', json_encode([]));
 
-        include(dirname(__FILE__).'/sql/install.php');
+        require_once __DIR__ . '/sql/install.php';
+
+        $uploadDir = _PS_MODULE_DIR_ . $this->name . '/secure_upload/';
+        if (!is_dir($uploadDir) && !@mkdir($uploadDir, 0700, true)) {
+            return false;
+        }
 
         return parent::install() &&
             $this->registerHook('header') &&
@@ -57,9 +64,11 @@ class Pskyc extends Module
 
     public function uninstall()
     {
-        Configuration::deleteByName('PSKYC_LIVE_MODE');
 
-        include(dirname(__FILE__).'/sql/uninstall.php');
+        require_once __DIR__ . '/sql/uninstall.php';
+
+        Configuration::deleteByName('PSKYC_RETENTION_DAYS');
+        Configuration::deleteByName('PSKYC_ALLOWED_CATEGORIES');
 
         return parent::uninstall();
     }
@@ -72,13 +81,13 @@ class Pskyc extends Module
         /**
          * If values have been submitted in the form, process.
          */
-        if (((bool)Tools::isSubmit('submitPskycModule')) == true) {
+        if (((bool) Tools::isSubmit('submitPskycModule')) == true) {
             $this->postProcess();
         }
 
         $this->context->smarty->assign('module_dir', $this->_path);
 
-        $output = $this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
+        $output = $this->context->smarty->fetch($this->local_path . 'views/templates/admin/configure.tpl');
 
         return $output;
     }
@@ -99,7 +108,7 @@ class Pskyc extends Module
         $helper->identifier = $this->identifier;
         $helper->submit_action = 'submitPskycModule';
         $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false)
-            .'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
+            . '&configure=' . $this->name . '&tab_module=' . $this->tab . '&module_name=' . $this->name;
         $helper->token = Tools::getAdminTokenLite('AdminModules');
 
         $helper->tpl_vars = array(
@@ -116,63 +125,40 @@ class Pskyc extends Module
      */
     protected function getConfigForm()
     {
-        return array(
-            'form' => array(
-                'legend' => array(
-                'title' => $this->l('Settings'),
-                'icon' => 'icon-cogs',
-                ),
-                'input' => array(
-                    array(
-                        'type' => 'switch',
-                        'label' => $this->l('Live mode'),
-                        'name' => 'PSKYC_LIVE_MODE',
-                        'is_bool' => true,
-                        'desc' => $this->l('Use this module in live mode'),
-                        'values' => array(
-                            array(
-                                'id' => 'active_on',
-                                'value' => true,
-                                'label' => $this->l('Enabled')
-                            ),
-                            array(
-                                'id' => 'active_off',
-                                'value' => false,
-                                'label' => $this->l('Disabled')
-                            )
-                        ),
-                    ),
-                    array(
-                        'col' => 3,
+        return [
+            'form' => [
+                'legend' => [
+                    'title' => $this->l('KYC Settings'),
+                    'icon' => 'icon-cogs',
+                ],
+                'input' => [
+                    [
                         'type' => 'text',
-                        'prefix' => '<i class="icon icon-envelope"></i>',
-                        'desc' => $this->l('Enter a valid email address'),
-                        'name' => 'PSKYC_ACCOUNT_EMAIL',
-                        'label' => $this->l('Email'),
-                    ),
-                    array(
-                        'type' => 'password',
-                        'name' => 'PSKYC_ACCOUNT_PASSWORD',
-                        'label' => $this->l('Password'),
-                    ),
-                ),
-                'submit' => array(
-                    'title' => $this->l('Save'),
-                ),
-            ),
-        );
+                        'name' => 'PSKYC_RETENTION_DAYS',
+                        'label' => $this->l('Retention (days)'),
+                        'desc' => $this->l('Documents older than this will be purged automatically.'),
+                        'col' => 2,
+                    ],
+                    [
+                        'type' => 'categories',
+                        'name' => 'PSKYC_ALLOWED_CATEGORIES',
+                        'label' => $this->l('Categories requiring KYC'),
+                        'tree' => [
+                            'root_category' => (int) Configuration::get('PS_HOME_CATEGORY'),
+                        ],
+                    ],
+                ],
+                'submit' => ['title' => $this->l('Save')],
+            ],
+        ];
     }
 
-    /**
-     * Set values for the inputs.
-     */
     protected function getConfigFormValues()
     {
-        return array(
-            'PSKYC_LIVE_MODE' => Configuration::get('PSKYC_LIVE_MODE', true),
-            'PSKYC_ACCOUNT_EMAIL' => Configuration::get('PSKYC_ACCOUNT_EMAIL', 'contact@prestashop.com'),
-            'PSKYC_ACCOUNT_PASSWORD' => Configuration::get('PSKYC_ACCOUNT_PASSWORD', null),
-        );
+        return [
+            'PSKYC_RETENTION_DAYS' => (int) Configuration::get('PSKYC_RETENTION_DAYS'),
+            'PSKYC_ALLOWED_CATEGORIES' => json_decode(Configuration::get('PSKYC_ALLOWED_CATEGORIES') ?: '[]', true),
+        ];
     }
 
     /**
@@ -188,13 +174,13 @@ class Pskyc extends Module
     }
 
     /**
-    * Add the CSS & JavaScript files you want to be loaded in the BO.
-    */
+     * Add the CSS & JavaScript files you want to be loaded in the BO.
+     */
     public function hookDisplayBackOfficeHeader()
     {
         if (Tools::getValue('configure') == $this->name) {
-            $this->context->controller->addJS($this->_path.'views/js/back.js');
-            $this->context->controller->addCSS($this->_path.'views/css/back.css');
+            $this->context->controller->addJS($this->_path . 'views/js/back.js');
+            $this->context->controller->addCSS($this->_path . 'views/css/back.css');
         }
     }
 
@@ -203,8 +189,8 @@ class Pskyc extends Module
      */
     public function hookHeader()
     {
-        $this->context->controller->addJS($this->_path.'/views/js/front.js');
-        $this->context->controller->addCSS($this->_path.'/views/css/front.css');
+        $this->context->controller->addJS($this->_path . '/views/js/front.js');
+        $this->context->controller->addCSS($this->_path . '/views/css/front.css');
     }
 
     public function hookActionAdminControllerSetMedia()
