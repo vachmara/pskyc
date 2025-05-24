@@ -213,8 +213,18 @@ class Pskyc extends Module
         /* Place your code here. */
     }
 
+    /**
+     * @return string
+     */
     public function hookDisplayCustomerAccount()
     {
-        /* Place your code here. */
+        $context = Context::getContext();
+
+        $this->context->smarty->assign([
+            'frontController' => $context->link->getModuleLink($this->name, 'kyc', [], true),
+            'customerId' => $context->customer->id,
+        ]);
+
+        return $this->fetch('module:' . $this->name . '/views/templates/front/account/box.tpl');
     }
 }
