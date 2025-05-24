@@ -221,7 +221,7 @@ class Pskyc extends Module
         $context = Context::getContext();
 
         $this->context->smarty->assign([
-            'frontController' => $context->link->getModuleLink($this->name, 'kyc', [], true),
+            'frontController' => $context->link->getModuleLink($this->name, 'verify', [], true),
             'customerId' => $context->customer->id,
         ]);
 
