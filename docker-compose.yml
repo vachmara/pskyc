@@ -1,0 +1,29 @@
+name: flashlight-test-module
+services:
+  prestashop:
+    image: prestashop/prestashop-flashlight:latest
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      - PS_DOMAIN=localhost:8000
+      - INIT_SCRIPTS_DIR=/tmp/init-scripts
+    ports:
+      - 8000:80
+    volumes:
+      - ./:/var/www/html/modules/pskyc
+
+  mysql:
+    image: mariadb:lts
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    environment:
+      - MYSQL_HOST=mysql
+      - MYSQL_USER=prestashop
+      - MYSQL_PASSWORD=prestashop
+      - MYSQL_ROOT_PASSWORD=prestashop
+      - MYSQL_PORT=3306
+      - MYSQL_DATABASE=prestashop
