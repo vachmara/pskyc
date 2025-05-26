@@ -67,9 +67,10 @@ class DocumentService
      * @param int $verificationId The verification ID to associate the document with
      * @param array $fileData Uploaded file data from $_FILES
      * @param string $documentType Type of document (e.g., 'passport', 'utility_bill')
+     * @param string|null $side Side of the document ('front' or 'back'), or null for single-sided documents
      * @return array Result array with success status and document ID or error message
      */
-    public function uploadDocument(int $verificationId, array $fileData, string $documentType): array
+    public function uploadDocument(int $verificationId, array $fileData, string $documentType, ?string $side = null): array
     {
         try {
             // Validate file
@@ -90,9 +91,21 @@ class DocumentService
                 ];
             }
 
+            // Check if document type requires both sides and validate completeness
+            if ($this->requiresBothSides($documentType)) {
+                $validationResult = $this->validateDocumentSideRequirement($verificationId, $documentType, $side);
+                if (!$validationResult['valid']) {
+                    return [
+                        'success' => false,
+                        'message' => $validationResult['message']
+                    ];
+                }
+            }
+
             // Generate unique filename
             $extension = $this->getFileExtension($fileData['name']);
-            $filename = uniqid('kyc_') . '_' . time() . '.' . $extension;
+            $sidePrefix = $side ? $side . '_' : '';
+            $filename = uniqid('kyc_' . $sidePrefix) . '_' . time() . '.' . $extension;
             $uploadPath = $this->getUploadDirectory() . '/' . $filename;
 
             // Encrypt and save file
@@ -102,6 +115,7 @@ class DocumentService
             $documentData = [
                 'verification_id' => $verificationId,
                 'type' => $documentType,
+                'side' => $side,
                 'filename' => $fileData['name'],
                 'filesize' => $fileData['size'],
                 'mime' => $this->getMimeType($fileData['tmp_name']),
@@ -116,7 +130,8 @@ class DocumentService
             return [
                 'success' => true,
                 'document_id' => $documentId,
-                'filename' => $filename
+                'filename' => $filename,
+                'side' => $side
             ];
 
         } catch (\Exception $e) {
@@ -344,5 +359,168 @@ class DocumentService
     {
         $retentionDays = (int) Configuration::get('PSKYC_RETENTION_DAYS', 365);
         return date('Y-m-d H:i:s', strtotime('+' . $retentionDays . ' days'));
+    }
+
+    /**
+     * Check if a document type requires both front and back sides
+     * 
+     * @param string $documentType The document type to check
+     * @return bool True if the document requires both sides
+     */
+    public function requiresBothSides(string $documentType): bool
+    {
+        $twoSidedDocuments = [
+            'drivers_license',
+            'national_id',
+            'residence_permit',
+            'id_card'
+        ];
+
+        return in_array($documentType, $twoSidedDocuments);
+    }
+
+    /**
+     * Get the required sides for a document type
+     * 
+     * @param string $documentType The document type
+     * @return array Array of required sides
+     */
+    public function getRequiredSides(string $documentType): array
+    {
+        if ($this->requiresBothSides($documentType)) {
+            return ['front', 'back'];
+        }
+
+        return []; // Single-sided documents don't specify sides
+    }
+
+    /**
+     * Validate document side requirement
+     * 
+     * Checks if the required sides are properly specified and not duplicated
+     * 
+     * @param int $verificationId The verification ID
+     * @param string $documentType The document type
+     * @param string|null $side The side being uploaded
+     * @return array Validation result with 'valid' boolean and 'message' string
+     */
+    private function validateDocumentSideRequirement(int $verificationId, string $documentType, ?string $side): array
+    {
+        // For two-sided documents, side must be specified
+        if ($side === null) {
+            return [
+                'valid' => false,
+                'message' => 'Document side (front/back) must be specified for ' . $documentType
+            ];
+        }
+
+        // Validate side value
+        if (!in_array($side, ['front', 'back'])) {
+            return [
+                'valid' => false,
+                'message' => 'Invalid document side. Must be "front" or "back"'
+            ];
+        }
+
+        // Check if this side already exists for this document type
+        $existingDocuments = $this->documentRepository->findByVerificationIdAndType($verificationId, $documentType);
+        foreach ($existingDocuments as $doc) {
+            if ($doc['side'] === $side) {
+                return [
+                    'valid' => false,
+                    'message' => 'The ' . $side . ' side of this document has already been uploaded'
+                ];
+            }
+        }
+
+        return ['valid' => true];
+    }
+
+    /**
+     * Check if verification has complete documents
+     * 
+     * Validates that all required document types and sides have been uploaded
+     * 
+     * @param int $verificationId The verification ID to check
+     * @return array Result with 'complete' boolean and details about missing documents
+     */
+    public function checkDocumentCompleteness(int $verificationId): array
+    {
+        try {
+            $documents = $this->documentRepository->findByVerificationId($verificationId);
+            $documentsByType = [];
+
+            // Group documents by type
+            foreach ($documents as $doc) {
+                $type = $doc['type'];
+                if (!isset($documentsByType[$type])) {
+                    $documentsByType[$type] = [];
+                }
+                $documentsByType[$type][] = $doc;
+            }
+
+            $missing = [];
+            $requiredTypes = ['identity', 'address']; // Configure as needed
+
+            foreach ($requiredTypes as $category) {
+                // This would need to be configured based on your requirements
+                // For now, we'll check that at least one identity and one address document exists
+                $hasDocument = false;
+                
+                foreach ($documentsByType as $type => $docs) {
+                    if ($this->getDocumentCategory($type) === $category) {
+                        // Check if all required sides are present for two-sided documents
+                        if ($this->requiresBothSides($type)) {
+                            $sides = array_column($docs, 'side');
+                            if (in_array('front', $sides) && in_array('back', $sides)) {
+                                $hasDocument = true;
+                                break;
+                            }
+                        } else {
+                            $hasDocument = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!$hasDocument) {
+                    $missing[] = $category;
+                }
+            }
+
+            return [
+                'complete' => empty($missing),
+                'missing_categories' => $missing,
+                'documents_by_type' => $documentsByType
+            ];
+
+        } catch (\Exception $e) {
+            PrestaShopLogger::addLog('Document completeness check error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            return [
+                'complete' => false,
+                'missing_categories' => ['unknown'],
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Get the category for a document type
+     * 
+     * @param string $documentType The document type
+     * @return string The category ('identity' or 'address')
+     */
+    private function getDocumentCategory(string $documentType): string
+    {
+        $identityDocuments = ['passport', 'drivers_license', 'national_id', 'residence_permit'];
+        $addressDocuments = ['utility_bill', 'bank_statement', 'rental_agreement', 'tax_document', 'insurance_statement', 'government_letter'];
+
+        if (in_array($documentType, $identityDocuments)) {
+            return 'identity';
+        } elseif (in_array($documentType, $addressDocuments)) {
+            return 'address';
+        }
+
+        return 'unknown';
     }
 }

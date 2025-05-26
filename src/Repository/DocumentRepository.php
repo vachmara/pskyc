@@ -87,6 +87,7 @@ class DocumentRepository
         ->values([
             'id_kyc_verification' => ':verification_id',
             'type' => ':type',
+            'side' => ':side',
             'filename' => ':filename',
             'filesize' => ':filesize',
             'mime' => ':mime',
@@ -191,5 +192,30 @@ class DocumentRepository
 
     $result = $query->execute();
     return (int) $result->fetchOne();
+  }
+
+  /**
+   * Find documents by verification ID and type
+   * 
+   * Retrieves all documents of a specific type for a verification request
+   * Useful for checking if front/back sides are complete
+   * 
+   * @param int $verificationId The verification ID to search for
+   * @param string $documentType The document type to filter by
+   * @return array Array of document records
+   */
+  public function findByVerificationIdAndType(int $verificationId, string $documentType): array
+  {
+    $qb = $this->connection->createQueryBuilder();
+    $query = $qb->select('*')
+        ->from(_DB_PREFIX_ . 'kyc_document')
+        ->where('id_kyc_verification = :verification_id')
+        ->andWhere('type = :document_type')
+        ->setParameter('verification_id', $verificationId)
+        ->setParameter('document_type', $documentType)
+        ->orderBy('side', 'ASC'); // front comes before back alphabetically
+
+    $result = $query->execute();
+    return $result->fetchAllAssociative();
   }
 }

@@ -57,22 +57,55 @@
           <select name="id_document_type" id="id_document_type" class="form-control" required>
             <option value="">{l s='Select document type' d='Modules.Pskyc.Shop'}</option>
             <option value="passport">{l s='Passport' d='Modules.Pskyc.Shop'}</option>
-            <option value="drivers_license">{l s='Driver\'s License' d='Modules.Pskyc.Shop'}</option>
-            <option value="national_id">{l s='National ID Card' d='Modules.Pskyc.Shop'}</option>
-            <option value="residence_permit">{l s='Residence Permit' d='Modules.Pskyc.Shop'}</option>
+            <option value="drivers_license" data-requires-both-sides="true">{l s='Driver\'s License' d='Modules.Pskyc.Shop'}</option>
+            <option value="national_id" data-requires-both-sides="true">{l s='National ID Card' d='Modules.Pskyc.Shop'}</option>
+            <option value="residence_permit" data-requires-both-sides="true">{l s='Residence Permit' d='Modules.Pskyc.Shop'}</option>
           </select>
         </div>
 
-        <div class="form-group">
+        {* Single document upload (for passports) *}
+        <div class="form-group" id="id-single-upload">
           <label for="id_document" class="form-control-label required">
             {l s='Upload Identity Document' d='Modules.Pskyc.Shop'}
           </label>
-          <input type="file" name="id_document" id="id_document" class="form-control-file" accept="image/*,.pdf"
-            required />
+          <input type="file" name="id_document" id="id_document" class="form-control-file" accept="image/*,.pdf" />
           <small class="form-text text-muted">
             {l s='Accepted formats: JPG, PNG, PDF. Maximum size: 10MB.' d='Modules.Pskyc.Shop'}
           </small>
           <div class="file-preview" id="id-preview"></div>
+        </div>
+
+        {* Front/Back document uploads (for two-sided documents) *}
+        <div class="form-group" id="id-front-back-upload" style="display: none;">
+          <div class="row">
+            <div class="col-md-6">
+              <label for="id_document_front" class="form-control-label required">
+                <i class="material-icons">credit_card</i>
+                {l s='Front Side' d='Modules.Pskyc.Shop'}
+              </label>
+              <input type="file" name="id_document_front" id="id_document_front" class="form-control-file" accept="image/*,.pdf" />
+              <small class="form-text text-muted">
+                {l s='Upload the front side of your document' d='Modules.Pskyc.Shop'}
+              </small>
+              <div class="file-preview" id="id-front-preview"></div>
+            </div>
+            <div class="col-md-6">
+              <label for="id_document_back" class="form-control-label required">
+                <i class="material-icons">flip_to_back</i>
+                {l s='Back Side' d='Modules.Pskyc.Shop'}
+              </label>
+              <input type="file" name="id_document_back" id="id_document_back" class="form-control-file" accept="image/*,.pdf" />
+              <small class="form-text text-muted">
+                {l s='Upload the back side of your document' d='Modules.Pskyc.Shop'}
+              </small>
+              <div class="file-preview" id="id-back-preview"></div>
+            </div>
+          </div>
+          <div class="alert alert-info mt-3">
+            <i class="material-icons">info</i>
+            <strong>{l s='Important:' d='Modules.Pskyc.Shop'}</strong>
+            {l s='Please ensure both sides of your document are clearly visible and readable. All text and images should be sharp and unobstructed.' d='Modules.Pskyc.Shop'}
+          </div>
         </div>
       </div>
 
@@ -427,13 +460,46 @@
     }
 
     setupFilePreview('id_document', 'id-preview');
+    setupFilePreview('id_document_front', 'id-front-preview');
+    setupFilePreview('id_document_back', 'id-back-preview');
     setupFilePreview('address_document', 'address-preview');
+
+    // Document type change event
+    const idDocumentType = document.getElementById('id_document_type');
+    const idSingleUpload = document.getElementById('id-single-upload');
+    const idFrontBackUpload = document.getElementById('id-front-back-upload');
+
+    if (idDocumentType) {
+      idDocumentType.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const requiresBothSides = selectedOption.getAttribute('data-requires-both-sides');
+
+        if (requiresBothSides === 'true') {
+          idSingleUpload.style.display = 'none';
+          idFrontBackUpload.style.display = 'block';
+          // Clear single upload and make front/back required
+          document.getElementById('id_document').removeAttribute('required');
+          document.getElementById('id_document_front').setAttribute('required', 'required');
+          document.getElementById('id_document_back').setAttribute('required', 'required');
+        } else {
+          idSingleUpload.style.display = 'block';
+          idFrontBackUpload.style.display = 'none';
+          // Clear front/back uploads and make single required
+          document.getElementById('id_document').setAttribute('required', 'required');
+          document.getElementById('id_document_front').removeAttribute('required');
+          document.getElementById('id_document_back').removeAttribute('required');
+        }
+      });
+    }
 
     // Form validation
     const form = document.getElementById('kyc-upload-form');
     if (form) {
       form.addEventListener('submit', function(e) {
-        const idDoc = document.getElementById('id_document');
+        const idDocType = document.getElementById('id_document_type').value;
+        const selectedOption = document.querySelector('#id_document_type option[value="' + idDocType + '"]');
+        const requiresBothSides = selectedOption ? selectedOption.getAttribute('data-requires-both-sides') : false;
+        
         const addressDoc = document.getElementById('address_document');
         const consent = document.getElementById('data_consent');
         const authenticity = document.getElementById('document_authenticity');
@@ -441,9 +507,47 @@
         let valid = true;
         let errors = [];
 
-        // Check file sizes (10MB limit)
-        if (idDoc.files[0] && idDoc.files[0].size > 10 * 1024 * 1024) {
-          errors.push('{l s="Identity document must be smaller than 10MB" d="Modules.Pskyc.Shop"}');
+        // Validate identity documents based on type
+        if (requiresBothSides === 'true') {
+          const frontDoc = document.getElementById('id_document_front');
+          const backDoc = document.getElementById('id_document_back');
+          
+          if (!frontDoc.files[0]) {
+            errors.push('{l s="Please upload the front side of your identity document" d="Modules.Pskyc.Shop"}');
+            valid = false;
+          }
+          if (!backDoc.files[0]) {
+            errors.push('{l s="Please upload the back side of your identity document" d="Modules.Pskyc.Shop"}');
+            valid = false;
+          }
+
+          // Check file sizes (10MB limit)
+          if (frontDoc.files[0] && frontDoc.files[0].size > 10 * 1024 * 1024) {
+            errors.push('{l s="Front side document must be smaller than 10MB" d="Modules.Pskyc.Shop"}');
+            valid = false;
+          }
+          if (backDoc.files[0] && backDoc.files[0].size > 10 * 1024 * 1024) {
+            errors.push('{l s="Back side document must be smaller than 10MB" d="Modules.Pskyc.Shop"}');
+            valid = false;
+          }
+        } else {
+          const idDoc = document.getElementById('id_document');
+          
+          if (!idDoc.files[0]) {
+            errors.push('{l s="Please upload your identity document" d="Modules.Pskyc.Shop"}');
+            valid = false;
+          }
+
+          // Check file sizes (10MB limit)
+          if (idDoc.files[0] && idDoc.files[0].size > 10 * 1024 * 1024) {
+            errors.push('{l s="Identity document must be smaller than 10MB" d="Modules.Pskyc.Shop"}');
+            valid = false;
+          }
+        }
+
+        // Check address document
+        if (!addressDoc.files[0]) {
+          errors.push('{l s="Please upload your proof of address document" d="Modules.Pskyc.Shop"}');
           valid = false;
         }
 

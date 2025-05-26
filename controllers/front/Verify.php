@@ -1,5 +1,8 @@
 <?php
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
+use PrestaShop\Module\Pskyc\Service\VerificationService;
+use PrestaShop\Module\Pskyc\Service\DocumentService;
+use PrestaShop\Module\Pskyc\Service\NotificationService;
 
 /**
  * Class PskycVerifyModuleFrontController
@@ -13,6 +16,21 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
      * @var Pskyc
      */
     public $module;
+
+    /**
+     * @var VerificationService
+     */
+    private $verificationService;
+
+    /**
+     * @var DocumentService
+     */
+    private $documentService;
+
+    /**
+     * @var NotificationService
+     */
+    private $notificationService;
 
     /**
      * Initialize content for the KYC verification page
@@ -32,14 +50,24 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
 
         parent::initContent();
 
+        // Initialize services through module
+        $this->initializeServices();
+
         // Handle form submissions
         if (Tools::isSubmit('action')) {
             $this->processForm();
         }
 
-        // Load existing verification data
+        // Load existing verification data using service
         $verification = $this->getCustomerVerification();
-        $documents = $verification ? $this->getVerificationDocuments($verification['id_kyc_verification']) : [];
+        $documents = [];
+        
+        if ($verification && $this->verificationService) {
+            $verificationWithDocs = $this->verificationService->getVerificationWithDocuments($verification['id_kyc_verification']);
+            if ($verificationWithDocs && isset($verificationWithDocs['documents'])) {
+                $documents = $verificationWithDocs['documents'];
+            }
+        }
 
         $this->context->smarty->assign([
             'pskyc_ps_version' => (bool) version_compare(_PS_VERSION_, '1.7', '>='),
@@ -51,6 +79,26 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
 
         $this->context->smarty->tpl_vars['page']->value['body_classes']['page-customer-account'] = true;
         $this->setTemplate('module:pskyc/views/templates/front/account/page.tpl');
+    }
+
+    /**
+     * Initialize Symfony services
+     * 
+     * Gets services using PrestaShop's service accessor
+     * 
+     * @return void
+     */
+    private function initializeServices()
+    {
+        try {
+            // Use PrestaShop's service accessor pattern
+            $this->verificationService = $this->get('PrestaShop\Module\Pskyc\Service\VerificationService');
+            $this->documentService = $this->get('PrestaShop\Module\Pskyc\Service\DocumentService');
+            $this->notificationService = $this->get('PrestaShop\Module\Pskyc\Service\NotificationService');
+            
+        } catch (Exception $e) {
+            PrestaShopLogger::addLog('Service initialization failed: ' . $e->getMessage(), 2, null, 'Pskyc');
+        }
     }
 
     /**
@@ -85,7 +133,7 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
      * Process document upload submission
      * 
      * Validates form data, uploaded files, and creates verification record
-     * Handles file upload and stores encrypted documents
+     * Handles file upload and stores encrypted documents using Symfony services
      * 
      * @return void
      */
@@ -115,52 +163,187 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
                 return; // Error messages are set in validateUploadedFile
             }
 
-            // Check if customer already has a verification in progress
-            $existingVerification = $this->getCustomerVerification();
-            if ($existingVerification && in_array($existingVerification['status'], ['pending', 'under_review'])) {
-                $this->errors[] = $this->trans('You already have a verification request in progress.', [], 'Modules.Pskyc.Shop');
-                return;
-            }
-
-            // Create new verification record
-            $verificationId = $this->createVerification();
-            if (!$verificationId) {
-                $this->errors[] = $this->trans('Failed to create verification request.', [], 'Modules.Pskyc.Shop');
-                return;
-            }
-
-            // Process documents via uploader controller
-            $uploadResult = $this->processDocuments($verificationId, [
-                'id_document' => [
-                    'file' => $idDocument,
-                    'type' => Tools::getValue('id_document_type'),
-                    'category' => 'identity'
-                ],
-                'address_document' => [
-                    'file' => $addressDocument,
-                    'type' => Tools::getValue('address_document_type'),
-                    'category' => 'address'
-                ]
-            ]);
-
-            if ($uploadResult['success']) {
-                // Log the action
-                $this->logAction($verificationId, 'documents_uploaded', 'Customer uploaded KYC documents');
-                
-                $this->success[] = $this->trans('Your documents have been uploaded successfully and are being reviewed.', [], 'Modules.Pskyc.Shop');
-                
-                // Send notification email to customer
-                $this->sendNotificationEmail('documents_submitted');
-                
-                // Redirect to avoid resubmission
-                Tools::redirect($this->context->link->getModuleLink($this->module->name, 'verify', [], true));
+            // Use service if available, otherwise fallback to legacy method
+            if ($this->verificationService) {
+                $this->processDocumentUploadWithServices($idDocument, $addressDocument);
             } else {
-                $this->errors[] = $uploadResult['message'];
+                $this->processDocumentUploadLegacy($idDocument, $addressDocument);
             }
 
         } catch (Exception $e) {
             PrestaShopLogger::addLog('KYC Upload Error: ' . $e->getMessage(), 3, null, 'Pskyc');
             $this->errors[] = $this->trans('An error occurred while processing your request.', [], 'Modules.Pskyc.Shop');
+        }
+    }
+
+    /**
+     * Process document upload using Symfony services
+     * 
+     * @param array $idDocument Identity document file data (for single-sided documents)
+     * @param array $addressDocument Address document file data
+     * @return void
+     */
+    private function processDocumentUploadWithServices($idDocument, $addressDocument)
+    {
+        // Check if customer already has a verification in progress using service
+        $existingVerifications = $this->verificationService->getCustomerVerifications($this->context->customer->id, 1);
+        if (!empty($existingVerifications)) {
+            $existingVerification = $existingVerifications[0];
+            if (in_array($existingVerification['status'], ['pending', 'under_review'])) {
+                $this->errors[] = $this->trans('You already have a verification request in progress.', [], 'Modules.Pskyc.Shop');
+                return;
+            }
+        }
+
+        // Create new verification record using service
+        $verificationResult = $this->verificationService->createVerification($this->context->customer->id, [
+            'admin_note' => Tools::getValue('additional_notes')
+        ]);
+
+        if (!$verificationResult['success']) {
+            $this->errors[] = $this->trans('Failed to create verification request.', [], 'Modules.Pskyc.Shop');
+            return;
+        }
+
+        $verificationId = $verificationResult['verification_id'];
+        $documentType = Tools::getValue('id_document_type');
+
+        // Handle identity document upload(s)
+        $identityUploadResults = [];
+        
+        // Check if document type requires both sides
+        if ($this->documentService && $this->documentService->requiresBothSides($documentType)) {
+            // Handle front/back uploads
+            if (isset($_FILES['id_document_front']) && $_FILES['id_document_front']['error'] === UPLOAD_ERR_OK) {
+                $identityUploadResults['front'] = $this->documentService->uploadDocument(
+                    $verificationId,
+                    $_FILES['id_document_front'],
+                    $documentType,
+                    'front'
+                );
+            }
+            
+            if (isset($_FILES['id_document_back']) && $_FILES['id_document_back']['error'] === UPLOAD_ERR_OK) {
+                $identityUploadResults['back'] = $this->documentService->uploadDocument(
+                    $verificationId,
+                    $_FILES['id_document_back'],
+                    $documentType,
+                    'back'
+                );
+            }
+        } else {
+            // Handle single document upload
+            $identityUploadResults['single'] = $this->documentService->uploadDocument(
+                $verificationId,
+                $idDocument,
+                $documentType
+            );
+        }
+
+        // Upload address document
+        $addressDocumentResult = $this->documentService->uploadDocument(
+            $verificationId,
+            $addressDocument,
+            Tools::getValue('address_document_type')
+        );
+
+        // Check if all uploads were successful
+        $allIdentityUploadsSuccessful = true;
+        $identityErrors = [];
+        
+        foreach ($identityUploadResults as $side => $result) {
+            if (!$result['success']) {
+                $allIdentityUploadsSuccessful = false;
+                $identityErrors[] = ucfirst($side) . ' side: ' . $result['message'];
+            }
+        }
+
+        if ($allIdentityUploadsSuccessful && $addressDocumentResult['success']) {
+            // Check if all required documents are complete
+            $completenessCheck = $this->documentService->checkDocumentCompleteness($verificationId);
+            
+            if ($completenessCheck['complete']) {
+                $this->success[] = $this->trans('Your documents have been uploaded successfully and are being reviewed.', [], 'Modules.Pskyc.Shop');
+            } else {
+                $this->success[] = $this->trans('Documents uploaded successfully. Additional documents may be required.', [], 'Modules.Pskyc.Shop');
+            }
+            
+            // Send notification email to customer using service
+            $customerData = $this->getCustomerData($this->context->customer->id);
+            if ($customerData && $this->notificationService) {
+                $verification = $this->verificationService->getVerificationWithDocuments($verificationId);
+                $this->notificationService->sendStatusChangeNotification(
+                    $verification,
+                    $customerData,
+                    null // No previous status for new submission
+                );
+            }
+            
+            // Redirect to avoid resubmission
+            Tools::redirect($this->context->link->getModuleLink($this->module->name, 'verify', [], true));
+        } else {
+            // Handle upload errors
+            $errors = [];
+            if (!$allIdentityUploadsSuccessful) {
+                $errors = array_merge($errors, $identityErrors);
+            }
+            if (!$addressDocumentResult['success']) {
+                $errors[] = 'Address document: ' . $addressDocumentResult['message'];
+            }
+            $this->errors[] = implode('. ', $errors);
+        }
+    }
+
+    /**
+     * Process document upload using legacy methods
+     * 
+     * @param array $idDocument Identity document file data
+     * @param array $addressDocument Address document file data
+     * @return void
+     */
+    private function processDocumentUploadLegacy($idDocument, $addressDocument)
+    {
+        // Check if customer already has a verification in progress
+        $existingVerification = $this->getCustomerVerificationLegacy();
+        if ($existingVerification && in_array($existingVerification['status'], ['pending', 'under_review'])) {
+            $this->errors[] = $this->trans('You already have a verification request in progress.', [], 'Modules.Pskyc.Shop');
+            return;
+        }
+
+        // Create new verification record
+        $verificationId = $this->createVerificationLegacy();
+        if (!$verificationId) {
+            $this->errors[] = $this->trans('Failed to create verification request.', [], 'Modules.Pskyc.Shop');
+            return;
+        }
+
+        // Process documents via uploader controller
+        $uploadResult = $this->processDocuments($verificationId, [
+            'id_document' => [
+                'file' => $idDocument,
+                'type' => Tools::getValue('id_document_type'),
+                'category' => 'identity'
+            ],
+            'address_document' => [
+                'file' => $addressDocument,
+                'type' => Tools::getValue('address_document_type'),
+                'category' => 'address'
+            ]
+        ]);
+
+        if ($uploadResult['success']) {
+            // Log the action
+            $this->logAction($verificationId, 'documents_uploaded', 'Customer uploaded KYC documents');
+            
+            $this->success[] = $this->trans('Your documents have been uploaded successfully and are being reviewed.', [], 'Modules.Pskyc.Shop');
+            
+            // Send notification email to customer
+            $this->sendNotificationEmail('documents_submitted');
+            
+            // Redirect to avoid resubmission
+            Tools::redirect($this->context->link->getModuleLink($this->module->name, 'verify', [], true));
+        } else {
+            $this->errors[] = $uploadResult['message'];
         }
     }
 
@@ -204,11 +387,31 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
     /**
      * Get customer's current verification record
      * 
-     * Retrieves the most recent verification record for the logged-in customer
+     * Retrieves the most recent verification record for the logged-in customer using service
+     * 
+     * @return array|null Verification record array or null if none found
+     */
+    protected function getCustomerVerification()
+    {
+        try {
+            if ($this->verificationService) {
+                $verifications = $this->verificationService->getCustomerVerifications($this->context->customer->id, 1);
+                return !empty($verifications) ? $verifications[0] : null;
+            } else {
+                return $this->getCustomerVerificationLegacy();
+            }
+        } catch (Exception $e) {
+            PrestaShopLogger::addLog('Get customer verification error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            return $this->getCustomerVerificationLegacy();
+        }
+    }
+
+    /**
+     * Get customer's current verification record using legacy method
      * 
      * @return array|false Verification record array or false if none found
      */
-    protected function getCustomerVerification()
+    protected function getCustomerVerificationLegacy()
     {
         $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'kyc_verification` 
                 WHERE `id_customer` = ' . (int)$this->context->customer->id . ' 
@@ -218,30 +421,11 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
     }
 
     /**
-     * Get verification documents
-     * 
-     * Retrieves all documents associated with a verification record
-     * 
-     * @param int $verificationId The verification record ID
-     * @return array Array of document records
-     */
-    protected function getVerificationDocuments($verificationId)
-    {
-        $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'kyc_document` 
-                WHERE `id_kyc_verification` = ' . (int)$verificationId . ' 
-                ORDER BY `date_uploaded` ASC';
-        
-        return Db::getInstance()->executeS($sql);
-    }
-
-    /**
-     * Create new verification record
-     * 
-     * Inserts a new verification record with pending status
+     * Create new verification record using legacy method
      * 
      * @return int|false New verification ID or false on failure
      */
-    protected function createVerification()
+    protected function createVerificationLegacy()
     {
         $sql = 'INSERT INTO `' . _DB_PREFIX_ . 'kyc_verification` 
                 (`id_customer`, `status`, `date_submitted`) 
@@ -255,9 +439,45 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
     }
 
     /**
+     * Get verification documents
+     * 
+     * Retrieves all documents associated with a verification record
+     * This method is kept for backward compatibility but delegates to service
+     * 
+     * @param int $verificationId The verification record ID
+     * @return array Array of document records
+     */
+    protected function getVerificationDocuments($verificationId)
+    {
+        try {
+            $verification = $this->verificationService->getVerificationWithDocuments($verificationId);
+            return $verification ? ($verification['documents'] ?? []) : [];
+        } catch (Exception $e) {
+            PrestaShopLogger::addLog('Get verification documents error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            return [];
+        }
+    }
+
+    /**
+     * Create new verification record
+     * 
+     * This method is deprecated - use VerificationService instead
+     * Kept for backward compatibility
+     * 
+     * @deprecated Use VerificationService::createVerification() instead
+     * @return int|false New verification ID or false on failure
+     */
+    protected function createVerification()
+    {
+        $result = $this->verificationService->createVerification($this->context->customer->id);
+        return $result['success'] ? $result['verification_id'] : false;
+    }
+
+    /**
      * Process documents using uploader controller logic
      * 
-     * Delegates document processing to the uploader controller
+     * This method is deprecated - DocumentService handles uploads now
+     * Kept for backward compatibility
      * 
      * @param int $verificationId The verification record ID
      * @param array $documents Array of documents to process
@@ -265,19 +485,46 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
      */
     protected function processDocuments($verificationId, $documents)
     {
-        require_once _PS_MODULE_DIR_ . 'pskyc/controllers/front/uploader.php';
-        
-        $uploader = new PskycUploaderModuleFrontController();
-        $uploader->module = $this->module;
-        
-        return $uploader->processDocuments($verificationId, $documents);
+        // Fallback to old uploader for backward compatibility
+        if (!$this->documentService) {
+            require_once _PS_MODULE_DIR_ . 'pskyc/controllers/front/uploader.php';
+            
+            $uploader = new PskycUploaderModuleFrontController();
+            $uploader->module = $this->module;
+            
+            return $uploader->processDocuments($verificationId, $documents);
+        }
+
+        // Use DocumentService for new implementation
+        $results = [];
+        foreach ($documents as $key => $docData) {
+            $result = $this->documentService->uploadDocument(
+                $verificationId,
+                $docData['file'],
+                $docData['type']
+            );
+            $results[$key] = $result;
+        }
+
+        // Return consolidated result
+        $allSuccessful = array_reduce($results, function($carry, $result) {
+            return $carry && $result['success'];
+        }, true);
+
+        return [
+            'success' => $allSuccessful,
+            'message' => $allSuccessful ? 'All documents uploaded successfully' : 'Some documents failed to upload',
+            'results' => $results
+        ];
     }
 
     /**
      * Log action to the KYC log table
      * 
-     * Records customer actions and system events for audit trail
+     * This method is deprecated - logging is handled by services now
+     * Kept for backward compatibility
      * 
+     * @deprecated Logging is handled automatically by services
      * @param int $verificationId The verification record ID
      * @param string $action Action performed (e.g., 'documents_uploaded')
      * @param string $message Descriptive message about the action
@@ -285,26 +532,52 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
      */
     protected function logAction($verificationId, $action, $message)
     {
-        $sql = 'INSERT INTO `' . _DB_PREFIX_ . 'kyc_log` 
-                (`id_kyc_verification`, `id_customer`, `action`, `message`, `ip_address`, `user_agent`, `date_add`) 
-                VALUES (' . (int)$verificationId . ', ' . (int)$this->context->customer->id . ', "' . pSQL($action) . '", 
-                "' . pSQL($message) . '", "' . pSQL(Tools::getRemoteAddr()) . '", "' . pSQL($_SERVER['HTTP_USER_AGENT']) . '", NOW())';
-        
-        Db::getInstance()->execute($sql);
+        // Logging is now handled automatically by services
+        // This method is kept for backward compatibility
+        PrestaShopLogger::addLog("KYC Action - {$action}: {$message}", 1, null, 'Pskyc');
     }
 
     /**
      * Send notification email to customer
      * 
-     * Sends email notifications based on verification status changes
+     * This method is deprecated - use NotificationService instead
+     * Kept for backward compatibility
      * 
+     * @deprecated Use NotificationService::sendStatusChangeNotification() instead
      * @param string $type Email type (e.g., 'documents_submitted', 'approved', 'rejected')
      * @return void
      */
     protected function sendNotificationEmail($type)
     {
-        // Implementation for sending emails based on type
-        // This would integrate with PrestaShop's Mail class
+        // Notifications are now handled by NotificationService
+        // This method is kept for backward compatibility
+        if ($this->notificationService) {
+            $customerData = $this->getCustomerData($this->context->customer->id);
+            $verification = $this->getCustomerVerification();
+            
+            if ($customerData && $verification) {
+                $this->notificationService->sendStatusChangeNotification($verification, $customerData, null);
+            }
+        }
+    }
+
+    /**
+     * Get customer data
+     * 
+     * Retrieves customer information for notifications and processing
+     * 
+     * @param int $customerId The customer ID
+     * @return array|null Customer data or null if not found
+     */
+    private function getCustomerData(int $customerId): ?array
+    {
+        try {
+            $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'customer` WHERE `id_customer` = ' . (int)$customerId;
+            return Db::getInstance()->getRow($sql);
+        } catch (Exception $e) {
+            PrestaShopLogger::addLog('Get customer data error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            return null;
+        }
     }
 
     /**

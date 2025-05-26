@@ -41,6 +41,12 @@ class Document
     private $type;
 
     /**
+     * @var string|null
+     * @ORM\Column(name="side", type="string", length=16, nullable=true)
+     */
+    private $side;
+
+    /**
      * @var string
      * @ORM\Column(name="filename", type="string", length=255)
      */
@@ -139,6 +145,28 @@ class Document
     public function setType(string $type): self
     {
         $this->type = $type;
+        return $this;
+    }
+
+    /**
+     * Get document side
+     * 
+     * @return string|null The document side ('front' or 'back'), or null if not applicable
+     */
+    public function getSide(): ?string
+    {
+        return $this->side;
+    }
+    
+    /**
+     * Set document side
+     * 
+     * @param string|null $side The document side to set ('front' or 'back')
+     * @return self
+     */
+    public function setSide(?string $side): self
+    {
+        $this->side = $side;
         return $this;
     }
 
