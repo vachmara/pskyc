@@ -6,10 +6,8 @@
 
 {block name='page_content'}
     <div class="container">
-        <div class="row">
-            <div class="col-xs-12">
-                {include file='modules/pskyc/views/templates/front/account/form.tpl'}
-            </div>
-        </div>
+        <section class="page_content">
+            {include file='modules/pskyc/views/templates/front/account/form.tpl'}
+        </section>
     </div>
 {/block}
