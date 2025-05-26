@@ -107,16 +107,18 @@ class VerificationRepository
      * 
      * @param int $customerId The customer ID
      * @param string $status Initial status (default: 'pending')
+     * @param string|null $customerNote Optional customer note
      * @return int The ID of the newly created verification
      */
-    public function create(int $customerId, string $status = 'pending'): int
+    public function create(int $customerId, string $status = 'pending', ?string $customerNote = null): int
     {
         $qb = $this->connection->createQueryBuilder();
         $qb->insert(_DB_PREFIX_ . 'kyc_verification')
             ->values([
                 'id_customer' => ':customer_id',
                 'status' => ':status',
-                'date_submitted' => 'NOW()'
+                'date_submitted' => 'NOW()',
+                'customer_note' => ':customer_note'
             ])
             ->setParameters([
                 'customer_id' => $customerId,
@@ -253,5 +255,26 @@ class VerificationRepository
             ->setParameter('verification_id', $verificationId);
 
         return (bool) $qb->execute();
+    }
+
+    /**
+     * Find active verifications for a customer
+     * 
+     * @param int $customerId The customer ID to search for
+     * @return array Array of active verification records for the customer
+     */
+    public function findActiveByCustomerId(int $customerId): array
+    {
+        $qb = $this->connection->createQueryBuilder();
+        $query = $qb->select('*')
+            ->from(_DB_PREFIX_ . 'kyc_verification')
+            ->where('id_customer = :customer_id')
+            ->andWhere('status != :expired_status')
+            ->setParameter('customer_id', $customerId)
+            ->setParameter('expired_status', 'expired')
+            ->orderBy('date_submitted', 'DESC');
+
+        $result = $query->execute();
+        return $result->fetchAllAssociative();
     }
 }

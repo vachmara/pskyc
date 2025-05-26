@@ -74,24 +74,17 @@ class VerificationService
     {
         try {
             // Check if customer already has an active verification
-            $existingVerification = $this->verificationRepository->findActiveByCustomerId($customerId);
-            if ($existingVerification) {
+            $existingVerificationArray = $this->verificationRepository->findActiveByCustomerId($customerId);
+            if (!empty($existingVerificationArray)) {
+                $existingVerification = $existingVerificationArray[0]; // Get the first active verification
                 return [
                     'success' => false,
                     'message' => 'Customer already has an active verification request',
                     'verification_id' => $existingVerification['id_kyc_verification']
                 ];
             }
-
-            // Create new verification record
-            $verificationData = [
-                'id_customer' => $customerId,
-                'status' => 'pending',
-                'date_submitted' => date('Y-m-d H:i:s'),
-                'admin_note' => $options['admin_note'] ?? null
-            ];
-
-            $verificationId = $this->verificationRepository->create($verificationData);
+            
+            $verificationId = $this->verificationRepository->create($customerId, status: $options['customer_note'] ?? null);
 
             if ($verificationId) {
                 // Log the creation
@@ -244,7 +237,7 @@ class VerificationService
     public function getMostRecentVerification(int $customerId): array
     {
         try {
-            return $this->verificationRepository->findByCustomerId($customerId) ?: [];
+            return $this->verificationRepository->findByCustomerId(customerId: $customerId) ?: [];
         } catch (\Exception $e) {
             PrestaShopLogger::addLog('Get customer verifications error: ' . $e->getMessage(), 3, null, 'Pskyc');
             return [];
@@ -354,15 +347,15 @@ class VerificationService
     private function logAction(int $verificationId, ?int $customerId, ?int $employeeId, string $action, string $message): void
     {
         try {
-            $this->logRepository->create([
-                'id_kyc_verification' => $verificationId,
-                'id_customer' => $customerId,
-                'id_employee' => $employeeId,
-                'action' => $action,
-                'message' => $message,
-                'ip_address' => $_SERVER['REMOTE_ADDR'] ?? null,
-                'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? null
-            ]);
+            $this->logRepository->createLog(
+                $verificationId,
+                $employeeId,
+                $customerId,
+                $action,
+                $message,
+                $_SERVER['REMOTE_ADDR'] ?? '',
+                $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown'
+            );
         } catch (\Exception $e) {
             PrestaShopLogger::addLog('Log action error: ' . $e->getMessage(), 3, null, 'Pskyc');
         }

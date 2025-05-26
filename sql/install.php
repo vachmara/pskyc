@@ -16,6 +16,7 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'kyc_verification` (
     `id_customer`         INT(11) UNSIGNED NOT NULL,
     `status`              VARCHAR(32)     NOT NULL DEFAULT "pending",
     `admin_note`          TEXT            NULL,
+    `customer_note`       TEXT            NULL,
     `date_submitted`      DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `date_validated`      DATETIME        NULL,
     `date_expiry`         DATETIME        NULL,

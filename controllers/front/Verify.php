@@ -61,7 +61,7 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
         // Load existing verification data using service
         $verification = $this->getCustomerVerification();
         $documents = [];
-        
+
         if ($verification) {
             $verificationWithDocs = $this->verificationService->getVerificationWithDocuments($verification['id_kyc_verification']);
             if ($verificationWithDocs && isset($verificationWithDocs['documents'])) {
@@ -95,7 +95,7 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
             $this->verificationService = $this->module->get('PrestaShop\Module\Pskyc\Service\VerificationService');
             $this->documentService = $this->module->get('PrestaShop\Module\Pskyc\Service\DocumentService');
             $this->notificationService = $this->module->get('PrestaShop\Module\Pskyc\Service\NotificationService');
-            
+
         } catch (Exception $e) {
             PrestaShopLogger::addLog('Service initialization failed: ' . $e->getMessage(), 2, null, 'Pskyc');
             throw new PrestaShopException('Required services not available');
@@ -182,18 +182,15 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
     private function processDocumentUploadWithServices($idDocument, $addressDocument)
     {
         // Check if customer already has a verification in progress using service
-        $existingVerifications = $this->verificationService->getMostRecentVerification($this->context->customer->id);
-        if (!empty($existingVerifications)) {
-            $existingVerification = $existingVerifications[0];
-            if (in_array($existingVerification['status'], ['pending', 'under_review'])) {
-                $this->errors[] = $this->trans('You already have a verification request in progress.', [], 'Modules.Pskyc.Shop');
-                return;
-            }
+        $existingVerification = $this->verificationService->getMostRecentVerification($this->context->customer->id);
+        if ($existingVerification) {
+            $this->errors[] = $this->trans('You already have a verification request in progress.', [], 'Modules.Pskyc.Shop');
+            return;
         }
 
         // Create new verification record using service
         $verificationResult = $this->verificationService->createVerification($this->context->customer->id, [
-            'admin_note' => Tools::getValue('additional_notes')
+            'customer_note' => Tools::getValue('additional_notes')
         ]);
 
         if (!$verificationResult['success']) {
@@ -206,7 +203,7 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
 
         // Handle identity document upload(s)
         $identityUploadResults = [];
-        
+
         // Check if document type requires both sides
         if ($this->documentService->requiresBothSides($documentType)) {
             // Handle front/back uploads
@@ -218,7 +215,7 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
                     'front'
                 );
             }
-            
+
             if (isset($_FILES['id_document_back']) && $_FILES['id_document_back']['error'] === UPLOAD_ERR_OK) {
                 $identityUploadResults['back'] = $this->documentService->uploadDocument(
                     $verificationId,
@@ -246,7 +243,7 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
         // Check if all uploads were successful
         $allIdentityUploadsSuccessful = true;
         $identityErrors = [];
-        
+
         foreach ($identityUploadResults as $side => $result) {
             if (!$result['success']) {
                 $allIdentityUploadsSuccessful = false;
@@ -257,13 +254,13 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
         if ($allIdentityUploadsSuccessful && $addressDocumentResult['success']) {
             // Check if all required documents are complete
             $completenessCheck = $this->documentService->checkDocumentCompleteness($verificationId);
-            
+
             if ($completenessCheck['complete']) {
                 $this->success[] = $this->trans('Your documents have been uploaded successfully and are being reviewed.', [], 'Modules.Pskyc.Shop');
             } else {
                 $this->success[] = $this->trans('Documents uploaded successfully. Additional documents may be required.', [], 'Modules.Pskyc.Shop');
             }
-            
+
             // Send notification email to customer using service
             $customerData = $this->getCustomerData($this->context->customer->id);
             if ($customerData) {
@@ -274,7 +271,7 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
                     null // No previous status for new submission
                 );
             }
-            
+
             // Redirect to avoid resubmission
             Tools::redirect($this->context->link->getModuleLink($this->module->name, 'verify', [], true));
         } else {
@@ -337,8 +334,8 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
     protected function getCustomerVerification()
     {
         try {
-            $verifications = $this->verificationService->getMostRecentVerification($this->context->customer->id);
-            return !empty($verifications) ? $verifications[0] : null;
+            $verification = $this->verificationService->getMostRecentVerification($this->context->customer->id);
+            return $verification ?? null;
         } catch (Exception $e) {
             PrestaShopLogger::addLog('Get customer verification error: ' . $e->getMessage(), 3, null, 'Pskyc');
             return null;
@@ -356,7 +353,7 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
     private function getCustomerData(int $customerId): ?array
     {
         try {
-            $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'customer` WHERE `id_customer` = ' . (int)$customerId;
+            $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'customer` WHERE `id_customer` = ' . (int) $customerId;
             return Db::getInstance()->getRow($sql);
         } catch (Exception $e) {
             PrestaShopLogger::addLog('Get customer data error: ' . $e->getMessage(), 3, null, 'Pskyc');
@@ -380,8 +377,8 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
         $breadcrumb = parent::getBreadcrumbLinks();
         $breadcrumb['links'][] = $this->addMyAccountToBreadcrumb();
         $breadcrumb['links'][] = [
-           'title' => $this->trans('KYC - Verify your identity', [], 'Modules.Pskyc.Shop'),
-           'url' => $this->context->link->getModuleLink($this->module->name, 'verify', [], true),
+            'title' => $this->trans('KYC - Verify your identity', [], 'Modules.Pskyc.Shop'),
+            'url' => $this->context->link->getModuleLink($this->module->name, 'verify', [], true),
         ];
 
         return $breadcrumb;

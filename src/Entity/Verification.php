@@ -54,6 +54,12 @@ class Verification
     private $adminNote;
 
     /**
+     * @var string|null
+     * @ORM\Column(name="customer_note", type="text", nullable=true)
+     */
+    private $customerNote;
+
+    /**
      * @var DateTime
      * @ORM\Column(name="date_submitted", type="datetime")
      */
@@ -144,6 +150,28 @@ class Verification
     public function setAdminNote(?string $note): self
     {
         $this->adminNote = $note;
+        return $this;
+    }
+
+    /**
+     * Get customer note
+     * 
+     * @return string|null Customer note/comment about this verification
+     */
+    public function getCustomerNote(): ?string
+    {
+        return $this->customerNote;
+    }
+
+    /**
+     * Set customer note
+     * 
+     * @param string|null $note Customer note/comment to set
+     * @return self
+     */
+    public function setCustomerNote(?string $note): self
+    {
+        $this->customerNote = $note;
         return $this;
     }
 
