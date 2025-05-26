@@ -1,0 +1,51 @@
+services:
+  _defaults:
+    public: true
+
+  Pskyc:
+    class: "Pskyc"
+    factory: ["Module", "getInstanceByName"]
+    arguments:
+      - 'pskyc'
+
+  # Repositories
+  PrestaShop\Module\Pskyc\Repository\VerificationRepository:
+    class: 'PrestaShop\Module\Pskyc\Repository\VerificationRepository'
+    arguments:
+      - '@doctrine.dbal.default_connection'
+
+  PrestaShop\Module\Pskyc\Repository\DocumentRepository:
+    class: 'PrestaShop\Module\Pskyc\Repository\DocumentRepository'
+    arguments:
+      - '@doctrine.dbal.default_connection'
+
+  PrestaShop\Module\Pskyc\Repository\LogRepository:
+    class: 'PrestaShop\Module\Pskyc\Repository\LogRepository'
+    arguments:
+      - '@doctrine.dbal.default_connection'
+
+  # Core Services
+  PrestaShop\Module\Pskyc\Service\EncryptionService:
+    class: 'PrestaShop\Module\Pskyc\Service\EncryptionService'
+
+  # Business Services
+  PrestaShop\Module\Pskyc\Service\DocumentService:
+    class: 'PrestaShop\Module\Pskyc\Service\DocumentService'
+    arguments:
+      - '@PrestaShop\Module\Pskyc\Repository\DocumentRepository'
+      - '@PrestaShop\Module\Pskyc\Repository\VerificationRepository'
+      - '@PrestaShop\Module\Pskyc\Service\EncryptionService'
+
+  PrestaShop\Module\Pskyc\Service\NotificationService:
+    class: 'PrestaShop\Module\Pskyc\Service\NotificationService'
+    arguments:
+      - '@=service("Pskyc").getTranslator()'
+
+  PrestaShop\Module\Pskyc\Service\VerificationService:
+    class: 'PrestaShop\Module\Pskyc\Service\VerificationService'
+    arguments:
+      - '@PrestaShop\Module\Pskyc\Repository\VerificationRepository'
+      - '@PrestaShop\Module\Pskyc\Repository\DocumentRepository'
+      - '@PrestaShop\Module\Pskyc\Repository\LogRepository'
+      - '@PrestaShop\Module\Pskyc\Service\DocumentService'
+      - '@PrestaShop\Module\Pskyc\Service\NotificationService'

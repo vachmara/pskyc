@@ -236,18 +236,15 @@ class VerificationService
     }
 
     /**
-     * Get customer verifications
-     * 
-     * Retrieves all verification records for a specific customer
+     * Get most recent verification for a customer
      * 
      * @param int $customerId The customer ID
-     * @param int $limit Maximum number of records to return
      * @return array Array of verification records
      */
-    public function getCustomerVerifications(int $customerId, int $limit = 10): array
+    public function getMostRecentVerification(int $customerId): array
     {
         try {
-            return $this->verificationRepository->findByCustomerId($customerId, $limit);
+            return $this->verificationRepository->findByCustomerId($customerId) ?: [];
         } catch (\Exception $e) {
             PrestaShopLogger::addLog('Get customer verifications error: ' . $e->getMessage(), 3, null, 'Pskyc');
             return [];

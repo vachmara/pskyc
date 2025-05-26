@@ -3,6 +3,11 @@
  * MIT License
  * Copyright (c) 2025 Valentin Chmara
  */
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 $sql = array();
 
 /* KYC VERIFICATION */
@@ -23,6 +28,7 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'kyc_document` (
     `id_kyc_document`     INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
     `id_kyc_verification` INT(11) UNSIGNED NOT NULL,
     `type`                VARCHAR(64)     NOT NULL,
+    `side`                VARCHAR(16)     NULL,
     `filename`            VARCHAR(255)    NOT NULL,
     `filesize`            INT(11) UNSIGNED NOT NULL,
     `mime`                VARCHAR(128)    NOT NULL,
@@ -32,9 +38,11 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'kyc_document` (
     `date_uploaded`       DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `expires_at`          DATETIME        NULL,
     PRIMARY KEY (`id_kyc_document`),
-    KEY `idx_verif` (`id_kyc_verification`)
+    KEY `idx_verif` (`id_kyc_verification`),
+    CONSTRAINT `fk_kyc_document_verification` FOREIGN KEY (`id_kyc_verification`) REFERENCES `' . _DB_PREFIX_ . 'kyc_verification` (`id_kyc_verification`) ON DELETE CASCADE
   ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;';
 
+/* KYC LOG */
 $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'kyc_log` (
     `id_kyc_log`          INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
     `id_kyc_verification` INT(11) UNSIGNED NOT NULL,
@@ -42,11 +50,15 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'kyc_log` (
     `id_customer`         INT(11) UNSIGNED NULL,
     `action`              VARCHAR(32)     NOT NULL,
     `message`             TEXT            NULL,
-    `ip_address`          VARBINARY(16)   NULL,
+    `ip_address`          VARCHAR(39)     NULL,
     `user_agent`          VARCHAR(255)    NULL,
     `date_add`            DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `date_upd`            DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id_kyc_log`),
-    KEY `idx_verif` (`id_kyc_verification`)
+    KEY `idx_verif` (`id_kyc_verification`),
+    KEY `idx_employee` (`id_employee`),
+    KEY `idx_customer` (`id_customer`),
+    CONSTRAINT `fk_kyc_log_verification` FOREIGN KEY (`id_kyc_verification`) REFERENCES `' . _DB_PREFIX_ . 'kyc_verification` (`id_kyc_verification`) ON DELETE CASCADE
   ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;';
 
 foreach ($sql as $query) {
@@ -54,3 +66,5 @@ foreach ($sql as $query) {
         return false;
     }
 }
+
+return true;

@@ -57,16 +57,16 @@ class VerificationRepository
      * 
      * Retrieves the most recent verification record for a specific customer
      * 
-     * @param CustomerId $customerId The customer ID to search for
+     * @param int $customerId The customer ID to search for
      * @return array|null Most recent verification record or null if none found
      */
-    public function findByCustomerId(CustomerId $customerId): ?array
+    public function findByCustomerId(int $customerId): ?array
     {
         $qb = $this->connection->createQueryBuilder();
         $query = $qb->select('*')
             ->from(_DB_PREFIX_ . 'kyc_verification')
             ->where('id_customer = :customer_id')
-            ->setParameter('customer_id', $customerId->getValue())
+            ->setParameter('customer_id', $customerId)
             ->orderBy('date_submitted', 'DESC')
             ->setMaxResults(1);
 
@@ -84,16 +84,16 @@ class VerificationRepository
      * 
      * Retrieves all verification records for a specific customer
      * 
-     * @param CustomerId $customerId The customer ID to search for
+     * @param int $customerId The customer ID to search for
      * @return array Array of verification records ordered by date descending
      */
-    public function findAllByCustomerId(CustomerId $customerId): array
+    public function findAllByCustomerId(int $customerId): array
     {
         $qb = $this->connection->createQueryBuilder();
         $query = $qb->select('*')
             ->from(_DB_PREFIX_ . 'kyc_verification')
             ->where('id_customer = :customer_id')
-            ->setParameter('customer_id', $customerId->getValue())
+            ->setParameter('customer_id', $customerId)
             ->orderBy('date_submitted', 'DESC');
 
         $result = $query->execute();

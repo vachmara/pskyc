@@ -19,14 +19,14 @@ class DocumentService
     private $documentRepository;
 
     /**
-     * @var EncryptionService
-     */
-    private $encryptionService;
-
-    /**
      * @var VerificationRepository
      */
     private $verificationRepository;
+
+    /**
+     * @var EncryptionService
+     */
+    private $encryptionService;
 
     /**
      * Maximum allowed file size in bytes (10MB)
@@ -46,13 +46,13 @@ class DocumentService
      * DocumentService constructor
      * 
      * @param DocumentRepository $documentRepository Repository for document data operations
-     * @param EncryptionService $encryptionService Service for file encryption/decryption
      * @param VerificationRepository $verificationRepository Repository for verification data operations
+     * @param EncryptionService $encryptionService Service for file encryption/decryption
      */
     public function __construct(
         DocumentRepository $documentRepository,
+        VerificationRepository $verificationRepository,
         EncryptionService $encryptionService,
-        VerificationRepository $verificationRepository
     ) {
         $this->documentRepository = $documentRepository;
         $this->encryptionService = $encryptionService;

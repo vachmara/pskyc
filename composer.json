@@ -32,7 +32,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Prestashop\\Module\\Pskyc\\": "src/"
+      "PrestaShop\\Module\\Pskyc\\": "src/"
     },
     "classmap": [
       "pskyc.php"
