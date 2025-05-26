@@ -186,11 +186,6 @@ class MyModuleDisplayModuleFrontController extends ModuleFrontController
 
 ## 9. Security Best Practices
 
-- Always start PHP files with:
-  ```php
-  <?php
-  if (!defined('_PS_VERSION_')) exit;
-  ```
 - Add an `index.php` with a redirect in each folder to prevent directory listing.
 - Validate and sanitize all input; use PrestaShop’s `Validate` class.
 - Use tokens for form submissions.

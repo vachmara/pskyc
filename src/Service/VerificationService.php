@@ -4,17 +4,49 @@ namespace PrestaShop\Module\Pskyc\Service;
 use PrestaShop\Module\Pskyc\Repository\VerificationRepository;
 use PrestaShop\Module\Pskyc\Repository\DocumentRepository;
 use PrestaShop\Module\Pskyc\Repository\LogRepository;
-use PrestaShop\Module\Pskyc\Service\DocumentService;
-use PrestaShop\Module\Pskyc\Service\NotificationService;
 
+/**
+ * Class VerificationService
+ * 
+ * Business logic service for managing KYC verifications
+ * Orchestrates the complete verification workflow from submission to approval/rejection
+ */
 class VerificationService
 {
+    /**
+     * @var VerificationRepository
+     */
     private $verificationRepository;
+
+    /**
+     * @var DocumentRepository
+     */
     private $documentRepository;
+
+    /**
+     * @var LogRepository
+     */
     private $logRepository;
+
+    /**
+     * @var DocumentService
+     */
     private $documentService;
+
+    /**
+     * @var NotificationService
+     */
     private $notificationService;
 
+    /**
+     * VerificationService constructor
+     * 
+     * @param VerificationRepository $verificationRepository Repository for verification data operations
+     * @param DocumentRepository $documentRepository Repository for document data operations
+     * @param LogRepository $logRepository Repository for audit log operations
+     * @param DocumentService $documentService Service for document management
+     * @param NotificationService $notificationService Service for sending notifications
+     */
     public function __construct(
         VerificationRepository $verificationRepository,
         DocumentRepository $documentRepository,
@@ -30,170 +62,420 @@ class VerificationService
     }
 
     /**
-     * Create a new verification with documents
+     * Create a new verification request
+     * 
+     * Initiates a new KYC verification process for a customer
+     * 
+     * @param int $customerId The customer ID
+     * @param array $options Additional options for the verification
+     * @return array Result array with success status and verification ID or error message
      */
-    public function createVerification($customerId, array $documents, array $metadata = [])
+    public function createVerification(int $customerId, array $options = []): array
     {
-        // Business logic: Create verification
-        $verificationId = $this->verificationRepository->createVerification($customerId);
-        
-        if (!$verificationId) {
-            throw new \RuntimeException('Failed to create verification');
-        }
-
-        // Process each document using DocumentService
-        $uploadedDocuments = [];
-        foreach ($documents as $type => $documentData) {
-            $documentId = $this->documentService->uploadDocument(
-                $verificationId,
-                $documentData['file'],
-                $type,
-                $documentData['category'] ?? 'general'
-            );
-            
-            if ($documentId) {
-                $uploadedDocuments[] = $documentId;
+        try {
+            // Check if customer already has an active verification
+            $existingVerification = $this->verificationRepository->findActiveByCustomerId($customerId);
+            if ($existingVerification) {
+                return [
+                    'success' => false,
+                    'message' => 'Customer already has an active verification request',
+                    'verification_id' => $existingVerification['id_kyc_verification']
+                ];
             }
+
+            // Create new verification record
+            $verificationData = [
+                'id_customer' => $customerId,
+                'status' => 'pending',
+                'date_submitted' => date('Y-m-d H:i:s'),
+                'admin_note' => $options['admin_note'] ?? null
+            ];
+
+            $verificationId = $this->verificationRepository->create($verificationData);
+
+            if ($verificationId) {
+                // Log the creation
+                $this->logAction($verificationId, $customerId, null, 'verification_created', 'New verification request created');
+
+                return [
+                    'success' => true,
+                    'verification_id' => $verificationId
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Failed to create verification request'
+            ];
+
+        } catch (\Exception $e) {
+            PrestaShopLogger::addLog('Verification creation error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            return [
+                'success' => false,
+                'message' => 'System error occurred while creating verification'
+            ];
         }
-
-        // Log the action
-        $this->logRepository->createLog(
-            $verificationId,
-            null, // employee_id
-            $customerId,
-            'verification_created',
-            'Customer created new verification request',
-            $_SERVER['REMOTE_ADDR'] ?? '',
-            $_SERVER['HTTP_USER_AGENT'] ?? ''
-        );
-
-        // Send notification
-        $this->notificationService->sendVerificationSubmitted($customerId, $verificationId);
-        $this->notificationService->sendAdminNotification($verificationId, $customerId);
-
-        return [
-            'verification_id' => $verificationId,
-            'documents' => $uploadedDocuments,
-            'success' => true
-        ];
-    }
-
-    /**
-     * Get customer's latest verification with documents
-     */
-    public function getCustomerVerification($customerId)
-    {
-        $verification = $this->verificationRepository->getLatestByCustomerId($customerId);
-        
-        if (!$verification) {
-            return null;
-        }
-
-        $documents = $this->documentService->getDocumentsByVerification($verification['id']);
-        
-        return [
-            'verification' => $verification,
-            'documents' => $documents
-        ];
     }
 
     /**
      * Update verification status
+     * 
+     * Changes the status of a verification and handles related actions
+     * 
+     * @param int $verificationId The verification ID
+     * @param string $newStatus The new status
+     * @param int|null $employeeId The admin employee ID making the change
+     * @param string|null $adminNote Optional note from admin
+     * @return array Result array with success status and message
      */
-    public function updateVerificationStatus($verificationId, $status, $adminNote = null, $employeeId = null)
+    public function updateStatus(int $verificationId, string $newStatus, ?int $employeeId = null, ?string $adminNote = null): array
     {
-        $result = $this->verificationRepository->updateVerificationStatus($verificationId, $status, $adminNote);
-        
-        if ($result) {
-            // Log the status change
-            $this->logRepository->createLog(
-                $verificationId,
-                $employeeId,
-                null, // customer_id not needed here
-                'verification_status_updated',
-                'Verification status updated to ' . $status . ($adminNote ? ' with note: ' . $adminNote : ''),
-                $_SERVER['REMOTE_ADDR'] ?? '',
-                $_SERVER['HTTP_USER_AGENT'] ?? ''
-            );
-
-            // Send notification to customer
-            $verification = $this->verificationRepository->findVerificationById($verificationId);
-            if ($verification) {
-                $this->notificationService->sendStatusUpdate(
-                    $verification['id_customer'],
-                    $status,
-                    $adminNote
-                );
+        try {
+            $verification = $this->verificationRepository->findById($verificationId);
+            if (!$verification) {
+                return [
+                    'success' => false,
+                    'message' => 'Verification not found'
+                ];
             }
-        }
 
-        return $result;
+            $previousStatus = $verification['status'];
+
+            // Validate status transition
+            if (!$this->isValidStatusTransition($previousStatus, $newStatus)) {
+                return [
+                    'success' => false,
+                    'message' => 'Invalid status transition from ' . $previousStatus . ' to ' . $newStatus
+                ];
+            }
+
+            // Update verification record
+            $updateData = [
+                'status' => $newStatus,
+                'admin_note' => $adminNote
+            ];
+
+            // Set validation date for approved status
+            if ($newStatus === 'approved') {
+                $updateData['date_validated'] = date('Y-m-d H:i:s');
+                $updateData['date_expiry'] = $this->calculateExpiryDate();
+            }
+
+            $updated = $this->verificationRepository->update($verificationId, $updateData);
+
+            if ($updated) {
+                // Log the status change
+                $logMessage = "Status changed from {$previousStatus} to {$newStatus}";
+                if ($adminNote) {
+                    $logMessage .= " - Note: {$adminNote}";
+                }
+
+                $this->logAction(
+                    $verificationId,
+                    $verification['id_customer'],
+                    $employeeId,
+                    'status_changed',
+                    $logMessage
+                );
+
+                // Send notification to customer
+                $customer = $this->getCustomerData($verification['id_customer']);
+                if ($customer) {
+                    $this->notificationService->sendStatusChangeNotification(
+                        array_merge($verification, $updateData),
+                        $customer,
+                        $previousStatus
+                    );
+                }
+
+                return [
+                    'success' => true,
+                    'message' => 'Verification status updated successfully'
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Failed to update verification status'
+            ];
+
+        } catch (\Exception $e) {
+            PrestaShopLogger::addLog('Status update error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            return [
+                'success' => false,
+                'message' => 'System error occurred while updating status'
+            ];
+        }
     }
 
     /**
-     * Get verification by ID
+     * Get verification with documents
+     * 
+     * Retrieves a verification record along with all associated documents
+     * 
+     * @param int $verificationId The verification ID
+     * @return array|null Verification data with documents or null if not found
      */
-    public function getVerificationById($verificationId)
+    public function getVerificationWithDocuments(int $verificationId): ?array
     {
-        $verification = $this->verificationRepository->findVerificationById($verificationId);
-        
-        if (!$verification) {
+        try {
+            $verification = $this->verificationRepository->findById($verificationId);
+            if (!$verification) {
+                return null;
+            }
+
+            $documents = $this->documentRepository->findByVerificationId($verificationId);
+            $verification['documents'] = $documents;
+
+            return $verification;
+
+        } catch (\Exception $e) {
+            PrestaShopLogger::addLog('Get verification error: ' . $e->getMessage(), 3, null, 'Pskyc');
             return null;
         }
+    }
 
-        $documents = $this->documentService->getDocumentsByVerification($verificationId);
-        
-        return [
-            'verification' => $verification,
-            'documents' => $documents
+    /**
+     * Get customer verifications
+     * 
+     * Retrieves all verification records for a specific customer
+     * 
+     * @param int $customerId The customer ID
+     * @param int $limit Maximum number of records to return
+     * @return array Array of verification records
+     */
+    public function getCustomerVerifications(int $customerId, int $limit = 10): array
+    {
+        try {
+            return $this->verificationRepository->findByCustomerId($customerId, $limit);
+        } catch (\Exception $e) {
+            PrestaShopLogger::addLog('Get customer verifications error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            return [];
+        }
+    }
+
+    /**
+     * Check if customer needs KYC verification
+     * 
+     * Determines if a customer needs to complete KYC verification
+     * based on their order history and product categories
+     * 
+     * @param int $customerId The customer ID
+     * @return array Result with 'required' boolean and 'reason' string
+     */
+    public function isKycRequired(int $customerId): array
+    {
+        try {
+            // Check if customer already has approved verification
+            $activeVerification = $this->verificationRepository->findActiveByCustomerId($customerId);
+            if ($activeVerification && $activeVerification['status'] === 'approved') {
+                // Check if verification is still valid (not expired)
+                if (!$this->isVerificationExpired($activeVerification)) {
+                    return [
+                        'required' => false,
+                        'reason' => 'Customer has valid KYC verification'
+                    ];
+                }
+            }
+
+            // Check if customer has ordered products that require KYC
+            $requiresKyc = $this->checkOrderHistory($customerId);
+            if ($requiresKyc) {
+                return [
+                    'required' => true,
+                    'reason' => 'Customer has ordered products that require KYC verification'
+                ];
+            }
+
+            return [
+                'required' => false,
+                'reason' => 'KYC verification not required for current customer activity'
+            ];
+
+        } catch (\Exception $e) {
+            PrestaShopLogger::addLog('KYC requirement check error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            return [
+                'required' => false,
+                'reason' => 'Error checking KYC requirement'
+            ];
+        }
+    }
+
+    /**
+     * Process pending verifications cleanup
+     * 
+     * Handles cleanup of old pending verifications and expired documents
+     * 
+     * @return array Cleanup statistics
+     */
+    public function processCleanup(): array
+    {
+        try {
+            $stats = [
+                'expired_verifications' => 0,
+                'deleted_documents' => 0,
+                'old_pending_verifications' => 0
+            ];
+
+            // Mark expired verifications
+            $expiredCount = $this->verificationRepository->markExpiredVerifications();
+            $stats['expired_verifications'] = $expiredCount;
+
+            // Clean up old pending verifications (older than 30 days)
+            $oldPendingCount = $this->verificationRepository->cleanupOldPendingVerifications();
+            $stats['old_pending_verifications'] = $oldPendingCount;
+
+            // Clean up expired documents
+            $deletedDocsCount = $this->documentService->cleanupExpiredDocuments();
+            $stats['deleted_documents'] = $deletedDocsCount;
+
+            return $stats;
+
+        } catch (\Exception $e) {
+            PrestaShopLogger::addLog('Cleanup process error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            return [
+                'expired_verifications' => 0,
+                'deleted_documents' => 0,
+                'old_pending_verifications' => 0,
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Log an action in the audit trail
+     * 
+     * Records an action in the KYC log for audit purposes
+     * 
+     * @param int $verificationId The verification ID
+     * @param int|null $customerId The customer ID (if customer action)
+     * @param int|null $employeeId The employee ID (if admin action)
+     * @param string $action The action performed
+     * @param string $message Descriptive message about the action
+     * @return void
+     */
+    private function logAction(int $verificationId, ?int $customerId, ?int $employeeId, string $action, string $message): void
+    {
+        try {
+            $this->logRepository->create([
+                'id_kyc_verification' => $verificationId,
+                'id_customer' => $customerId,
+                'id_employee' => $employeeId,
+                'action' => $action,
+                'message' => $message,
+                'ip_address' => $_SERVER['REMOTE_ADDR'] ?? null,
+                'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? null
+            ]);
+        } catch (\Exception $e) {
+            PrestaShopLogger::addLog('Log action error: ' . $e->getMessage(), 3, null, 'Pskyc');
+        }
+    }
+
+    /**
+     * Validate status transition
+     * 
+     * Checks if a status transition is valid according to business rules
+     * 
+     * @param string $fromStatus Current status
+     * @param string $toStatus Target status
+     * @return bool True if transition is valid, false otherwise
+     */
+    private function isValidStatusTransition(string $fromStatus, string $toStatus): bool
+    {
+        $validTransitions = [
+            'pending' => ['under_review', 'rejected', 'approved'],
+            'under_review' => ['approved', 'rejected', 'pending'],
+            'rejected' => ['under_review', 'pending'],
+            'approved' => ['expired'],
+            'expired' => ['pending']
         ];
+
+        return isset($validTransitions[$fromStatus]) && 
+               in_array($toStatus, $validTransitions[$fromStatus]);
     }
 
     /**
-     * Delete verification and all associated documents
+     * Check if verification is expired
+     * 
+     * Determines if a verification has passed its expiry date
+     * 
+     * @param array $verification Verification record
+     * @return bool True if expired, false otherwise
      */
-    public function deleteVerification($verificationId, $employeeId = null)
+    private function isVerificationExpired(array $verification): bool
     {
-        // Get documents first
-        $documents = $this->documentService->getDocumentsByVerification($verificationId);
-        
-        // Delete all documents (files and records)
-        foreach ($documents as $document) {
-            $this->documentService->deleteDocument($document['id_kyc_document']);
+        if (empty($verification['date_expiry'])) {
+            return false;
         }
 
-        // Log the deletion
-        if ($employeeId) {
-            $this->logRepository->createLog(
-                $verificationId,
-                $employeeId,
-                null,
-                'verification_deleted',
-                'Verification and all documents deleted by admin',
-                $_SERVER['REMOTE_ADDR'] ?? '',
-                $_SERVER['HTTP_USER_AGENT'] ?? ''
-            );
+        return strtotime($verification['date_expiry']) < time();
+    }
+
+    /**
+     * Calculate expiry date for approved verification
+     * 
+     * Returns the date when an approved verification should expire
+     * 
+     * @return string Expiry date in MySQL datetime format
+     */
+    private function calculateExpiryDate(): string
+    {
+        $validityDays = (int) Configuration::get('PSKYC_VALIDITY_DAYS', 365);
+        return date('Y-m-d H:i:s', strtotime('+' . $validityDays . ' days'));
+    }
+
+    /**
+     * Check customer order history for KYC requirements
+     * 
+     * Analyzes customer's order history to determine if KYC is required
+     * 
+     * @param int $customerId The customer ID
+     * @return bool True if KYC is required based on order history
+     */
+    private function checkOrderHistory(int $customerId): bool
+    {
+        try {
+            // Get configured categories that require KYC
+            $kycCategories = Configuration::get('PSKYC_REQUIRED_CATEGORIES');
+            if (empty($kycCategories)) {
+                return false;
+            }
+
+            $categoryIds = explode(',', $kycCategories);
+            
+            // Check if customer has ordered from KYC-required categories
+            $sql = 'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'orders` o
+                    INNER JOIN `' . _DB_PREFIX_ . 'order_detail` od ON o.id_order = od.id_order
+                    INNER JOIN `' . _DB_PREFIX_ . 'product` p ON od.product_id = p.id_product
+                    WHERE o.id_customer = ' . (int)$customerId . '
+                    AND p.id_category_default IN (' . implode(',', array_map('intval', $categoryIds)) . ')
+                    LIMIT 1';
+
+            $result = Db::getInstance()->getValue($sql);
+            return (bool) $result;
+
+        } catch (\Exception $e) {
+            PrestaShopLogger::addLog('Order history check error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            return false;
         }
-
-        // Delete verification record
-        return $this->verificationRepository->delete($verificationId);
     }
 
     /**
-     * Check if customer has pending verification
+     * Get customer data
+     * 
+     * Retrieves customer information for notifications
+     * 
+     * @param int $customerId The customer ID
+     * @return array|null Customer data or null if not found
      */
-    public function hasActivePendingVerification($customerId)
+    private function getCustomerData(int $customerId): ?array
     {
-        $verification = $this->verificationRepository->getLatestByCustomerId($customerId);
-        
-        return $verification && in_array($verification['status'], ['pending', 'under_review']);
-    }
-
-    /**
-     * Get all verifications for admin with pagination
-     */
-    public function getAllVerifications($offset = 0, $limit = 20, $filters = [])
-    {
-        return $this->verificationRepository->findAllWithPagination($offset, $limit, $filters);
+        try {
+            $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'customer` WHERE `id_customer` = ' . (int)$customerId;
+            return Db::getInstance()->getRow($sql);
+        } catch (\Exception $e) {
+            PrestaShopLogger::addLog('Get customer data error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            return null;
+        }
     }
 }

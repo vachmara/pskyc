@@ -1,6 +1,12 @@
 <?php
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
 
+/**
+ * Class PskycVerifyModuleFrontController
+ * 
+ * Front office controller for KYC document verification
+ * Handles customer document uploads and verification status display
+ */
 class PskycVerifyModuleFrontController extends ModuleFrontController
 {
     /**
@@ -9,7 +15,13 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
     public $module;
 
     /**
+     * Initialize content for the KYC verification page
+     * 
+     * Displays the verification form and handles form submissions
+     * Redirects non-logged customers to home page
+     * 
      * @throws PrestaShopException
+     * @return void
      */
     public function initContent()
     {
@@ -43,6 +55,10 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
 
     /**
      * Process form submissions
+     * 
+     * Validates security token and routes to appropriate action handler
+     * 
+     * @return void
      */
     protected function processForm()
     {
@@ -66,7 +82,12 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
     }
 
     /**
-     * Process document upload
+     * Process document upload submission
+     * 
+     * Validates form data, uploaded files, and creates verification record
+     * Handles file upload and stores encrypted documents
+     * 
+     * @return void
      */
     protected function processDocumentUpload()
     {
@@ -145,6 +166,11 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
 
     /**
      * Validate uploaded file
+     * 
+     * Checks file upload errors, size limits, and allowed MIME types
+     * 
+     * @param array $file Uploaded file array from $_FILES
+     * @return bool True if file is valid, false otherwise
      */
     protected function validateUploadedFile($file)
     {
@@ -176,7 +202,11 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
     }
 
     /**
-     * Get customer's current verification
+     * Get customer's current verification record
+     * 
+     * Retrieves the most recent verification record for the logged-in customer
+     * 
+     * @return array|false Verification record array or false if none found
      */
     protected function getCustomerVerification()
     {
@@ -189,6 +219,11 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
 
     /**
      * Get verification documents
+     * 
+     * Retrieves all documents associated with a verification record
+     * 
+     * @param int $verificationId The verification record ID
+     * @return array Array of document records
      */
     protected function getVerificationDocuments($verificationId)
     {
@@ -201,6 +236,10 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
 
     /**
      * Create new verification record
+     * 
+     * Inserts a new verification record with pending status
+     * 
+     * @return int|false New verification ID or false on failure
      */
     protected function createVerification()
     {
@@ -217,6 +256,12 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
 
     /**
      * Process documents using uploader controller logic
+     * 
+     * Delegates document processing to the uploader controller
+     * 
+     * @param int $verificationId The verification record ID
+     * @param array $documents Array of documents to process
+     * @return array Result array with success status and message
      */
     protected function processDocuments($verificationId, $documents)
     {
@@ -229,7 +274,14 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
     }
 
     /**
-     * Log action
+     * Log action to the KYC log table
+     * 
+     * Records customer actions and system events for audit trail
+     * 
+     * @param int $verificationId The verification record ID
+     * @param string $action Action performed (e.g., 'documents_uploaded')
+     * @param string $message Descriptive message about the action
+     * @return void
      */
     protected function logAction($verificationId, $action, $message)
     {
@@ -242,7 +294,12 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
     }
 
     /**
-     * Send notification email
+     * Send notification email to customer
+     * 
+     * Sends email notifications based on verification status changes
+     * 
+     * @param string $type Email type (e.g., 'documents_submitted', 'approved', 'rejected')
+     * @return void
      */
     protected function sendNotificationEmail($type)
     {
@@ -251,9 +308,11 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
     }
 
     /**
-     * Get breadcrumb links
+     * Get breadcrumb links for the page
+     * 
+     * Builds navigation breadcrumb including "My Account" and current page
      *
-     * @return array
+     * @return array Breadcrumb configuration array
      *
      * @throws InvalidArgumentException
      * @throws PrestaShopDatabaseException

@@ -8,10 +8,21 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+/**
+ * Class Pskyc
+ * 
+ * Main module class for KYC Secure Upload module
+ * Handles document verification and encrypted storage for PrestaShop
+ */
 class Pskyc extends Module
 {
     protected $config_form = false;
 
+    /**
+     * Module constructor
+     * 
+     * Initializes module properties and configuration
+     */
     public function __construct()
     {
         $this->name = 'pskyc';
@@ -36,8 +47,12 @@ class Pskyc extends Module
     }
 
     /**
-     * Don't forget to create update methods if needed:
-     * http://doc.prestashop.com/display/PS16/Enabling+the+Auto-Update
+     * Install the module
+     * 
+     * Creates database tables, sets default configuration,
+     * creates upload directory and registers hooks
+     * 
+     * @return bool True if installation successful, false otherwise
      */
     public function install()
     {
@@ -62,6 +77,13 @@ class Pskyc extends Module
             $this->registerHook('displayCustomerAccount');
     }
 
+    /**
+     * Uninstall the module
+     * 
+     * Removes database tables, configuration values and uploaded files
+     * 
+     * @return bool True if uninstallation successful, false otherwise
+     */
     public function uninstall()
     {
 
@@ -75,6 +97,10 @@ class Pskyc extends Module
 
     /**
      * Load the configuration form
+     * 
+     * Handles form submission and displays the module configuration page
+     * 
+     * @return string HTML content for the configuration page
      */
     public function getContent()
     {
@@ -93,7 +119,9 @@ class Pskyc extends Module
     }
 
     /**
-     * Create the form that will be displayed in the configuration of your module.
+     * Create the form that will be displayed in the configuration of your module
+     * 
+     * @return string HTML form content
      */
     protected function renderForm()
     {
@@ -121,7 +149,9 @@ class Pskyc extends Module
     }
 
     /**
-     * Create the structure of your form.
+     * Create the structure of your form
+     * 
+     * @return array Form configuration array
      */
     protected function getConfigForm()
     {
@@ -153,6 +183,11 @@ class Pskyc extends Module
         ];
     }
 
+    /**
+     * Get current configuration form values
+     * 
+     * @return array Current configuration values
+     */
     protected function getConfigFormValues()
     {
         return [
@@ -162,7 +197,11 @@ class Pskyc extends Module
     }
 
     /**
-     * Save form data.
+     * Save form data
+     * 
+     * Processes and saves the configuration form values
+     * 
+     * @return void
      */
     protected function postProcess()
     {
@@ -174,7 +213,11 @@ class Pskyc extends Module
     }
 
     /**
-     * Add the CSS & JavaScript files you want to be loaded in the BO.
+     * Add the CSS & JavaScript files you want to be loaded in the BO
+     * 
+     * Hook executed on back office header display
+     * 
+     * @return void
      */
     public function hookDisplayBackOfficeHeader()
     {
@@ -185,7 +228,11 @@ class Pskyc extends Module
     }
 
     /**
-     * Add the CSS & JavaScript files you want to be added on the FO.
+     * Add the CSS & JavaScript files you want to be added on the FO
+     * 
+     * Hook executed on front office header display
+     * 
+     * @return void
      */
     public function hookHeader()
     {
@@ -193,28 +240,58 @@ class Pskyc extends Module
         $this->context->controller->addCSS($this->_path . '/views/css/front.css');
     }
 
+    /**
+     * Hook executed when admin controller sets media
+     * 
+     * @return void
+     */
     public function hookActionAdminControllerSetMedia()
     {
         /* Place your code here. */
     }
 
+    /**
+     * Hook executed when an order is validated
+     * 
+     * Can be used to check KYC status before order completion
+     * 
+     * @return void
+     */
     public function hookActionValidateOrder()
     {
         /* Place your code here. */
     }
 
+    /**
+     * Hook executed in admin customers page
+     * 
+     * Can display KYC status for each customer
+     * 
+     * @return void
+     */
     public function hookDisplayAdminCustomers()
     {
         /* Place your code here. */
     }
 
+    /**
+     * Hook executed in admin order page
+     * 
+     * Can display KYC status for the order's customer
+     * 
+     * @return void
+     */
     public function hookDisplayAdminOrder()
     {
         /* Place your code here. */
     }
 
     /**
-     * @return string
+     * Display KYC verification link in customer account
+     * 
+     * Hook executed in customer account page to show KYC verification box
+     * 
+     * @return string HTML content for the KYC verification box
      */
     public function hookDisplayCustomerAccount()
     {

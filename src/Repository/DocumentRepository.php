@@ -2,8 +2,13 @@
 namespace PrestaShop\Module\Pskyc\Repository;
 
 use Doctrine\DBAL\Connection;
-use Prestashop\Module\Pskyc\Entity\Document;
 
+/**
+ * Class DocumentRepository
+ * 
+ * Repository for managing KYC document records in the database
+ * Provides methods for CRUD operations on document data
+ */
 class DocumentRepository
 {
   /**
@@ -12,9 +17,9 @@ class DocumentRepository
   private $connection;
 
   /**
-   * DocumentRepository constructor.
-   *
-   * @param Connection $connection
+   * DocumentRepository constructor
+   * 
+   * @param Connection $connection Database connection instance
    */
   public function __construct(Connection $connection)
   {
@@ -22,128 +27,169 @@ class DocumentRepository
   }
 
   /**
-   * Find document by id
-   *
-   * @param int $id
-   *
-   * @return Document|null
+   * Find document by ID
+   * 
+   * Retrieves a single document record by its unique identifier
+   * 
+   * @param int $id The document ID to search for
+   * @return array|null Document record array or null if not found
    */
-  public function findDocumentById(int $id): ?Document
+  public function findById(int $id): ?array
   {
     $qb = $this->connection->createQueryBuilder();
     $query = $qb->select('*')
-      ->from(_DB_PREFIX_ . 'kyc_document', 'd')
-      ->where('d.id_kyc_document = :id')
-      ->setParameter('id', $id)
-    ;
+        ->from(_DB_PREFIX_ . 'kyc_document')
+        ->where('id_kyc_document = :id')
+        ->setParameter('id', $id);
 
     $result = $query->execute();
 
     if ($result->rowCount() === 0) {
-      return null;
+        return null;
     }
 
-    return $result->fetchObject(Document::class);
+    return $result->fetchAssociative();
   }
 
   /**
-   * Find documents by verification id
-   *
-   * @param int $verificationId
-   *
-   * @return Document[]
+   * Find documents by verification ID
+   * 
+   * Retrieves all documents associated with a specific verification request
+   * 
+   * @param int $verificationId The verification ID to search for
+   * @return array Array of document records
    */
-  public function findDocumentsByVerificationId(int $verificationId): array
+  public function findByVerificationId(int $verificationId): array
   {
     $qb = $this->connection->createQueryBuilder();
     $query = $qb->select('*')
-      ->from(_DB_PREFIX_ . 'kyc_document', 'd')
-      ->where('d.id_kyc_verification = :verificationId')
-      ->setParameter('verificationId', $verificationId)
-    ;
+        ->from(_DB_PREFIX_ . 'kyc_document')
+        ->where('id_kyc_verification = :verification_id')
+        ->setParameter('verification_id', $verificationId)
+        ->orderBy('date_uploaded', 'ASC');
 
     $result = $query->execute();
-
     return $result->fetchAllAssociative();
   }
 
   /**
    * Create a new document record
-   *
-   * @param array $data
-   *
-   * @return int The new document ID
+   * 
+   * Inserts a new document record into the database
+   * 
+   * @param array $data Document data array containing required fields
+   * @return int The ID of the newly created document
    */
   public function create(array $data): int
   {
     $qb = $this->connection->createQueryBuilder();
     $qb->insert(_DB_PREFIX_ . 'kyc_document')
-      ->values([
-        'id_kyc_verification' => ':id_kyc_verification',
-        'document_type' => ':document_type',
-        'category' => ':category',
-        'filename' => ':filename',
-        'original_name' => ':original_name',
-        'filesize' => ':filesize',
-        'mime_type' => ':mime_type',
-        'sha256_hash' => ':sha256_hash',
-        'encryption_key' => ':encryption_key',
-        'iv' => ':iv',
-        'status' => ':status',
-        'date_uploaded' => ':date_uploaded'
-      ])
-      ->setParameters($data);
+        ->values([
+            'id_kyc_verification' => ':verification_id',
+            'type' => ':type',
+            'filename' => ':filename',
+            'filesize' => ':filesize',
+            'mime' => ':mime',
+            'sha256' => ':sha256',
+            'iv' => ':iv',
+            'encrypted' => ':encrypted',
+            'date_uploaded' => 'NOW()',
+            'expires_at' => ':expires_at'
+        ])
+        ->setParameters($data);
 
     $qb->execute();
-
     return (int) $this->connection->lastInsertId();
   }
 
   /**
    * Update document status
-   *
-   * @param int $documentId
-   * @param string $status
-   * @param string|null $reviewNote
-   * @param int|null $employeeId
-   *
-   * @return bool
+   * 
+   * Updates document metadata such as status, review notes, and employee information
+   * 
+   * @param int $documentId The document ID to update
+   * @param string $status New status for the document
+   * @param string|null $reviewNote Optional review note from admin
+   * @param int|null $employeeId Optional employee ID who performed the review
+   * @return bool True if update was successful, false otherwise
    */
   public function updateStatus(int $documentId, string $status, ?string $reviewNote = null, ?int $employeeId = null): bool
   {
     $qb = $this->connection->createQueryBuilder();
     $qb->update(_DB_PREFIX_ . 'kyc_document')
-      ->set('status', ':status')
-      ->set('review_note', ':review_note')
-      ->set('id_employee_reviewed', ':employee_id')
-      ->where('id_kyc_document = :document_id')
-      ->setParameters([
-        'status' => $status,
-        'review_note' => $reviewNote,
-        'employee_id' => $employeeId,
-        'document_id' => $documentId
-      ]);
+        ->set('status', ':status')
+        ->where('id_kyc_document = :document_id')
+        ->setParameter('status', $status)
+        ->setParameter('document_id', $documentId);
+
+    if ($reviewNote !== null) {
+        $qb->set('review_note', ':review_note')
+           ->setParameter('review_note', $reviewNote);
+    }
+
+    if ($employeeId !== null) {
+        $qb->set('reviewed_by', ':employee_id')
+           ->setParameter('employee_id', $employeeId);
+    }
 
     return (bool) $qb->execute();
   }
 
   /**
    * Delete document by ID
-   *
-   * @param int $documentId
-   *
-   * @return bool
+   * 
+   * Removes a document record from the database
+   * Note: This does not delete the physical file, only the database record
+   * 
+   * @param int $documentId The document ID to delete
+   * @return bool True if deletion was successful, false otherwise
    */
   public function delete(int $documentId): bool
   {
     $qb = $this->connection->createQueryBuilder();
     $qb->delete(_DB_PREFIX_ . 'kyc_document')
-      ->where('id_kyc_document = :document_id')
-      ->setParameter('document_id', $documentId);
+        ->where('id_kyc_document = :document_id')
+        ->setParameter('document_id', $documentId);
 
     return (bool) $qb->execute();
   }
-  
-  
 
+  /**
+   * Find expired documents
+   * 
+   * Retrieves all documents that have passed their expiration date
+   * 
+   * @return array Array of expired document records
+   */
+  public function findExpiredDocuments(): array
+  {
+    $qb = $this->connection->createQueryBuilder();
+    $query = $qb->select('*')
+        ->from(_DB_PREFIX_ . 'kyc_document')
+        ->where('expires_at IS NOT NULL')
+        ->andWhere('expires_at < NOW()');
+
+    $result = $query->execute();
+    return $result->fetchAllAssociative();
+  }
+
+  /**
+   * Count documents by verification ID
+   * 
+   * Returns the number of documents associated with a verification request
+   * 
+   * @param int $verificationId The verification ID to count documents for
+   * @return int Number of documents
+   */
+  public function countByVerificationId(int $verificationId): int
+  {
+    $qb = $this->connection->createQueryBuilder();
+    $query = $qb->select('COUNT(*)')
+        ->from(_DB_PREFIX_ . 'kyc_document')
+        ->where('id_kyc_verification = :verification_id')
+        ->setParameter('verification_id', $verificationId);
+
+    $result = $query->execute();
+    return (int) $result->fetchOne();
+  }
 }

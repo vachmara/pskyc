@@ -9,6 +9,11 @@ if (!defined('_PS_VERSION_')) {
 }
 
 /**
+ * Class Log
+ * 
+ * Entity representing a KYC audit log entry
+ * Tracks all actions performed on KYC verifications for security and compliance
+ * 
  * @ORM\Table(name="kyc_log")
  * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks()
@@ -77,95 +82,208 @@ class Log
      */
     private $updatedAt;
 
+    /**
+     * Get log entry ID
+     * 
+     * @return int|null The log entry ID
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    /**
+     * Get KYC verification ID
+     * 
+     * @return int The verification ID this log entry is associated with
+     */
     public function getKycVerificationId(): int
     {
         return $this->kycVerificationId;
     }
+    
+    /**
+     * Set KYC verification ID
+     * 
+     * @param int $id The verification ID to associate with this log entry
+     * @return self
+     */
     public function setKycVerificationId(int $id): self
     {
         $this->kycVerificationId = $id;
         return $this;
     }
 
+    /**
+     * Get employee ID
+     * 
+     * @return int|null The ID of the employee who performed this action, if any
+     */
     public function getEmployeeId(): ?int
     {
         return $this->employeeId;
     }
+    
+    /**
+     * Set employee ID
+     * 
+     * @param int|null $id The employee ID to set
+     * @return self
+     */
     public function setEmployeeId(?int $id): self
     {
         $this->employeeId = $id;
         return $this;
     }
 
+    /**
+     * Get customer ID
+     * 
+     * @return int|null The ID of the customer associated with this action, if any
+     */
     public function getCustomerId(): ?int
     {
         return $this->customerId;
     }
+    
+    /**
+     * Set customer ID
+     * 
+     * @param int|null $id The customer ID to set
+     * @return self
+     */
     public function setCustomerId(?int $id): self
     {
         $this->customerId = $id;
         return $this;
     }
 
+    /**
+     * Get action type
+     * 
+     * @return string The type of action that was logged
+     */
     public function getAction(): string
     {
         return $this->action;
     }
+    
+    /**
+     * Set action type
+     * 
+     * @param string $action The type of action to log
+     * @return self
+     */
     public function setAction(string $action): self
     {
         $this->action = $action;
         return $this;
     }
 
+    /**
+     * Get log message
+     * 
+     * @return string The detailed message describing the action
+     */
     public function getMessage(): string
     {
         return $this->message;
     }
+    
+    /**
+     * Set log message
+     * 
+     * @param string $message The message to set
+     * @return self
+     */
     public function setMessage(string $message): self
     {
         $this->message = $message;
         return $this;
     }
 
-    public function getIpAddress(): string
+    /**
+     * Get IP address
+     * 
+     * @return string|null The IP address from which the action was performed
+     */
+    public function getIpAddress(): ?string
     {
         return $this->ipAddress;
     }
-    public function setIpAddress(string $ip): self
+    
+    /**
+     * Set IP address
+     * 
+     * @param string|null $ip The IP address to log
+     * @return self
+     */
+    public function setIpAddress(?string $ip): self
     {
         $this->ipAddress = $ip;
         return $this;
     }
 
+    /**
+     * Get user agent
+     * 
+     * @return string The user agent string from the request
+     */
     public function getUserAgent(): string
     {
         return $this->userAgent;
     }
+    
+    /**
+     * Set user agent
+     * 
+     * @param string $ua The user agent string to set
+     * @return self
+     */
     public function setUserAgent(string $ua): self
     {
         $this->userAgent = $ua;
         return $this;
     }
 
+    /**
+     * Get creation date
+     * 
+     * @return DateTime When this log entry was created
+     */
     public function getCreatedAt(): DateTime
     {
         return $this->createdAt;
     }
+    
+    /**
+     * Set creation date
+     * 
+     * @param DateTime $date The creation date to set
+     * @return self
+     */
     public function setCreatedAt(DateTime $date): self
     {
         $this->createdAt = $date;
         return $this;
     }
 
+    /**
+     * Get last update date
+     * 
+     * @return DateTime When this log entry was last updated
+     */
     public function getUpdatedAt(): DateTime
     {
         return $this->updatedAt;
     }
+    
+    /**
+     * Set last update date
+     * 
+     * @param DateTime $date The update date to set
+     * @return self
+     */
     public function setUpdatedAt(DateTime $date): self
     {
         $this->updatedAt = $date;
@@ -173,8 +291,13 @@ class Log
     }
 
     /**
+     * Update timestamps automatically
+     * 
+     * Doctrine lifecycle callback that sets creation and update timestamps
+     * 
      * @ORM\PrePersist
      * @ORM\PreUpdate
+     * @return void
      */
     public function updateTimestamps(): void
     {

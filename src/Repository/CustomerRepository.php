@@ -5,17 +5,23 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Query\Expr;
 use PrestaShop\PrestaShop\Core\Domain\Customer\ValueObject\CustomerId;
 
+/**
+ * Class CustomerRepository
+ * 
+ * Repository for managing customer data access
+ * Provides methods for retrieving customer information needed for KYC operations
+ */
 class CustomerRepository
 {
     /**
-     * @var Connection
+     * @var Connection Database connection instance
      */
     private $connection;
 
     /**
-     * CustomerRepository constructor.
+     * CustomerRepository constructor
      *
-     * @param Connection $connection
+     * @param Connection $connection Database connection instance
      */
     public function __construct(Connection $connection)
     {
@@ -23,11 +29,12 @@ class CustomerRepository
     }
 
     /**
-     * Find customer name by customer id
+     * Find customer name by customer ID
      *
-     * @param CustomerId $customerId
+     * Retrieves the full name (firstname + lastname) of a customer by their ID
      *
-     * @return string
+     * @param CustomerId $customerId The customer ID to search for
+     * @return string The customer's full name (firstname lastname)
      */
     public function findCustomerNameByCustomerId(CustomerId $customerId): string
     {

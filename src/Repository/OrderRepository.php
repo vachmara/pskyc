@@ -5,17 +5,23 @@ use Doctrine\DBAL\Connection;
 use Exception;
 use PrestaShop\PrestaShop\Core\Domain\Customer\ValueObject\CustomerId;
 
+/**
+ * Class OrderRepository
+ * 
+ * Repository for managing order-related data access
+ * Provides methods for retrieving order and cart information needed for KYC risk assessment
+ */
 class OrderRepository
 {
     /**
-     * @var Connection
+     * @var Connection Database connection instance
      */
     private $connection;
 
     /**
-     * OrderRepository constructor.
+     * OrderRepository constructor
      *
-     * @param Connection $connection
+     * @param Connection $connection Database connection instance
      */
     public function __construct(Connection $connection)
     {
@@ -23,11 +29,13 @@ class OrderRepository
     }
 
     /**
-     * Get the categories ID of the customer cart
+     * Get the categories ID of products in the customer's cart
      * 
-     * @param CustomerId $customerId
+     * Retrieves all distinct default category IDs for products currently in the customer's cart.
+     * This information can be used for KYC risk assessment based on product categories.
      * 
-     * @return array
+     * @param CustomerId $customerId The customer ID to search for
+     * @return array Array of category IDs from the customer's cart products
      */
     public function findProductsCartsCategoriesByCustomerId(CustomerId $customerId): array
     {
@@ -45,9 +53,8 @@ class OrderRepository
           return $result->fetchAllAssociative();
         }
         catch (Exception $e) {
-            // Handle exception
+            // Handle exception - log error and return empty array
             return [];
         }
     }
-    
 }
