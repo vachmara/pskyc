@@ -22,28 +22,48 @@ class LogRepository
   }
 
   /**
-   * Find log by id
+   * Create a new log entry
    *
-   * @param int $id
-   *
-   * @return Log|null
+   * @param int $kycVerificationId
+   * @param int|null $employeeId
+   * @param int|null $customerId
+   * @param string $action
+   * @param string $message
+   * @param string $ipAddress
+   * @param string $userAgent
+   * @return int|null
    */
-  public function findLogById(int $id): ?Log
-  {
-    $qb = $this->connection->createQueryBuilder();
-    $query = $qb->select('*')
-      ->from(_DB_PREFIX_ . 'kyc_log', 'l')
-      ->where('l.id_kyc_log = :id')
-      ->setParameter('id', $id)
-    ;
+  public function createLog(
+    int $kycVerificationId,
+    ?int $employeeId,
+    ?int $customerId,
+    string $action,
+    string $message,
+    string $ipAddress,
+    string $userAgent
+  ): ?int {
+    $log = new Log();
+    $log->setKycVerificationId($kycVerificationId);
+    $log->setEmployeeId($employeeId);
+    $log->setCustomerId($customerId);
+    $log->setAction($action);
+    $log->setMessage($message);
+    $log->setIpAddress($ipAddress);
+    $log->setUserAgent($userAgent);
 
-    $result = $query->execute();
+    // Persist the log entity
+    $this->connection->insert('kyc_log', [
+      'id_kyc_verification' => $log->getKycVerificationId(),
+      'id_employee' => $log->getEmployeeId(),
+      'id_customer' => $log->getCustomerId(),
+      'action' => $log->getAction(),
+      'message' => $log->getMessage(),
+      'ip_address' => $log->getIpAddress(),
+      'user_agent' => $log->getUserAgent(),
+      'date_add' => (new \DateTime())->format('Y-m-d H:i:s'),
+    ]);
 
-    if ($result->rowCount() === 0) {
-      return null;
-    }
-
-    return $result->fetchObject(Log::class);
+    return (int) $this->connection->lastInsertId();
   }
 
 }
