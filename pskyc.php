@@ -4,10 +4,8 @@
  * Copyright (c) 2025 Valentin Chmara
  */
 
-if (!defined('_PS_VERSION_')) {
-    exit;
-}
-
+ use PrestaShop\Module\Pskyc\Service\VerificationService;
+ 
 /**
  * Class Pskyc
  * 
@@ -36,6 +34,18 @@ class Pskyc extends Module
          */
         $this->bootstrap = true;
 
+        $this->tabs = [
+            [
+                'route_name' => 'admin_pskyc_verification_list',
+                'class_name' => 'AdminVerification',
+                'visible' => true,
+                'name' => 'KYC Verifications',
+                'wording' => 'KYC Verifications',
+                'wording_domain' => 'Modules.Pskyc.Admin',
+                'parent_class_name' => 'AdminParentCustomer',
+            ]
+        ];
+
         parent::__construct();
 
         $this->displayName = $this->l('KYC Secure Upload');
@@ -43,7 +53,7 @@ class Pskyc extends Module
 
         $this->confirmUninstall = $this->l('All KYC verification data and associated documents will be permanently deleted. This action cannot be undone.');
 
-        $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
+        $this->ps_versions_compliancy = array('min' => '1.7.8', 'max' => _PS_VERSION_);
     }
 
     /**
@@ -76,7 +86,6 @@ class Pskyc extends Module
         }
 
         return parent::install() &&
-            $this->installTab() &&
             $this->registerHook('header') &&
             $this->registerHook('displayBackOfficeHeader') &&
             $this->registerHook('actionAdminControllerSetMedia') &&
@@ -84,24 +93,6 @@ class Pskyc extends Module
             $this->registerHook('displayAdminCustomers') &&
             $this->registerHook('displayAdminOrder') &&
             $this->registerHook('displayCustomerAccount');
-    }
-
-    /**
-     * Install the KYC Verification tab in the back office
-     */
-    private function installTab()
-    {
-        $tab = new Tab();
-        $tab->active = 1;
-        $tab->class_name = 'AdminPskyc';
-        $tab->name = [];
-        foreach (Language::getLanguages(false) as $lang) {
-            $tab->name[$lang['id_lang']] = $this->l('KYC Verification');
-        }
-        $tab->module = $this->name;
-        $tab->id_parent = (int) Tab::getIdFromClassName('AdminParentCustomer');
-        $tab->active = 1;
-        return $tab->add();
     }
 
     /**
@@ -414,6 +405,7 @@ class Pskyc extends Module
         if (!$customerId) {
             return;
         }
+        /** @var VerificationService $verificationService */
         $verificationService = $this->get('PrestaShop\Module\Pskyc\Service\VerificationService');
         $verifications = $verificationService->getVerificationsByCustomerId($customerId);
         $this->context->smarty->assign([
@@ -422,7 +414,6 @@ class Pskyc extends Module
             'customerId' => $customerId,
         ]);
         return $this->fetch('module:' . $this->name . '/views/templates/admin/customers/kyc_status.tpl');
-
     }
 
     /**

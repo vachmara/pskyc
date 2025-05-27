@@ -14,11 +14,11 @@ $db = Db::getInstance();
 /* 1. Drop child table first (avoids FK constraint errors) */
 $ok &= $db->execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.'kyc_document`');
 
-/* 2. Then drop parent table */
-$ok &= $db->execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.'kyc_verification`');
-
-/* 3. Drop log table */
+/* 2. Drop log table */
 $ok &= $db->execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.'kyc_log`');
+
+/* 3. Then drop parent table */
+$ok &= $db->execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.'kyc_verification`');
 
 /* 3. Remove module configuration values */
 $ok &= Configuration::deleteByName('PSKYC_RETENTION_DAYS');

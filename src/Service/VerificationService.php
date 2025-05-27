@@ -112,92 +112,33 @@ class VerificationService
     }
 
     /**
-     * Update verification status
+     * Get verifications with pagination and filtering
      * 
-     * Changes the status of a verification and handles related actions
-     * 
-     * @param int $verificationId The verification ID
-     * @param string $newStatus The new status
-     * @param int|null $employeeId The admin employee ID making the change
-     * @param string|null $adminNote Optional note from admin
-     * @return array Result array with success status and message
+     * @param array $filters Filters to apply (e.g., status, customer ID)
+     * @param int $limit Number of records per page
+     * @param int $offset Offset for pagination
+     * @return array Array of verifications with total count
      */
-    public function updateStatus(int $verificationId, string $newStatus, ?int $employeeId = null, ?string $adminNote = null): array
+    public function getVerifications(array $filters = [], int $limit = 20, int $offset = 0): array
     {
         try {
-            $verification = $this->verificationRepository->findById($verificationId);
-            if (!$verification) {
-                return [
-                    'success' => false,
-                    'message' => 'Verification not found'
-                ];
-            }
+            $verifications = $this->verificationRepository->findAll($filters, $limit, $offset);
+            $totalCount = $this->verificationRepository->countAll($filters);
 
-            $previousStatus = $verification['status'];
-
-            // Validate status transition
-            if (!$this->isValidStatusTransition($previousStatus, $newStatus)) {
-                return [
-                    'success' => false,
-                    'message' => 'Invalid status transition from ' . $previousStatus . ' to ' . $newStatus
-                ];
-            }
-
-            // Update verification record
-            $updateData = [
-                'status' => $newStatus,
-                'admin_note' => $adminNote
-            ];
-
-            // Set validation date for approved status
-            if ($newStatus === 'approved') {
-                $updateData['date_validated'] = date('Y-m-d H:i:s');
-                $updateData['date_expiry'] = $this->calculateExpiryDate();
-            }
-
-            $updated = $this->verificationRepository->update($verificationId, $updateData);
-
-            if ($updated) {
-                // Log the status change
-                $logMessage = "Status changed from {$previousStatus} to {$newStatus}";
-                if ($adminNote) {
-                    $logMessage .= " - Note: {$adminNote}";
-                }
-
-                $this->logAction(
-                    $verificationId,
-                    $verification['id_customer'],
-                    $employeeId,
-                    'status_changed',
-                    $logMessage
-                );
-
-                // Send notification to customer
-                $customer = $this->getCustomerData($verification['id_customer']);
-                if ($customer) {
-                    $this->notificationService->sendStatusChangeNotification(
-                        array_merge($verification, $updateData),
-                        $customer,
-                        $previousStatus
-                    );
-                }
-
-                return [
-                    'success' => true,
-                    'message' => 'Verification status updated successfully'
-                ];
+            // Check if any verification is expired
+            foreach ($verifications as &$verification) {
+                $verification['is_expired'] = $this->isVerificationExpired($verification);
             }
 
             return [
-                'success' => false,
-                'message' => 'Failed to update verification status'
+                'verifications' => $verifications,
+                'total_count' => $totalCount
             ];
-
         } catch (\Exception $e) {
-            PrestaShopLogger::addLog('Status update error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            PrestaShopLogger::addLog('Get verifications error: ' . $e->getMessage(), 3, null, 'Pskyc');
             return [
-                'success' => false,
-                'message' => 'System error occurred while updating status'
+                'verifications' => [],
+                'total_count' => 0
             ];
         }
     }
@@ -245,6 +186,22 @@ class VerificationService
         }
     }
 
+    /**
+     * Get status counts for all verifications
+     * 
+     * @return array Associative array of status counts
+     */
+    public function getStatusCounts(): array
+    {
+        try {
+            return $this->verificationRepository->getStatusCounts();
+        } catch (\Exception $e) {
+            PrestaShopLogger::addLog('Get status counts error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            return [];
+        }
+    }
+
+    
     /**
      * Get all Verifications by customer ID
      * 

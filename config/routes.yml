@@ -1,0 +1,47 @@
+# KYC Admin Routes
+admin_pskyc_verification_list:
+  path: /pskyc/verification/
+  methods: [GET]
+  defaults:
+    _controller: PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::listAction
+    _legacy_controller: AdminPskycVerification
+    _legacy_link: AdminPskycVerification
+
+admin_pskyc_verification_view:
+  path: /pskyc/verification/{id}
+  methods: [GET]
+  defaults:
+    _controller: PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::viewAction
+    _legacy_controller: AdminPskycVerification
+    _legacy_link: AdminPskycVerification
+  requirements:
+    id: \d+
+
+admin_pskyc_verification_update_status:
+  path: /pskyc/verification/{id}/status
+  methods: [POST]
+  defaults:
+    _controller: PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::updateStatusAction
+  requirements:
+    id: \d+
+
+admin_pskyc_verification_download_document:
+  path: /pskyc/verification/{id}/document/{documentId}/download
+  methods: [GET]
+  defaults:
+    _controller: PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::downloadDocumentAction
+  requirements:
+    id: \d+
+    documentId: \d+
+
+admin_pskyc_verification_bulk_action:
+  path: /pskyc/verification/bulk
+  methods: [POST]
+  defaults:
+    _controller: PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::bulkActionAction
+
+admin_pskyc_verification_stats:
+  path: /pskyc/verification/stats
+  methods: [GET]
+  defaults:
+    _controller: PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::statsAction

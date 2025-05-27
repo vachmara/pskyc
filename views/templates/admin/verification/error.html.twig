@@ -1,0 +1,33 @@
+{% extends '@PrestaShop/Admin/layout.html.twig' %}
+
+{% block content %}
+<div class="content-div">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header text-white">
+                    <h3 class="card-header-title mb-0">
+                        <i class="material-icons">error</i>
+                        {{ layoutTitle|default('Error'|trans({}, 'Admin.Global')) }}
+                    </h3>
+                </div>
+                <div class="card-body text-center">
+                    <div class="alert alert-danger">
+                        <h4 class="mt-3">{{ 'An error occurred'|trans({}, 'Admin.Global') }}</h4>
+                        <p class="mb-0">
+                            {{ 'Something went wrong while loading the KYC verifications. Please try again or contact your administrator.'|trans({}, 'Modules.Pskyc.Admin') }}
+                        </p>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <a href="{{ path('admin_pskyc_verification_list') }}" class="btn btn-primary">
+                            <i class="material-icons">refresh</i>
+                            {{ 'Try Again'|trans({}, 'Admin.Actions') }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

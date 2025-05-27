@@ -52,6 +52,97 @@ class VerificationRepository
     }
 
     /**
+     * Find all verifications with pagination and optional filters
+     * 
+     * @param array $filters Optional filters for status and customer ID
+     * @param int $limit Number of records per page
+     * @param int $offset Offset for pagination
+     * @return array Array of verification records with pagination
+     */
+    public function findAll(array $filters = [], int $limit = 20, int $offset = 0): array
+    {
+        $qb = $this->connection->createQueryBuilder();
+        $qb->select('*')
+            ->from(_DB_PREFIX_ . 'kyc_verification')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset);
+
+        // Apply filters if provided
+        if (!empty($filters['status'])) {
+            $qb->andWhere('status = :status')
+                ->setParameter('status', $filters['status']);
+        }
+        if (!empty($filters['customer_id'])) {
+            $qb->andWhere('id_customer = :customer_id')
+                ->setParameter('customer_id', $filters['customer_id']);
+        }
+
+        if (!empty($filters['date_from'])) {
+            $qb->andWhere('date_submitted >= :date_from')
+                ->setParameter('date_from', $filters['date_from']);
+        }
+
+        if (!empty($filters['date_to'])) {
+            $qb->andWhere('date_submitted <= :date_to')
+                ->setParameter('date_to', $filters['date_to']);
+        }
+
+        $query = $qb->execute();
+        return $query->fetchAllAssociative();
+    }
+
+    /**
+     * Get status counts 
+     * 
+     * @return array Associative array of status counts
+     */
+    public function getStatusCounts(): array
+    {
+        $qb = $this->connection->createQueryBuilder();
+        $qb->select('status, COUNT(*) as count')
+            ->from(_DB_PREFIX_ . 'kyc_verification')
+            ->groupBy('status');
+
+        $result = $qb->execute();
+        return $result->fetchAllKeyValue();
+    }
+
+    /**
+     * Count total verifications with optional filters
+     * 
+     * @param array $filters Optional filters for status and customer ID
+     * @return int Total count of verification records matching the filters
+     */
+    public function countAll(array $filters = []): int
+    {
+        $qb = $this->connection->createQueryBuilder();
+        $qb->select('COUNT(*)')
+            ->from(_DB_PREFIX_ . 'kyc_verification');
+
+        // Apply filters if provided
+        if (!empty($filters['status'])) {
+            $qb->andWhere('status = :status')
+                ->setParameter('status', $filters['status']);
+        }
+        if (!empty($filters['customer_id'])) {
+            $qb->andWhere('id_customer = :customer_id')
+                ->setParameter('customer_id', $filters['customer_id']);
+        }
+
+        if (!empty($filters['date_from'])) {
+            $qb->andWhere('date_submitted >= :date_from')
+                ->setParameter('date_from', $filters['date_from']);
+        }
+
+        if (!empty($filters['date_to'])) {
+            $qb->andWhere('date_submitted <= :date_to')
+                ->setParameter('date_to', $filters['date_to']);
+        }
+
+        return (int) $qb->execute()->fetchOne();
+    }
+
+    /**
      * Find verification by customer ID
      * 
      * Retrieves the most recent verification record for a specific customer
@@ -127,134 +218,6 @@ class VerificationRepository
 
         $qb->execute();
         return (int) $this->connection->lastInsertId();
-    }
-
-    /**
-     * Update verification status
-     * 
-     * Updates the status and related fields of a verification record
-     * 
-     * @param int $verificationId The verification ID to update
-     * @param string $status New status for the verification
-     * @param string|null $adminNote Optional admin note
-     * @param \DateTime|null $dateValidated Optional validation date
-     * @param \DateTime|null $dateExpiry Optional expiry date
-     * @return bool True if update was successful, false otherwise
-     */
-    public function updateStatus(
-        int $verificationId,
-        string $status,
-        ?string $adminNote = null,
-        ?\DateTime $dateValidated = null,
-        ?\DateTime $dateExpiry = null
-    ): bool {
-        $qb = $this->connection->createQueryBuilder();
-        $qb->update(_DB_PREFIX_ . 'kyc_verification')
-            ->set('status', ':status')
-            ->where('id_kyc_verification = :verification_id')
-            ->setParameter('status', $status)
-            ->setParameter('verification_id', $verificationId);
-
-        if ($adminNote !== null) {
-            $qb->set('admin_note', ':admin_note')
-               ->setParameter('admin_note', $adminNote);
-        }
-
-        if ($dateValidated !== null) {
-            $qb->set('date_validated', ':date_validated')
-               ->setParameter('date_validated', $dateValidated->format('Y-m-d H:i:s'));
-        }
-
-        if ($dateExpiry !== null) {
-            $qb->set('date_expiry', ':date_expiry')
-               ->setParameter('date_expiry', $dateExpiry->format('Y-m-d H:i:s'));
-        }
-
-        return (bool) $qb->execute();
-    }
-
-    /**
-     * Find verifications by status
-     * 
-     * Retrieves all verification records with a specific status
-     * 
-     * @param string $status The status to filter by
-     * @param int $limit Maximum number of records to return (default: 100)
-     * @param int $offset Offset for pagination (default: 0)
-     * @return array Array of verification records
-     */
-    public function findByStatus(string $status, int $limit = 100, int $offset = 0): array
-    {
-        $qb = $this->connection->createQueryBuilder();
-        $query = $qb->select('*')
-            ->from(_DB_PREFIX_ . 'kyc_verification')
-            ->where('status = :status')
-            ->setParameter('status', $status)
-            ->orderBy('date_submitted', 'DESC')
-            ->setFirstResult($offset)
-            ->setMaxResults($limit);
-
-        $result = $query->execute();
-        return $result->fetchAllAssociative();
-    }
-
-    /**
-     * Find expired verifications
-     * 
-     * Retrieves all verification records that have passed their expiry date
-     * 
-     * @return array Array of expired verification records
-     */
-    public function findExpiredVerifications(): array
-    {
-        $qb = $this->connection->createQueryBuilder();
-        $query = $qb->select('*')
-            ->from(_DB_PREFIX_ . 'kyc_verification')
-            ->where('date_expiry IS NOT NULL')
-            ->andWhere('date_expiry < NOW()')
-            ->andWhere('status != :expired_status')
-            ->setParameter('expired_status', 'expired');
-
-        $result = $query->execute();
-        return $result->fetchAllAssociative();
-    }
-
-    /**
-     * Count verifications by status
-     * 
-     * Returns the number of verification records for each status
-     * 
-     * @return array Array of status counts
-     */
-    public function countByStatus(): array
-    {
-        $qb = $this->connection->createQueryBuilder();
-        $query = $qb->select('status, COUNT(*) as count')
-            ->from(_DB_PREFIX_ . 'kyc_verification')
-            ->groupBy('status')
-            ->orderBy('count', 'DESC');
-
-        $result = $query->execute();
-        return $result->fetchAllAssociative();
-    }
-
-    /**
-     * Delete verification by ID
-     * 
-     * Removes a verification record from the database
-     * Note: This should also handle cascade deletion of related documents and logs
-     * 
-     * @param int $verificationId The verification ID to delete
-     * @return bool True if deletion was successful, false otherwise
-     */
-    public function delete(int $verificationId): bool
-    {
-        $qb = $this->connection->createQueryBuilder();
-        $qb->delete(_DB_PREFIX_ . 'kyc_verification')
-            ->where('id_kyc_verification = :verification_id')
-            ->setParameter('verification_id', $verificationId);
-
-        return (bool) $qb->execute();
     }
 
     /**
