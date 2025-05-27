@@ -8,9 +8,9 @@ Open source, GDPR-compliant KYC document verification for PrestaShop.
 
 ## Features
 
-- [ ] Secure KYC file uploads (ID, proof of address)
-- [ ] End-to-end file encryption (OpenSSL)
-- [ ] Front-office upload & status tracking
+- [x] Secure KYC file uploads (ID, proof of address)
+- [x] End-to-end file encryption (OpenSSL)
+- [x] Front-office upload & status tracking
 - [ ] Back-office admin panel: validation, logs, messaging
 - [ ] Automated email notifications (status updates, rejections, deletions)
 - [ ] Order blocking for sensitive products until KYC is validated
@@ -34,35 +34,6 @@ Open source, GDPR-compliant KYC document verification for PrestaShop.
 
 PRs welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-## Development
-<!--
-### Requirements
-
-This module requires: 
-- [Node.js](https://nodejs.org/) (for build tools)
-- [PNPM](https://pnpm.io/) (for package management)
-- [Composer](https://getcomposer.org/) (for PHP dependencies)
-- [Vite](https://vitejs.dev/) (for building and bundling CSS, TypeScript, and other frontend assets)
-
-### Setup
-
-1. Install PHP dependencies:
-   ```sh
-   composer install
-   ```
-2. Install Node.js dependencies:
-   ```sh
-   pnpm install
-   ```
-3. Build frontend assets with Vite:
-   ```sh
-   pnpm run build
-   ```
-   For development with hot reload:
-   ```sh
-   pnpm run dev
-   ```
---> 
 ## License
 
 MIT License. See [LICENSE.md](LICENSE.md) for details.
