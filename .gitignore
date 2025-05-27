@@ -7,3 +7,5 @@ config_*.xml
 .php_cs.cache
 .idea
 .php-cs-fixer.cache
+
+secure_upload/

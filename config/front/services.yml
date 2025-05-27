@@ -24,6 +24,11 @@ services:
     arguments:
       - '@doctrine.dbal.default_connection'
 
+  PrestaShop\Module\Pskyc\Repository\CustomerRepository:
+    class: 'PrestaShop\Module\Pskyc\Repository\CustomerRepository'
+    arguments:
+      - '@doctrine.dbal.default_connection'
+
   # Core Services
   PrestaShop\Module\Pskyc\Service\EncryptionService:
     class: 'PrestaShop\Module\Pskyc\Service\EncryptionService'

@@ -29,27 +29,22 @@ class CustomerRepository
     }
 
     /**
-     * Find customer name by customer ID
+     * Get customer data
      *
-     * Retrieves the full name (firstname + lastname) of a customer by their ID
+     * Retrieves
      *
-     * @param CustomerId $customerId The customer ID to search for
-     * @return string The customer's full name (firstname lastname)
+     * @param int $customerId Customer ID
+     * @return array Customer data
      */
-    public function findCustomerNameByCustomerId(CustomerId $customerId): string
+    public function getCustomerData(int $customerId): array
     {
-        $qb = $this->connection->createQueryBuilder();
-        $expression = new Expr();
-        $concat = $expression->concat('firstname', '" "', 'lastname');
+        $queryBuilder = $this->connection->createQueryBuilder();
+        $queryBuilder
+            ->select('c.id_customer', 'c.firstname', 'c.lastname', 'c.email', 'c.date_add')
+            ->from('customer', 'c')
+            ->where($queryBuilder->expr()->eq('c.id_customer', ':customerId'))
+            ->setParameter(':customerId', $customerId);
 
-        $query = $qb->select($concat . ' as name')
-            ->from(_DB_PREFIX_ . 'customer', 'customer')
-            ->where('customer.id_customer = :id_customer')
-            ->setParameter('id_customer', $customerId->getValue())
-        ;
-
-        $result = $query->execute();
-
-        return $result->fetchOne();
+        return $queryBuilder->executeQuery()->fetchAssociative() ?: [];
     }
 }

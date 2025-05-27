@@ -353,8 +353,9 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
     private function getCustomerData(int $customerId): ?array
     {
         try {
-            $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'customer` WHERE `id_customer` = ' . (int) $customerId;
-            return Db::getInstance()->getRow($sql);
+            $customerRepository = $this->module->get('PrestaShop\Module\Pskyc\Repository\CustomerRepository');
+            $customerData = $customerRepository->getCustomerData($customerId);
+            return $customerData ?: null;
         } catch (Exception $e) {
             PrestaShopLogger::addLog('Get customer data error: ' . $e->getMessage(), 3, null, 'Pskyc');
             return null;
