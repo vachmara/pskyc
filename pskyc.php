@@ -56,9 +56,17 @@ class Pskyc extends Module
      */
     public function install()
     {
-        // default config
+        // Set default configuration values
         Configuration::updateValue('PSKYC_RETENTION_DAYS', 365);
         Configuration::updateValue('PSKYC_ALLOWED_CATEGORIES', json_encode([]));
+        Configuration::updateValue('PSKYC_ADMIN_EMAILS', Configuration::get('PS_SHOP_EMAIL'));
+        Configuration::updateValue('PSKYC_AUTO_NOTIFICATIONS', true);
+
+        // Generate encryption key
+        if (!Configuration::get('PSKYC_ENCRYPTION_KEY')) {
+            $key = base64_encode(random_bytes(32));
+            Configuration::updateValue('PSKYC_ENCRYPTION_KEY', $key);
+        }
 
         require_once __DIR__ . '/sql/install.php';
 
@@ -104,16 +112,29 @@ class Pskyc extends Module
      */
     public function getContent()
     {
+        $output = '';
+        $errors = [];
+
         /**
          * If values have been submitted in the form, process.
          */
-        if (((bool) Tools::isSubmit('submitPskycModule')) == true) {
-            $this->postProcess();
+        if (Tools::isSubmit('submitPskycModule')) {
+            $result = $this->postProcess();
+            if ($result['success']) {
+                $output .= $this->displayConfirmation($this->l('Settings updated successfully!'));
+            } else {
+                $errors = $result['errors'];
+            }
         }
 
-        $this->context->smarty->assign('module_dir', $this->_path);
+        // Assign template variables
+        $this->context->smarty->assign([
+            'module_dir' => $this->_path,
+            'form_html' => $this->renderForm(),
+            'errors' => $errors,
+        ]);
 
-        $output = $this->context->smarty->fetch($this->local_path . 'views/templates/admin/configure.tpl');
+        $output .= $this->context->smarty->fetch($this->local_path . 'views/templates/admin/configure.tpl');
 
         return $output;
     }
@@ -165,20 +186,60 @@ class Pskyc extends Module
                     [
                         'type' => 'text',
                         'name' => 'PSKYC_RETENTION_DAYS',
-                        'label' => $this->l('Retention (days)'),
-                        'desc' => $this->l('Documents older than this will be purged automatically.'),
+                        'label' => $this->l('Document Retention (days)'),
+                        'desc' => $this->l('Documents older than this will be purged automatically. Set to 0 to disable automatic cleanup.'),
                         'col' => 2,
+                        'suffix' => 'days',
+                        'required' => true,
+                        'cast' => 'intval',
+                        'class' => 'fixed-width-sm'
                     ],
                     [
                         'type' => 'categories',
                         'name' => 'PSKYC_ALLOWED_CATEGORIES',
                         'label' => $this->l('Categories requiring KYC'),
+                        'desc' => $this->l('Select product categories that require KYC verification before purchase. Leave empty to disable automatic order blocking.'),
                         'tree' => [
+                            'id' => 'categories-tree',
+                            'selected_categories' => json_decode(Configuration::get('PSKYC_ALLOWED_CATEGORIES') ?: '[]', true),
                             'root_category' => (int) Configuration::get('PS_HOME_CATEGORY'),
+                            'use_checkbox' => true,
+                            'use_search' => true,
+                            'disabled_categories' => [],
+                            'top_category' => Category::getTopCategory(),
+                            'use_context' => true,
                         ],
                     ],
+                    [
+                        'type' => 'text',
+                        'name' => 'PSKYC_ADMIN_EMAILS',
+                        'label' => $this->l('Admin notification emails'),
+                        'desc' => $this->l('Comma-separated list of emails to notify for new KYC submissions. Example: admin@store.com, manager@store.com'),
+                        'col' => 6,
+                        'placeholder' => 'admin@yourstore.com, manager@yourstore.com'
+                    ],
+                    [
+                        'type' => 'switch',
+                        'name' => 'PSKYC_AUTO_NOTIFICATIONS',
+                        'label' => $this->l('Auto notifications'),
+                        'desc' => $this->l('Send automatic email notifications to customers when their verification status changes.'),
+                        'is_bool' => true,
+                        'values' => [
+                            ['id' => 'active_on', 'value' => 1, 'label' => $this->l('Enabled')],
+                            ['id' => 'active_off', 'value' => 0, 'label' => $this->l('Disabled')]
+                        ],
+                    ],
+                    [
+                        'type' => 'html',
+                        'name' => 'encryption_info',
+                        'html_content' => '<div class="alert alert-info"><strong>' . $this->l('Security Note:') . '</strong> ' . 
+                            $this->l('All uploaded documents are automatically encrypted using AES-256-CBC encryption. The encryption key is automatically generated and stored securely.') . '</div>'
+                    ]
                 ],
-                'submit' => ['title' => $this->l('Save')],
+                'submit' => [
+                    'title' => $this->l('Save Configuration'),
+                    'class' => 'btn btn-default pull-right'
+                ],
             ],
         ];
     }
@@ -193,6 +254,8 @@ class Pskyc extends Module
         return [
             'PSKYC_RETENTION_DAYS' => (int) Configuration::get('PSKYC_RETENTION_DAYS'),
             'PSKYC_ALLOWED_CATEGORIES' => json_decode(Configuration::get('PSKYC_ALLOWED_CATEGORIES') ?: '[]', true),
+            'PSKYC_ADMIN_EMAILS' => Configuration::get('PSKYC_ADMIN_EMAILS'),
+            'PSKYC_AUTO_NOTIFICATIONS' => (bool) Configuration::get('PSKYC_AUTO_NOTIFICATIONS'),
         ];
     }
 
@@ -201,14 +264,71 @@ class Pskyc extends Module
      * 
      * Processes and saves the configuration form values
      * 
-     * @return void
+     * @return array Result with success status and any errors
      */
     protected function postProcess()
     {
-        $form_values = $this->getConfigFormValues();
+        $errors = [];
+        $success = true;
 
-        foreach (array_keys($form_values) as $key) {
-            Configuration::updateValue($key, Tools::getValue($key));
+        // Validate retention days
+        $retentionDays = (int) Tools::getValue('PSKYC_RETENTION_DAYS');
+        if ($retentionDays < 0) {
+            $errors[] = $this->l('Retention days must be 0 or positive.');
+            $success = false;
+        }
+
+        // Validate admin emails
+        $adminEmails = Tools::getValue('PSKYC_ADMIN_EMAILS');
+        if (!empty($adminEmails)) {
+            $emails = array_map('trim', explode(',', $adminEmails));
+            foreach ($emails as $email) {
+                if (!Validate::isEmail($email)) {
+                    $errors[] = sprintf($this->l('Invalid email address: %s'), $email);
+                    $success = false;
+                }
+            }
+        }
+
+        // If validation passed, save the values
+        if ($success) {
+            // Handle categories specifically
+            $categoryIds = Tools::getValue('PSKYC_ALLOWED_CATEGORIES');
+            if (is_array($categoryIds)) {
+                // Remove any invalid category IDs
+                $categoryIds = array_filter($categoryIds, function($id) {
+                    return is_numeric($id) && (int)$id > 0;
+                });
+                Configuration::updateValue('PSKYC_ALLOWED_CATEGORIES', json_encode(array_values($categoryIds)));
+            } else {
+                Configuration::updateValue('PSKYC_ALLOWED_CATEGORIES', json_encode([]));
+            }
+
+            // Handle other configuration values
+            Configuration::updateValue('PSKYC_RETENTION_DAYS', $retentionDays);
+            Configuration::updateValue('PSKYC_ADMIN_EMAILS', $adminEmails);
+            Configuration::updateValue('PSKYC_AUTO_NOTIFICATIONS', (bool)Tools::getValue('PSKYC_AUTO_NOTIFICATIONS'));
+
+            // Ensure encryption key exists
+            $this->ensureEncryptionKey();
+        }
+
+        return [
+            'success' => $success,
+            'errors' => $errors
+        ];
+    }
+
+    /**
+     * Ensure encryption key exists
+     * 
+     * @return void
+     */
+    private function ensureEncryptionKey()
+    {
+        if (!Configuration::get('PSKYC_ENCRYPTION_KEY')) {
+            $key = base64_encode(random_bytes(32)); // 256-bit key
+            Configuration::updateValue('PSKYC_ENCRYPTION_KEY', $key);
         }
     }
 

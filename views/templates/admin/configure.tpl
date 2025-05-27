@@ -4,42 +4,69 @@
 *}
 
 <div class="panel">
-	<div class="row moduleconfig-header">
-		<div class="col-xs-5 text-right">
-			<img src="{$module_dir|escape:'html':'UTF-8'}views/img/logo.jpg" />
-		</div>
-		<div class="col-xs-7 text-left">
-			<h2>{l s='Lorem' mod='pskyc'}</h2>
-			<h4>{l s='Lorem ipsum dolor' mod='pskyc'}</h4>
-		</div>
-	</div>
+    <div class="panel-heading">
+        <i class="icon-cogs"></i> {l s='KYC Secure Upload Configuration' mod='pskyc'}
+    </div>
+    
+    <div class="panel-body">
+        <div class="alert alert-info">
+            <p><strong>{l s='Welcome to KYC Secure Upload!' mod='pskyc'}</strong></p>
+            <p>{l s='This module allows your customers to upload identity documents for verification. Configure the settings below to customize the behavior.' mod='pskyc'}</p>
+        </div>
 
-	<hr />
+        {if isset($confirmation)}
+            <div class="alert alert-success">
+                {l s='Settings updated successfully!' mod='pskyc'}
+            </div>
+        {/if}
 
-	<div class="moduleconfig-content">
-		<div class="row">
-			<div class="col-xs-12">
-				<p>
-					<h4>{l s='Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor' mod='pskyc'}</h4>
-					<ul class="ul-spaced">
-						<li><strong>{l s='Lorem ipsum dolor sit amet' mod='pskyc'}</strong></li>
-						<li>{l s='Lorem ipsum dolor sit amet' mod='pskyc'}</li>
-						<li>{l s='Lorem ipsum dolor sit amet' mod='pskyc'}</li>
-						<li>{l s='Lorem ipsum dolor sit amet' mod='pskyc'}</li>
-						<li>{l s='Lorem ipsum dolor sit amet' mod='pskyc'}</li>
-					</ul>
-				</p>
+        {if isset($errors) && count($errors)}
+            <div class="alert alert-danger">
+                <ul>
+                    {foreach from=$errors item=error}
+                        <li>{$error}</li>
+                    {/foreach}
+                </ul>
+            </div>
+        {/if}
 
-				<br />
+        {$form_html nofilter}
+    </div>
+</div>
 
-				<p class="text-center">
-					<strong>
-						<a href="http://www.prestashop.com" target="_blank" title="Lorem ipsum dolor">
-							{l s='Lorem ipsum dolor' mod='pskyc' }
-						</a>
-					</strong>
-				</p>
-			</div>
-		</div>
-	</div>
+<div class="panel">
+    <div class="panel-heading">
+        <i class="icon-info"></i> {l s='Module Information' mod='pskyc'}
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h4>{l s='Current Status' mod='pskyc'}</h4>
+                <ul class="list-unstyled">
+                    <li><strong>{l s='Version:' mod='pskyc'}</strong> 0.1.0</li>
+                    <li><strong>{l s='Upload Directory:' mod='pskyc'}</strong> {$module_dir}secure_upload/</li>
+                    <li><strong>{l s='Encryption:' mod='pskyc'}</strong> 
+                        {if function_exists('openssl_encrypt')}
+                            <span class="label label-success">{l s='Available' mod='pskyc'}</span>
+                        {else}
+                            <span class="label label-danger">{l s='Not Available' mod='pskyc'}</span>
+                        {/if}
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h4>{l s='Quick Actions' mod='pskyc'}</h4>
+                <p>
+                    <a href="#" class="btn btn-default" onclick="alert('Feature coming soon!');">
+                        <i class="icon-list"></i> {l s='View Verifications' mod='pskyc'}
+                    </a>
+                </p>
+                <p>
+                    <a href="#" class="btn btn-default" onclick="alert('Feature coming soon!');">
+                        <i class="icon-cogs"></i> {l s='Manage Documents' mod='pskyc'}
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
 </div>
