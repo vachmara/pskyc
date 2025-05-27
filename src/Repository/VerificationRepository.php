@@ -2,7 +2,6 @@
 namespace PrestaShop\Module\Pskyc\Repository;
 
 use Doctrine\DBAL\Connection;
-use PrestaShop\PrestaShop\Core\Domain\Customer\ValueObject\CustomerId;
 
 /**
  * Class VerificationRepository
@@ -122,7 +121,8 @@ class VerificationRepository
             ])
             ->setParameters([
                 'customer_id' => $customerId,
-                'status' => $status
+                'status' => $status,
+                'customer_note' => $customerNote ?? null,
             ]);
 
         $qb->execute();

@@ -4,7 +4,8 @@ namespace PrestaShop\Module\Pskyc\Service;
 use PrestaShop\Module\Pskyc\Repository\VerificationRepository;
 use PrestaShop\Module\Pskyc\Repository\DocumentRepository;
 use PrestaShop\Module\Pskyc\Repository\LogRepository;
-
+use PrestaShopLogger;
+use Configuration; 
 /**
  * Class VerificationService
  * 
@@ -84,7 +85,7 @@ class VerificationService
                 ];
             }
             
-            $verificationId = $this->verificationRepository->create($customerId, status: $options['customer_note'] ?? null);
+            $verificationId = $this->verificationRepository->create($customerId, 'pending', $options['customer_note'] ?? null);
 
             if ($verificationId) {
                 // Log the creation
@@ -412,60 +413,5 @@ class VerificationService
     {
         $validityDays = (int) Configuration::get('PSKYC_VALIDITY_DAYS', 365);
         return date('Y-m-d H:i:s', strtotime('+' . $validityDays . ' days'));
-    }
-
-    /**
-     * Check customer order history for KYC requirements
-     * 
-     * Analyzes customer's order history to determine if KYC is required
-     * 
-     * @param int $customerId The customer ID
-     * @return bool True if KYC is required based on order history
-     */
-    private function checkOrderHistory(int $customerId): bool
-    {
-        try {
-            // Get configured categories that require KYC
-            $kycCategories = Configuration::get('PSKYC_REQUIRED_CATEGORIES');
-            if (empty($kycCategories)) {
-                return false;
-            }
-
-            $categoryIds = explode(',', $kycCategories);
-            
-            // Check if customer has ordered from KYC-required categories
-            $sql = 'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'orders` o
-                    INNER JOIN `' . _DB_PREFIX_ . 'order_detail` od ON o.id_order = od.id_order
-                    INNER JOIN `' . _DB_PREFIX_ . 'product` p ON od.product_id = p.id_product
-                    WHERE o.id_customer = ' . (int)$customerId . '
-                    AND p.id_category_default IN (' . implode(',', array_map('intval', $categoryIds)) . ')
-                    LIMIT 1';
-
-            $result = Db::getInstance()->getValue($sql);
-            return (bool) $result;
-
-        } catch (\Exception $e) {
-            PrestaShopLogger::addLog('Order history check error: ' . $e->getMessage(), 3, null, 'Pskyc');
-            return false;
-        }
-    }
-
-    /**
-     * Get customer data
-     * 
-     * Retrieves customer information for notifications
-     * 
-     * @param int $customerId The customer ID
-     * @return array|null Customer data or null if not found
-     */
-    private function getCustomerData(int $customerId): ?array
-    {
-        try {
-            $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'customer` WHERE `id_customer` = ' . (int)$customerId;
-            return Db::getInstance()->getRow($sql);
-        } catch (\Exception $e) {
-            PrestaShopLogger::addLog('Get customer data error: ' . $e->getMessage(), 3, null, 'Pskyc');
-            return null;
-        }
     }
 }

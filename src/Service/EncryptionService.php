@@ -1,6 +1,6 @@
 <?php
 namespace PrestaShop\Module\Pskyc\Service;
-
+use Configuration;
 /**
  * Class EncryptionService
  * 
