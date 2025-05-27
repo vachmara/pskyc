@@ -1,9 +1,7 @@
-<?php 
+<?php
 namespace PrestaShop\Module\Pskyc\Repository;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\ORM\Query\Expr;
-use PrestaShop\PrestaShop\Core\Domain\Customer\ValueObject\CustomerId;
 
 /**
  * Class CustomerRepository
@@ -31,7 +29,7 @@ class CustomerRepository
     /**
      * Get customer data
      *
-     * Retrieves
+     * Retrieves customer information for KYC verification
      *
      * @param int $customerId Customer ID
      * @return array Customer data
@@ -41,10 +39,11 @@ class CustomerRepository
         $queryBuilder = $this->connection->createQueryBuilder();
         $queryBuilder
             ->select('c.id_customer', 'c.firstname', 'c.lastname', 'c.email', 'c.date_add')
-            ->from('customer', 'c')
+            ->from(_DB_PREFIX_ . 'customer', 'c')
             ->where($queryBuilder->expr()->eq('c.id_customer', ':customerId'))
-            ->setParameter(':customerId', $customerId);
+            ->setParameter('customerId', $customerId);
 
-        return $queryBuilder->executeQuery()->fetchAssociative() ?: [];
+        $result = $queryBuilder->execute();
+        return $result->fetchAssociative() ?: [];
     }
 }

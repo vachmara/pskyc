@@ -5,6 +5,8 @@ use PrestaShop\Module\Pskyc\Repository\DocumentRepository;
 use PrestaShop\Module\Pskyc\Repository\VerificationRepository;
 use PrestaShop\Module\Pskyc\Service\EncryptionService;
 
+use PrestaShopLogger;
+use Configuration;
 /**
  * Class DocumentService
  * 

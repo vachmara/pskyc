@@ -35,10 +35,33 @@
       <p><small>{l s='Submitted on:' d='Modules.Pskyc.Shop'}
           {$verification.date_submitted|date_format:'%B %e, %Y at %H:%M'}</small></p>
     </div>
+    {* Existing Documents *}
+    {if isset($documents) && $documents}
+      <div class="existing-documents">
+        <h3><i class="material-icons">folder</i> {l s='Uploaded Documents' d='Modules.Pskyc.Shop'}</h3>
+        <div class="documents-list">
+          {foreach from=$documents item=document}
+            <div class="document-item">
+              <div class="document-info">
+                <span class="document-type">{$document.type|escape:'html':'UTF-8'}</span>
+                <span class="document-name">{$document.filename|escape:'html':'UTF-8'}</span>
+                <span class="document-size">{($document.filesize/1024)|string_format:"%.1f"} KB</span>
+                <span class="document-date">{$document.date_uploaded|date_format:'%B %e, %Y'}</span>
+              </div>
+              <div class="document-actions">
+                <i class="material-icons document-icon">
+                  {if $document.mime|strpos:'image' !== false}image{elseif $document.mime|strpos:'pdf' !== false}picture_as_pdf{else}description{/if}
+                </i>
+              </div>
+            </div>
+          {/foreach}
+        </div>
+      </div>
+    {/if}
   {/if}
 
   {* Upload Form *}
-  {if !isset($verification) || $verification.status != 'approved'}
+  {if !isset($verification)}
     <form id="kyc-upload-form" method="post" enctype="multipart/form-data"
       action="{$smarty.server.REQUEST_URI|escape:'html':'UTF-8'}">
       <input type="hidden" name="action" value="upload_documents" />
@@ -57,9 +80,12 @@
           <select name="id_document_type" id="id_document_type" class="form-control" required>
             <option value="">{l s='Select document type' d='Modules.Pskyc.Shop'}</option>
             <option value="passport">{l s='Passport' d='Modules.Pskyc.Shop'}</option>
-            <option value="drivers_license" data-requires-both-sides="true">{l s='Driver\'s License' d='Modules.Pskyc.Shop'}</option>
-            <option value="national_id" data-requires-both-sides="true">{l s='National ID Card' d='Modules.Pskyc.Shop'}</option>
-            <option value="residence_permit" data-requires-both-sides="true">{l s='Residence Permit' d='Modules.Pskyc.Shop'}</option>
+            <option value="drivers_license" data-requires-both-sides="true">
+              {l s='Driver\'s License' d='Modules.Pskyc.Shop'}</option>
+            <option value="national_id" data-requires-both-sides="true">{l s='National ID Card' d='Modules.Pskyc.Shop'}
+            </option>
+            <option value="residence_permit" data-requires-both-sides="true">
+              {l s='Residence Permit' d='Modules.Pskyc.Shop'}</option>
           </select>
         </div>
 
@@ -83,7 +109,8 @@
                 <i class="material-icons">credit_card</i>
                 {l s='Front Side' d='Modules.Pskyc.Shop'}
               </label>
-              <input type="file" name="id_document_front" id="id_document_front" class="form-control-file" accept="image/*,.pdf" />
+              <input type="file" name="id_document_front" id="id_document_front" class="form-control-file"
+                accept="image/*,.pdf" />
               <small class="form-text text-muted">
                 {l s='Upload the front side of your document' d='Modules.Pskyc.Shop'}
               </small>
@@ -94,7 +121,8 @@
                 <i class="material-icons">flip_to_back</i>
                 {l s='Back Side' d='Modules.Pskyc.Shop'}
               </label>
-              <input type="file" name="id_document_back" id="id_document_back" class="form-control-file" accept="image/*,.pdf" />
+              <input type="file" name="id_document_back" id="id_document_back" class="form-control-file"
+                accept="image/*,.pdf" />
               <small class="form-text text-muted">
                 {l s='Upload the back side of your document' d='Modules.Pskyc.Shop'}
               </small>
@@ -197,37 +225,6 @@
         </div>
       </div>
     </form>
-  {else}
-    <div class="alert alert-success">
-      <h4><i class="material-icons">check_circle</i> {l s='Verification Complete' d='Modules.Pskyc.Shop'}</h4>
-      <p>
-        {l s='Your identity has been successfully verified. You can now access all features of our platform.' d='Modules.Pskyc.Shop'}
-      </p>
-    </div>
-  {/if}
-
-  {* Existing Documents *}
-  {if isset($documents) && $documents}
-    <div class="existing-documents">
-      <h3><i class="material-icons">folder</i> {l s='Uploaded Documents' d='Modules.Pskyc.Shop'}</h3>
-      <div class="documents-list">
-        {foreach from=$documents item=document}
-          <div class="document-item">
-            <div class="document-info">
-              <span class="document-type">{$document.type|escape:'html':'UTF-8'}</span>
-              <span class="document-name">{$document.filename|escape:'html':'UTF-8'}</span>
-              <span class="document-size">{($document.filesize/1024)|string_format:"%.1f"} KB</span>
-              <span class="document-date">{$document.date_uploaded|date_format:'%B %e, %Y'}</span>
-            </div>
-            <div class="document-actions">
-              <i class="material-icons document-icon">
-                {if $document.mime|strpos:'image' !== false}image{elseif $document.mime|strpos:'pdf' !== false}picture_as_pdf{else}description{/if}
-              </i>
-            </div>
-          </div>
-        {/foreach}
-      </div>
-    </div>
   {/if}
 </div>
 
@@ -498,8 +495,9 @@
       form.addEventListener('submit', function(e) {
         const idDocType = document.getElementById('id_document_type').value;
         const selectedOption = document.querySelector('#id_document_type option[value="' + idDocType + '"]');
-        const requiresBothSides = selectedOption ? selectedOption.getAttribute('data-requires-both-sides') : false;
-        
+        const requiresBothSides = selectedOption ? selectedOption.getAttribute('data-requires-both-sides') :
+          false;
+
         const addressDoc = document.getElementById('address_document');
         const consent = document.getElementById('data_consent');
         const authenticity = document.getElementById('document_authenticity');
@@ -511,7 +509,7 @@
         if (requiresBothSides === 'true') {
           const frontDoc = document.getElementById('id_document_front');
           const backDoc = document.getElementById('id_document_back');
-          
+
           if (!frontDoc.files[0]) {
             errors.push('{l s="Please upload the front side of your identity document" d="Modules.Pskyc.Shop"}');
             valid = false;
@@ -532,7 +530,7 @@
           }
         } else {
           const idDoc = document.getElementById('id_document');
-          
+
           if (!idDoc.files[0]) {
             errors.push('{l s="Please upload your identity document" d="Modules.Pskyc.Shop"}');
             valid = false;
