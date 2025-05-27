@@ -5,7 +5,7 @@ use PrestaShop\Module\Pskyc\Repository\VerificationRepository;
 use PrestaShop\Module\Pskyc\Repository\DocumentRepository;
 use PrestaShop\Module\Pskyc\Repository\LogRepository;
 use PrestaShopLogger;
-use Configuration; 
+use Configuration;
 /**
  * Class VerificationService
  * 
@@ -84,7 +84,7 @@ class VerificationService
                     'verification_id' => $existingVerification['id_kyc_verification']
                 ];
             }
-            
+
             $verificationId = $this->verificationRepository->create($customerId, 'pending', $options['customer_note'] ?? null);
 
             if ($verificationId) {
@@ -246,90 +246,26 @@ class VerificationService
     }
 
     /**
-     * Check if customer needs KYC verification
-     * 
-     * Determines if a customer needs to complete KYC verification
-     * based on their order history and product categories
+     * Get all Verifications by customer ID
      * 
      * @param int $customerId The customer ID
-     * @return array Result with 'required' boolean and 'reason' string
+     * @return array|null Returns an array of verifications or null if none found
      */
-    public function isKycRequired(int $customerId): array
+    public function getVerificationsByCustomerId(int $customerId): ?array
     {
         try {
-            // Check if customer already has approved verification
-            $activeVerification = $this->verificationRepository->findActiveByCustomerId($customerId);
-            if ($activeVerification && $activeVerification['status'] === 'approved') {
-                // Check if verification is still valid (not expired)
-                if (!$this->isVerificationExpired($activeVerification)) {
-                    return [
-                        'required' => false,
-                        'reason' => 'Customer has valid KYC verification'
-                    ];
-                }
+            $verifications = $this->verificationRepository->findAllByCustomerId($customerId);
+            if (empty($verifications)) {
+                return null;
             }
-
-            // Check if customer has ordered products that require KYC
-            $requiresKyc = $this->checkOrderHistory($customerId);
-            if ($requiresKyc) {
-                return [
-                    'required' => true,
-                    'reason' => 'Customer has ordered products that require KYC verification'
-                ];
+            // Check if any verification is expired
+            foreach ($verifications as &$verification) {
+                $verification['is_expired'] = $this->isVerificationExpired($verification);
             }
-
-            return [
-                'required' => false,
-                'reason' => 'KYC verification not required for current customer activity'
-            ];
-
+            return $verifications;
         } catch (\Exception $e) {
-            PrestaShopLogger::addLog('KYC requirement check error: ' . $e->getMessage(), 3, null, 'Pskyc');
-            return [
-                'required' => false,
-                'reason' => 'Error checking KYC requirement'
-            ];
-        }
-    }
-
-    /**
-     * Process pending verifications cleanup
-     * 
-     * Handles cleanup of old pending verifications and expired documents
-     * 
-     * @return array Cleanup statistics
-     */
-    public function processCleanup(): array
-    {
-        try {
-            $stats = [
-                'expired_verifications' => 0,
-                'deleted_documents' => 0,
-                'old_pending_verifications' => 0
-            ];
-
-            // Mark expired verifications
-            $expiredCount = $this->verificationRepository->markExpiredVerifications();
-            $stats['expired_verifications'] = $expiredCount;
-
-            // Clean up old pending verifications (older than 30 days)
-            $oldPendingCount = $this->verificationRepository->cleanupOldPendingVerifications();
-            $stats['old_pending_verifications'] = $oldPendingCount;
-
-            // Clean up expired documents
-            $deletedDocsCount = $this->documentService->cleanupExpiredDocuments();
-            $stats['deleted_documents'] = $deletedDocsCount;
-
-            return $stats;
-
-        } catch (\Exception $e) {
-            PrestaShopLogger::addLog('Cleanup process error: ' . $e->getMessage(), 3, null, 'Pskyc');
-            return [
-                'expired_verifications' => 0,
-                'deleted_documents' => 0,
-                'old_pending_verifications' => 0,
-                'error' => $e->getMessage()
-            ];
+            PrestaShopLogger::addLog('Get verifications by customer ID error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            return null;
         }
     }
 
@@ -381,8 +317,8 @@ class VerificationService
             'expired' => ['pending']
         ];
 
-        return isset($validTransitions[$fromStatus]) && 
-               in_array($toStatus, $validTransitions[$fromStatus]);
+        return isset($validTransitions[$fromStatus]) &&
+            in_array($toStatus, $validTransitions[$fromStatus]);
     }
 
     /**

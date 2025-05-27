@@ -76,6 +76,7 @@ class Pskyc extends Module
         }
 
         return parent::install() &&
+            $this->installTab() &&
             $this->registerHook('header') &&
             $this->registerHook('displayBackOfficeHeader') &&
             $this->registerHook('actionAdminControllerSetMedia') &&
@@ -83,6 +84,24 @@ class Pskyc extends Module
             $this->registerHook('displayAdminCustomers') &&
             $this->registerHook('displayAdminOrder') &&
             $this->registerHook('displayCustomerAccount');
+    }
+
+    /**
+     * Install the KYC Verification tab in the back office
+     */
+    private function installTab()
+    {
+        $tab = new Tab();
+        $tab->active = 1;
+        $tab->class_name = 'AdminPskyc';
+        $tab->name = [];
+        foreach (Language::getLanguages(false) as $lang) {
+            $tab->name[$lang['id_lang']] = $this->l('KYC Verification');
+        }
+        $tab->module = $this->name;
+        $tab->id_parent = (int) Tab::getIdFromClassName('AdminParentCustomer');
+        $tab->active = 1;
+        return $tab->add();
     }
 
     /**
@@ -391,7 +410,19 @@ class Pskyc extends Module
      */
     public function hookDisplayAdminCustomers()
     {
-        /* Place your code here. */
+        $customerId = Tools::getValue('id_customer');
+        if (!$customerId) {
+            return;
+        }
+        $verificationService = $this->get('PrestaShop\Module\Pskyc\Service\VerificationService');
+        $verifications = $verificationService->getVerificationsByCustomerId($customerId);
+        $this->context->smarty->assign([
+            'verifications' => $verifications,
+            'count' => count($verifications ?? []),
+            'customerId' => $customerId,
+        ]);
+        return $this->fetch('module:' . $this->name . '/views/templates/admin/customers/kyc_status.tpl');
+
     }
 
     /**
