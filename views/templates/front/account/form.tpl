@@ -35,6 +35,7 @@
       <p><small>{l s='Submitted on:' d='Modules.Pskyc.Shop'}
           {$verification.date_submitted|date_format:'%B %e, %Y at %H:%M'}</small></p>
     </div>
+
     {* Existing Documents *}
     {if isset($documents) && $documents}
       <div class="existing-documents">
@@ -60,8 +61,7 @@
     {/if}
   {/if}
 
-  {* Upload Form *}
-  {if !isset($verification)}
+  {if !isset($verification) || !$verification}
     <form id="kyc-upload-form" method="post" enctype="multipart/form-data"
       action="{$smarty.server.REQUEST_URI|escape:'html':'UTF-8'}">
       <input type="hidden" name="action" value="upload_documents" />
