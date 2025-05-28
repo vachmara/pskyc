@@ -1,0 +1,114 @@
+{% extends '@Modules/pskyc/mails/themes/pskyc/layouts/kyc_base.html.twig' %}
+
+{% set status_config = {
+    'pending': {
+        'title': 'KYC Verification Pending'|trans({}, 'Modules.Pskyc.Shop', language.locale),
+        'subtitle': 'Verification Pending'|trans({}, 'Modules.Pskyc.Shop', language.locale),
+        'header_color': '#6c757d',
+        'accent_color': '#6c757d',
+        'message': 'We have received your KYC verification request and it is currently pending processing.'|trans({}, 'Modules.Pskyc.Shop', language.locale),
+        'additional_info': 'Your verification request has been added to our processing queue. Our team will begin reviewing your documents shortly.'|trans({}, 'Modules.Pskyc.Shop', language.locale)
+    },
+    'under_review': {
+        'title': 'KYC Verification Under Review'|trans({}, 'Modules.Pskyc.Shop', language.locale),
+        'subtitle': 'Under Review'|trans({}, 'Modules.Pskyc.Shop', language.locale),
+        'header_color': '#ffc107',
+        'accent_color': '#ffc107',
+        'message': 'Your KYC verification documents are currently under review by our team.'|trans({}, 'Modules.Pskyc.Shop', language.locale),
+        'additional_info': 'Our verification team is carefully reviewing your submitted documents. This process typically takes 24-48 hours.'|trans({}, 'Modules.Pskyc.Shop', language.locale)
+    },
+    'approved': {
+        'title': 'KYC Verification Approved'|trans({}, 'Modules.Pskyc.Shop', language.locale),
+        'subtitle': 'Approved'|trans({}, 'Modules.Pskyc.Shop', language.locale),
+        'header_color': '#28a745',
+        'accent_color': '#28a745',
+        'message': 'Great news! Your KYC verification has been approved.'|trans({}, 'Modules.Pskyc.Shop', language.locale),
+        'additional_info': 'You can now access all features that require identity verification.'|trans({}, 'Modules.Pskyc.Shop', language.locale)
+    },
+    'rejected': {
+        'title': 'KYC Verification Rejected'|trans({}, 'Modules.Pskyc.Shop', language.locale),
+        'subtitle': 'Rejected'|trans({}, 'Modules.Pskyc.Shop', language.locale),
+        'header_color': '#dc3545',
+        'accent_color': '#dc3545',
+        'message': 'We regret to inform you that your KYC verification has been rejected.'|trans({}, 'Modules.Pskyc.Shop', language.locale),
+        'additional_info': 'You can submit a new verification request with corrected documents at any time.'|trans({}, 'Modules.Pskyc.Shop', language.locale)
+    },
+    'expired': {
+        'title': 'KYC Verification Expired'|trans({}, 'Modules.Pskyc.Shop', language.locale),
+        'subtitle': 'Expired'|trans({}, 'Modules.Pskyc.Shop', language.locale),
+        'header_color': '#6c757d',
+        'accent_color': '#6c757d',
+        'message': 'Your KYC verification has expired and needs to be renewed.'|trans({}, 'Modules.Pskyc.Shop', language.locale),
+        'additional_info': 'To continue using services that require identity verification, please submit new documents.'|trans({}, 'Modules.Pskyc.Shop', language.locale)
+    }
+} %}
+
+{% set current_status = status_config[status] ?? status_config['pending'] %}
+
+{% block title %}{{ current_status.title }}{% endblock %}
+{% block header_color %}{{ current_status.header_color }}{% endblock %}
+{% block accent_color %}{{ current_status.accent_color }}{% endblock %}
+{% block header_subtitle %}{{ current_status.subtitle }}{% endblock %}
+
+{% block content %}
+    <p>{{ 'Dear'|trans({}, 'Modules.Pskyc.Shop', language.locale) }} {{ customer_name }},</p>
+    
+    <p>{{ current_status.message }}</p>
+    
+    <div class="info-box">
+        <p><strong>{{ 'Verification ID'|trans({}, 'Modules.Pskyc.Shop', language.locale) }}:</strong> #{{ verification_id }}</p>
+        <p><strong>{{ 'Status'|trans({}, 'Modules.Pskyc.Shop', language.locale) }}:</strong> 
+            <span class="status-badge" style="background-color: {{ current_status.accent_color }};">
+                {{ current_status.subtitle }}
+            </span>
+        </p>
+        <p><strong>{{ 'Date Submitted'|trans({}, 'Modules.Pskyc.Shop', language.locale) }}:</strong> {{ date_submitted|date('Y-m-d H:i:s') }}</p>
+        {% if date_validated %}
+            <p><strong>{{ 'Date Processed'|trans({}, 'Modules.Pskyc.Shop', language.locale) }}:</strong> {{ date_validated|date('Y-m-d H:i:s') }}</p>
+        {% endif %}
+        {% if date_expiry and status == 'approved' %}
+            <p><strong>{{ 'Valid Until'|trans({}, 'Modules.Pskyc.Shop', language.locale) }}:</strong> {{ date_expiry|date('Y-m-d H:i:s') }}</p>
+        {% endif %}
+    </div>
+    
+    <p>{{ current_status.additional_info }}</p>
+    
+    {% if admin_note %}
+        {% if status == 'approved' %}
+            <div class="alert alert-success">
+                <p><strong>{{ 'Note from our team'|trans({}, 'Modules.Pskyc.Shop', language.locale) }}:</strong></p>
+                <p>{{ admin_note }}</p>
+            </div>
+        {% elseif status == 'rejected' %}
+            <div class="alert alert-danger">
+                <p><strong>{{ 'Reason for rejection'|trans({}, 'Modules.Pskyc.Shop', language.locale) }}:</strong></p>
+                <p>{{ admin_note }}</p>
+            </div>
+        {% else %}
+            <div class="alert alert-warning">
+                <p><strong>{{ 'Additional Information'|trans({}, 'Modules.Pskyc.Shop', language.locale) }}:</strong></p>
+                <p>{{ admin_note }}</p>
+            </div>
+        {% endif %}
+    {% endif %}
+    
+    {% if status == 'expired' or status == 'rejected' %}
+        <div style="text-align: center;">
+            <a href="{{ shop_url }}" class="button" style="background-color: {{ current_status.accent_color }};">
+                {% if status == 'expired' %}
+                    {{ 'Renew Verification'|trans({}, 'Modules.Pskyc.Shop', language.locale) }}
+                {% else %}
+                    {{ 'Submit New Verification'|trans({}, 'Modules.Pskyc.Shop', language.locale) }}
+                {% endif %}
+            </a>
+        </div>
+    {% else %}
+        <div style="text-align: center;">
+            <a href="{{ shop_url }}" class="button">{{ 'Visit'|trans({}, 'Modules.Pskyc.Shop', language.locale) }} {{ shop_name }}</a>
+        </div>
+    {% endif %}
+    
+    {% if status == 'pending' or status == 'under_review' %}
+        <p><em>{{ 'You will receive email updates as your verification progresses through our review process.'|trans({}, 'Modules.Pskyc.Shop', language.locale) }}</em></p>
+    {% endif %}
+{% endblock %}

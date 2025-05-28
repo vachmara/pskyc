@@ -3,15 +3,20 @@
 namespace PrestaShop\Module\Pskyc\Service;
 
 use Context;
-use Mail;
-use Customer;
 use Configuration;
 use Symfony\Component\Translation\TranslatorInterface;
+use PrestaShop\PrestaShop\Core\MailTemplate\Layout\LayoutInterface;
+use PrestaShop\PrestaShop\Core\MailTemplate\ThemeCatalogInterface;
+use PrestaShop\PrestaShop\Core\MailTemplate\ThemeCollectionInterface;
+use PrestaShop\PrestaShop\Core\MailTemplate\MailTemplate;
+use PrestaShop\PrestaShop\Core\MailTemplate\MailTemplateInterface;
+use PrestaShop\PrestaShop\Adapter\MailTemplate\MailPartialTemplateRenderer;
+use Symfony\Component\Templating\EngineInterface;
 
 /**
  * Class NotificationService
  * 
- * Handles email notifications for KYC verification status changes
+ * Handles email notifications for KYC verification status changes using PrestaShop 8's modern email theme system
  * Sends automated emails to customers and administrators
  */
 class NotificationService
@@ -22,24 +27,26 @@ class NotificationService
     private $translator;
 
     /**
+     * @var Context
+     */
+    private $context;
+
+    /**
+     * @var EngineInterface
+     */
+    private $templating;
+
+    /**
      * NotificationService constructor
      * 
      * @param TranslatorInterface $translator Translator service for internationalization
+     * @param EngineInterface $templating Templating engine for email rendering
      */
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(TranslatorInterface $translator, EngineInterface $templating = null)
     {
         $this->translator = $translator;
         $this->context = Context::getContext();
-    }
-
-    /**
-     * Create in-app notification/alert
-     */
-    public function createInAppNotification($customerId, $message, $type = 'info')
-    {
-        // TODO: Store notification in database for display in customer account
-        // Could be used for dashboard notifications
-        return true;
+        $this->templating = $templating;
     }
 
     /**
@@ -61,29 +68,23 @@ class NotificationService
                 'status' => $verification['status'],
                 'previous_status' => $previousStatus,
                 'date_submitted' => $verification['date_submitted'],
+                'date_validated' => $verification['date_validated'] ?? null,
+                'date_expiry' => $verification['date_expiry'] ?? null,
                 'admin_note' => $verification['admin_note'] ?? '',
                 'shop_name' => Configuration::get('PS_SHOP_NAME'),
-                'shop_url' => Context::getContext()->shop->getBaseURL(true)
+                'shop_url' => $this->context->shop->getBaseURL(true)
             ];
 
-            $template = $this->getEmailTemplate($verification['status']);
             $subject = $this->getEmailSubject($verification['status']);
-
-            // Handle missing id_lang with proper fallback
             $customerLang = $customer['id_lang'] ?? Configuration::get('PS_LANG_DEFAULT');
 
-            return Mail::Send(
-                $customerLang,
-                $template,
+            return $this->sendThemeEmail(
+                'verification_status',
                 $subject,
                 $templateVars,
                 $customer['email'],
                 $customer['firstname'] . ' ' . $customer['lastname'],
-                Configuration::get('PS_SHOP_EMAIL'),
-                Configuration::get('PS_SHOP_NAME'),
-                null,
-                null,
-                _PS_MODULE_DIR_ . 'pskyc/mails/'
+                $customerLang
             );
 
         } catch (\Exception $e) {
@@ -112,7 +113,7 @@ class NotificationService
                 'documents' => $documents,
                 'date_submitted' => $verification['date_submitted'],
                 'shop_name' => Configuration::get('PS_SHOP_NAME'),
-                'shop_url' => Context::getContext()->shop->getBaseURL(true)
+                'shop_url' => $this->context->shop->getBaseURL(true)
             ];
 
             $subject = $this->translator->trans(
@@ -121,22 +122,19 @@ class NotificationService
                 'Modules.Pskyc.Shop'
             );
 
-            return Mail::Send(
-                $customer['id_lang'],
+            $customerLang = $customer['id_lang'] ?? Configuration::get('PS_LANG_DEFAULT');
+
+            return $this->sendThemeEmail(
                 'document_upload_confirmation',
                 $subject,
                 $templateVars,
                 $customer['email'],
                 $customer['firstname'] . ' ' . $customer['lastname'],
-                Configuration::get('PS_SHOP_EMAIL'),
-                Configuration::get('PS_SHOP_NAME'),
-                null,
-                null,
-                _PS_MODULE_DIR_ . 'pskyc/mails/'
+                $customerLang
             );
 
         } catch (\Exception $e) {
-            PrestaShopLogger::addLog('KYC upload confirmation error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            \PrestaShopLogger::addLog('KYC upload confirmation error: ' . $e->getMessage(), 3, null, 'Pskyc');
             return false;
         }
     }
@@ -164,7 +162,7 @@ class NotificationService
                 'customer_id' => $customer['id_customer'],
                 'verification_id' => $verification['id_kyc_verification'],
                 'date_submitted' => $verification['date_submitted'],
-                'admin_url' => Context::getContext()->link->getAdminLink('AdminModules') . '&configure=pskyc',
+                'admin_url' => $this->context->link->getAdminLink('AdminModules') . '&configure=pskyc',
                 'shop_name' => Configuration::get('PS_SHOP_NAME')
             ];
 
@@ -176,18 +174,13 @@ class NotificationService
 
             $success = true;
             foreach ($adminEmails as $adminEmail) {
-                $result = Mail::Send(
-                    Configuration::get('PS_LANG_DEFAULT'),
+                $result = $this->sendThemeEmail(
                     'admin_new_verification',
                     $subject,
                     $templateVars,
                     $adminEmail['email'],
                     $adminEmail['name'],
-                    Configuration::get('PS_SHOP_EMAIL'),
-                    Configuration::get('PS_SHOP_NAME'),
-                    null,
-                    null,
-                    _PS_MODULE_DIR_ . 'pskyc/mails/'
+                    Configuration::get('PS_LANG_DEFAULT')
                 );
                 $success = $success && $result;
             }
@@ -195,7 +188,7 @@ class NotificationService
             return $success;
 
         } catch (\Exception $e) {
-            PrestaShopLogger::addLog('KYC admin notification error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            \PrestaShopLogger::addLog('KYC admin notification error: ' . $e->getMessage(), 3, null, 'Pskyc');
             return false;
         }
     }
@@ -218,9 +211,9 @@ class NotificationService
                 'verification_id' => $verification['id_kyc_verification'],
                 'days_until_expiry' => $daysUntilExpiry,
                 'expiry_date' => $verification['date_expiry'],
-                'renewal_url' => Context::getContext()->link->getModuleLink('pskyc', 'verify'),
+                'renewal_url' => $this->context->link->getModuleLink('pskyc', 'verify'),
                 'shop_name' => Configuration::get('PS_SHOP_NAME'),
-                'shop_url' => Context::getContext()->shop->getBaseURL(true)
+                'shop_url' => $this->context->shop->getBaseURL(true)
             ];
 
             $subject = $this->translator->trans(
@@ -229,45 +222,122 @@ class NotificationService
                 'Modules.Pskyc.Shop'
             );
 
-            return Mail::Send(
-                $customer['id_lang'],
+            $customerLang = $customer['id_lang'] ?? Configuration::get('PS_LANG_DEFAULT');
+
+            return $this->sendThemeEmail(
                 'verification_expiry_warning',
                 $subject,
                 $templateVars,
                 $customer['email'],
                 $customer['firstname'] . ' ' . $customer['lastname'],
-                Configuration::get('PS_SHOP_EMAIL'),
-                Configuration::get('PS_SHOP_NAME'),
-                null,
-                null,
-                _PS_MODULE_DIR_ . 'pskyc/mails/'
+                $customerLang
             );
 
         } catch (\Exception $e) {
-            PrestaShopLogger::addLog('KYC expiry warning error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            \PrestaShopLogger::addLog('KYC expiry warning error: ' . $e->getMessage(), 3, null, 'Pskyc');
             return false;
         }
     }
 
     /**
-     * Get email template name based on verification status
+     * Send email using PrestaShop 8's theme system
      * 
-     * Maps verification status to appropriate email template
-     * 
-     * @param string $status The verification status
-     * @return string The email template name
+     * @param string $template Template name (without .html.twig extension)
+     * @param string $subject Email subject
+     * @param array $templateVars Template variables
+     * @param string $toEmail Recipient email
+     * @param string $toName Recipient name
+     * @param int $langId Language ID
+     * @return bool True if email was sent successfully
      */
-    private function getEmailTemplate(string $status): string
+    private function sendThemeEmail(string $template, string $subject, array $templateVars, string $toEmail, string $toName, int $langId): bool
     {
-        $templates = [
-            'approved' => 'verification_approved',
-            'rejected' => 'verification_rejected',
-            'under_review' => 'verification_under_review',
-            'expired' => 'verification_expired',
-            'pending' => 'verification_pending'
-        ];
+        try {
+            // Try modern theme approach first
+            if ($this->templating && class_exists('PrestaShop\PrestaShop\Core\MailTemplate\MailTemplate')) {
+                return $this->sendModernThemeEmail($template, $subject, $templateVars, $toEmail, $toName, $langId);
+            }
 
-        return $templates[$status] ?? 'verification_status_change';
+            // Fallback to traditional Mail::Send with theme path
+            return \Mail::Send(
+                $langId,
+                $template,
+                $subject,
+                $templateVars,
+                $toEmail,
+                $toName,
+                Configuration::get('PS_SHOP_EMAIL'),
+                Configuration::get('PS_SHOP_NAME'),
+                null,
+                null,
+                _PS_MODULE_DIR_ . 'pskyc/mails/',
+                false,
+                null,
+                null,
+                _PS_MODULE_DIR_ . 'pskyc/mails/themes/pskyc/'
+            );
+
+        } catch (\Exception $e) {
+            \PrestaShopLogger::addLog('Theme email send error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            return false;
+        }
+    }
+
+    /**
+     * Send email using PrestaShop 8's modern MailTemplate system
+     * 
+     * @param string $template Template name
+     * @param string $subject Email subject
+     * @param array $templateVars Template variables
+     * @param string $toEmail Recipient email
+     * @param string $toName Recipient name
+     * @param int $langId Language ID
+     * @return bool True if email was sent successfully
+     */
+    private function sendModernThemeEmail(string $template, string $subject, array $templateVars, string $toEmail, string $toName, int $langId): bool
+    {
+        try {
+            // Get language info
+            $language = new \Language($langId);
+            $templateVars['language'] = [
+                'locale' => $language->locale ?? 'en',
+                'id' => $langId
+            ];
+            
+            // Add shop context
+            $templateVars['shop'] = [
+                'name' => Configuration::get('PS_SHOP_NAME'),
+                'url' => $this->context->shop->getBaseURL(true)
+            ];
+
+            // Render the email template
+            $templatePath = '@Modules/pskyc/mails/themes/pskyc/layouts/' . $template . '.html.twig';
+            $htmlContent = $this->templating->render($templatePath, $templateVars);
+
+            // Send using Swift Mailer or Mail class
+            return \Mail::Send(
+                $langId,
+                null, // No template file needed as we have content
+                $subject,
+                [],
+                $toEmail,
+                $toName,
+                Configuration::get('PS_SHOP_EMAIL'),
+                Configuration::get('PS_SHOP_NAME'),
+                null,
+                null,
+                null,
+                false,
+                null,
+                null,
+                null,
+                $htmlContent // Pass rendered HTML content directly
+            );
+
+        } catch (\Exception $e) {
+            \PrestaShopLogger::addLog('Modern theme email error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            return false;
+        }
     }
 
     /**
@@ -320,7 +390,7 @@ class NotificationService
                 $emails = explode(',', $additionalEmails);
                 foreach ($emails as $email) {
                     $email = trim($email);
-                    if (Validate::isEmail($email)) {
+                    if (\Validate::isEmail($email)) {
                         $adminEmails[] = [
                             'email' => $email,
                             'name' => 'KYC Administrator'
@@ -332,7 +402,7 @@ class NotificationService
             return $adminEmails;
 
         } catch (\Exception $e) {
-            PrestaShopLogger::addLog('Error getting admin emails: ' . $e->getMessage(), 3, null, 'Pskyc');
+            \PrestaShopLogger::addLog('Error getting admin emails: ' . $e->getMessage(), 3, null, 'Pskyc');
             return [];
         }
     }
@@ -355,18 +425,13 @@ class NotificationService
 
         foreach ($recipients as $recipient) {
             try {
-                $result = Mail::Send(
-                    Configuration::get('PS_LANG_DEFAULT'),
+                $result = $this->sendThemeEmail(
                     $template,
                     $subject,
                     $templateVars,
                     $recipient['email'],
                     $recipient['name'],
-                    Configuration::get('PS_SHOP_EMAIL'),
-                    Configuration::get('PS_SHOP_NAME'),
-                    null,
-                    null,
-                    _PS_MODULE_DIR_ . 'pskyc/mails/'
+                    Configuration::get('PS_LANG_DEFAULT')
                 );
 
                 if ($result) {
@@ -377,7 +442,7 @@ class NotificationService
 
             } catch (\Exception $e) {
                 $failedEmails[] = $recipient['email'];
-                PrestaShopLogger::addLog(
+                \PrestaShopLogger::addLog(
                     'Bulk notification error for ' . $recipient['email'] . ': ' . $e->getMessage(),
                     3,
                     null,
