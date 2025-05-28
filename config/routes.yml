@@ -1,7 +1,7 @@
 # KYC Verification routes
 ps_pskyc_verification_index:
   path: /pskyc/verification
-  methods: [GET]
+  methods: [GET, POST]
   defaults:
     _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::indexAction'
 
