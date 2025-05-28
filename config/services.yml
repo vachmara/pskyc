@@ -1,2 +1,88 @@
 imports:
   - { resource: 'front/services.yml' }
+
+services:
+  _defaults:
+    public: true
+
+  # Controllers
+  PrestaShop\Module\Pskyc\Controller\Admin\VerificationController:
+    tags: ['controller.service_arguments']
+
+  # Grid Definition Factory (explicitly define public since it has a parent)
+  prestashop.module.pskyc.grid.definition.factory.verifications:
+    class: 'PrestaShop\Module\Pskyc\Grid\Definition\Factory\VerificationGridDefinitionFactory'
+    parent: 'prestashop.core.grid.definition.factory.abstract_grid_definition'
+    public: true
+
+  # Query Builder - don't use parent, define it directly
+  PrestaShop\Module\Pskyc\Grid\Query\VerificationQueryBuilder:
+    class: 'PrestaShop\Module\Pskyc\Grid\Query\VerificationQueryBuilder'
+    public: true
+    arguments:
+      - '@doctrine.dbal.default_connection'
+      - '%database_prefix%'
+      - '@prestashop.core.query.doctrine_search_criteria_applicator'
+      - '@prestashop.core.grid.query.filter.doctrine_filter_applicator'
+
+  # Grid Data Provider
+  prestashop.module.pskyc.grid.data_provider.verifications:
+    class: '%prestashop.core.grid.data.factory.doctrine_grid_data_factory%'
+    arguments:
+      - '@PrestaShop\Module\Pskyc\Grid\Query\VerificationQueryBuilder'
+      - '@prestashop.core.hook.dispatcher'
+      - '@prestashop.core.grid.query.doctrine_query_parser'
+      - 'verification'
+
+  # Grid Factory
+  prestashop.module.pskyc.grid.factory.verifications:
+    class: 'PrestaShop\PrestaShop\Core\Grid\GridFactory'
+    arguments: 
+      - '@prestashop.module.pskyc.grid.definition.factory.verifications'
+      - '@prestashop.module.pskyc.grid.data_provider.verifications'
+      - '@prestashop.core.grid.filter.form_factory'
+      - '@prestashop.core.hook.dispatcher'
+
+  # Grid Filters
+  PrestaShop\Module\Pskyc\Grid\Filters\VerificationFilters: ~
+
+  # Repositories
+  PrestaShop\Module\Pskyc\Repository\VerificationRepository:
+    arguments:
+      - '@doctrine.dbal.default_connection'
+
+  PrestaShop\Module\Pskyc\Repository\DocumentRepository:
+    arguments:
+      - '@doctrine.dbal.default_connection'
+
+  PrestaShop\Module\Pskyc\Repository\LogRepository:
+    arguments:
+      - '@doctrine.dbal.default_connection'
+
+  PrestaShop\Module\Pskyc\Repository\CustomerRepository:
+    arguments:
+      - '@doctrine.dbal.default_connection'
+
+  PrestaShop\Module\Pskyc\Repository\OrderRepository:
+    arguments:
+      - '@doctrine.dbal.default_connection'
+
+  # Services
+  PrestaShop\Module\Pskyc\Service\VerificationService:
+    arguments:
+      - '@PrestaShop\Module\Pskyc\Repository\VerificationRepository'
+      - '@PrestaShop\Module\Pskyc\Repository\DocumentRepository'
+      - '@PrestaShop\Module\Pskyc\Repository\LogRepository'
+      - '@PrestaShop\Module\Pskyc\Service\DocumentService'
+      - '@PrestaShop\Module\Pskyc\Service\NotificationService'
+
+  PrestaShop\Module\Pskyc\Service\DocumentService:
+    arguments:
+      - '@PrestaShop\Module\Pskyc\Repository\DocumentRepository'
+      - '@PrestaShop\Module\Pskyc\Service\EncryptionService'
+
+  PrestaShop\Module\Pskyc\Service\EncryptionService: ~
+
+  PrestaShop\Module\Pskyc\Service\NotificationService:
+    arguments:
+      - '@translator'

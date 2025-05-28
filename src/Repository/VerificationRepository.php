@@ -240,4 +240,74 @@ class VerificationRepository
         $result = $query->execute();
         return $result->fetchAllAssociative();
     }
+
+    /**
+     * Find verification by ID (alias for Grid controller compatibility)
+     * 
+     * @param int $id The verification ID to search for
+     * @return array|null Verification record array or null if not found
+     */
+    public function findOneById(int $id): ?array
+    {
+        return $this->findById($id);
+    }
+
+    /**
+     * Update verification status
+     * 
+     * @param int $id The verification ID to update
+     * @param string $status The new status
+     * @return bool True if update was successful
+     */
+    public function updateStatus(int $id, string $status): bool
+    {
+        $qb = $this->connection->createQueryBuilder();
+        $qb->update(_DB_PREFIX_ . 'kyc_verification')
+            ->set('status', ':status')
+            ->set('date_validated', 'NOW()')
+            ->where('id_kyc_verification = :id')
+            ->setParameters([
+                'status' => $status,
+                'id' => $id,
+            ]);
+
+        return $qb->execute() > 0;
+    }
+
+    /**
+     * Update admin note for verification
+     * 
+     * @param int $id The verification ID to update
+     * @param string|null $note The admin note
+     * @return bool True if update was successful
+     */
+    public function updateAdminNote(int $id, ?string $note): bool
+    {
+        $qb = $this->connection->createQueryBuilder();
+        $qb->update(_DB_PREFIX_ . 'kyc_verification')
+            ->set('admin_note', ':note')
+            ->where('id_kyc_verification = :id')
+            ->setParameters([
+                'note' => $note,
+                'id' => $id,
+            ]);
+
+        return $qb->execute() > 0;
+    }
+
+    /**
+     * Delete verification by ID
+     * 
+     * @param int $id The verification ID to delete
+     * @return bool True if deletion was successful
+     */
+    public function delete(int $id): bool
+    {
+        $qb = $this->connection->createQueryBuilder();
+        $qb->delete(_DB_PREFIX_ . 'kyc_verification')
+            ->where('id_kyc_verification = :id')
+            ->setParameter('id', $id);
+
+        return $qb->execute() > 0;
+    }
 }

@@ -34,18 +34,6 @@ class Pskyc extends Module
          */
         $this->bootstrap = true;
 
-        $this->tabs = [
-            [
-                'route_name' => 'admin_pskyc_verification_list',
-                'class_name' => 'AdminVerification',
-                'visible' => true,
-                'name' => 'KYC Verifications',
-                'wording' => 'KYC Verifications',
-                'wording_domain' => 'Modules.Pskyc.Admin',
-                'parent_class_name' => 'AdminParentCustomer',
-            ]
-        ];
-
         parent::__construct();
 
         $this->displayName = $this->l('KYC Secure Upload');
@@ -54,6 +42,19 @@ class Pskyc extends Module
         $this->confirmUninstall = $this->l('All KYC verification data and associated documents will be permanently deleted. This action cannot be undone.');
 
         $this->ps_versions_compliancy = array('min' => '1.7.8', 'max' => _PS_VERSION_);
+
+        // Define admin tabs following PrestaShop 8 official documentation
+        $this->tabs = [
+            [
+                'route_name' => 'ps_pskyc_verification_index',
+                'class_name' => 'AdminPskycVerification',
+                'visible' => true,
+                'name' => 'KYC Verifications',
+                'wording' => 'KYC Verifications',
+                'wording_domain' => 'Modules.Pskyc.Admin',
+                'parent_class_name' => 'AdminParentCustomer',
+            ]
+        ];
     }
 
     /**
@@ -104,7 +105,6 @@ class Pskyc extends Module
      */
     public function uninstall()
     {
-
         require_once __DIR__ . '/sql/uninstall.php';
 
         Configuration::deleteByName('PSKYC_RETENTION_DAYS');

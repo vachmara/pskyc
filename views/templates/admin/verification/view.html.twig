@@ -1,0 +1,191 @@
+{% extends '@PrestaShop/Admin/layout.html.twig' %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-header-title">
+      <i class="material-icons">visibility</i>
+      {{ 'KYC Verification Details'|trans({}, 'Modules.Pskyc.Admin') }}
+      <span class="badge badge-secondary ml-2">#{{ verification.id_kyc_verification }}</span>
+    </h3>
+    <div class="card-header-toolbar">
+      <a href="{{ path('ps_pskyc_verification_index') }}" class="btn btn-outline-secondary">
+        <i class="material-icons">arrow_back</i>
+        {{ 'Back to list'|trans({}, 'Admin.Actions') }}
+      </a>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <div class="row">
+      {# Customer Information #}
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h4 class="card-header-title">
+              <i class="material-icons">person</i>
+              {{ 'Customer Information'|trans({}, 'Modules.Pskyc.Admin') }}
+            </h4>
+          </div>
+          <div class="card-body">
+            <table class="table table-striped">
+              <tr>
+                <td><strong>{{ 'Customer ID'|trans({}, 'Modules.Pskyc.Admin') }}:</strong></td>
+                <td>{{ verification.id_customer }}</td>
+              </tr>
+              <tr>
+                <td><strong>{{ 'Email'|trans({}, 'Admin.Global') }}:</strong></td>
+                <td>{{ verification.customer_email|default('-') }}</td>
+              </tr>
+              <tr>
+                <td><strong>{{ 'Name'|trans({}, 'Admin.Global') }}:</strong></td>
+                <td>{{ verification.customer_name|default('-') }}</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      {# Verification Status #}
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h4 class="card-header-title">
+              <i class="material-icons">assignment</i>
+              {{ 'Verification Status'|trans({}, 'Modules.Pskyc.Admin') }}
+            </h4>
+          </div>
+          <div class="card-body">
+            <table class="table table-striped">
+              <tr>
+                <td><strong>{{ 'Status'|trans({}, 'Admin.Global') }}:</strong></td>
+                <td>
+                  {% set status_class = '' %}
+                  {% if verification.status == 'pending' %}
+                    {% set status_class = 'badge-warning' %}
+                  {% elseif verification.status == 'approved' %}
+                    {% set status_class = 'badge-success' %}
+                  {% elseif verification.status == 'rejected' %}
+                    {% set status_class = 'badge-danger' %}
+                  {% elseif verification.status == 'under_review' %}
+                    {% set status_class = 'badge-info' %}
+                  {% else %}
+                    {% set status_class = 'badge-secondary' %}
+                  {% endif %}
+                  <span class="badge {{ status_class }}">
+                    {{ ('status.' ~ verification.status)|trans({}, 'Modules.Pskyc.Admin') }}
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>{{ 'Submitted'|trans({}, 'Modules.Pskyc.Admin') }}:</strong></td>
+                <td>{{ verification.date_submitted|date('Y-m-d H:i:s') }}</td>
+              </tr>
+              <tr>
+                <td><strong>{{ 'Last Updated'|trans({}, 'Modules.Pskyc.Admin') }}:</strong></td>
+                <td>{{ verification.date_validated|date('Y-m-d H:i:s')|default('-') }}</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# Documents Section #}
+    {% if verification.documents is defined and verification.documents %}
+    <div class="card mt-3">
+      <div class="card-header">
+        <h4 class="card-header-title">
+          <i class="material-icons">attachment</i>
+          {{ 'Submitted Documents'|trans({}, 'Modules.Pskyc.Admin') }}
+        </h4>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>{{ 'Document Type'|trans({}, 'Modules.Pskyc.Admin') }}</th>
+                <th>{{ 'Original Name'|trans({}, 'Modules.Pskyc.Admin') }}</th>
+                <th>{{ 'Upload Date'|trans({}, 'Modules.Pskyc.Admin') }}</th>
+                <th>{{ 'Actions'|trans({}, 'Admin.Actions') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for document in verification.documents %}
+                <tr>
+                  <td>
+                    <i class="material-icons">
+                      {% if document.document_type == 'identity' %}
+                        credit_card
+                      {% elseif document.document_type == 'address_proof' %}
+                        home
+                      {% else %}
+                        description
+                      {% endif %}
+                    </i>
+                    {{ document.document_type|trans({}, 'Modules.Pskyc.Admin') }}
+                  </td>
+                  <td>{{ document.original_filename }}</td>
+                  <td>{{ document.date_uploaded|date('Y-m-d H:i:s') }}</td>
+                  <td>
+                    <a href="{{ path('ps_pskyc_document_download', {documentId: document.id_kyc_document}) }}" 
+                       class="btn btn-sm btn-outline-primary" 
+                       title="{{ 'Download'|trans({}, 'Admin.Actions') }}">
+                      <i class="material-icons">download</i>
+                    </a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    {# Admin Notes Section #}
+    <div class="card mt-3">
+      <div class="card-header">
+        <h4 class="card-header-title">
+          <i class="material-icons">note</i>
+          {{ 'Admin Notes'|trans({}, 'Modules.Pskyc.Admin') }}
+        </h4>
+      </div>
+      <div class="card-body">
+        {% if verification.admin_note %}
+          <div class="alert alert-info">
+            <strong>{{ 'Current Note'|trans({}, 'Modules.Pskyc.Admin') }}:</strong><br>
+            {{ verification.admin_note|nl2br }}
+          </div>
+        {% endif %}
+
+        <form method="post" action="{{ path('ps_pskyc_verification_update_note', {verificationId: verification.id_kyc_verification}) }}">
+          <div class="form-group">
+            <label for="admin_note">{{ 'Add/Update Note'|trans({}, 'Modules.Pskyc.Admin') }}:</label>
+            <textarea name="admin_note" id="admin_note" class="form-control" rows="3" 
+                      placeholder="{{ 'Add your notes here...'|trans({}, 'Modules.Pskyc.Admin') }}">{{ verification.admin_note }}</textarea>
+          </div>
+          
+          <div class="form-group">
+            <div class="btn-group">
+              <button type="submit" name="action" value="approve" class="btn btn-success">
+                <i class="material-icons">check</i> {{ 'Approve'|trans({}, 'Modules.Pskyc.Admin') }}
+              </button>
+              <button type="submit" name="action" value="reject" class="btn btn-danger">
+                <i class="material-icons">close</i> {{ 'Reject'|trans({}, 'Modules.Pskyc.Admin') }}
+              </button>
+              <button type="submit" name="action" value="request_info" class="btn btn-warning">
+                <i class="material-icons">help</i> {{ 'Request More Info'|trans({}, 'Modules.Pskyc.Admin') }}
+              </button>
+              <button type="submit" name="action" value="update_note" class="btn btn-secondary">
+                <i class="material-icons">save</i> {{ 'Update Note Only'|trans({}, 'Modules.Pskyc.Admin') }}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

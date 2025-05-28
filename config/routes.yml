@@ -1,47 +1,68 @@
-# KYC Admin Routes
-admin_pskyc_verification_list:
-  path: /pskyc/verification/
+# KYC Verification routes
+ps_pskyc_verification_index:
+  path: /pskyc/verification
   methods: [GET]
   defaults:
-    _controller: PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::listAction
-    _legacy_controller: AdminPskycVerification
-    _legacy_link: AdminPskycVerification
+    _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::indexAction'
 
-admin_pskyc_verification_view:
-  path: /pskyc/verification/{id}
-  methods: [GET]
-  defaults:
-    _controller: PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::viewAction
-    _legacy_controller: AdminPskycVerification
-    _legacy_link: AdminPskycVerification
-  requirements:
-    id: \d+
-
-admin_pskyc_verification_update_status:
-  path: /pskyc/verification/{id}/status
+ps_pskyc_verification_search:
+  path: /pskyc/verification/search
   methods: [POST]
   defaults:
-    _controller: PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::updateStatusAction
-  requirements:
-    id: \d+
+    _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::searchAction'
 
-admin_pskyc_verification_download_document:
-  path: /pskyc/verification/{id}/document/{documentId}/download
+ps_pskyc_verification_view:
+  path: /pskyc/verification/{verificationId}/view
   methods: [GET]
   defaults:
-    _controller: PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::downloadDocumentAction
+    _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::viewAction'
   requirements:
-    id: \d+
-    documentId: \d+
+    verificationId: \d+
 
-admin_pskyc_verification_bulk_action:
-  path: /pskyc/verification/bulk
+ps_pskyc_verification_approve:
+  path: /pskyc/verification/{verificationId}/approve
   methods: [POST]
   defaults:
-    _controller: PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::bulkActionAction
+    _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::approveAction'
+  requirements:
+    verificationId: \d+
 
-admin_pskyc_verification_stats:
-  path: /pskyc/verification/stats
+ps_pskyc_verification_reject:
+  path: /pskyc/verification/{verificationId}/reject
+  methods: [POST]
+  defaults:
+    _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::rejectAction'
+  requirements:
+    verificationId: \d+
+
+ps_pskyc_verification_delete:
+  path: /pskyc/verification/{verificationId}/delete
+  methods: [POST, DELETE]
+  defaults:
+    _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::deleteAction'
+  requirements:
+    verificationId: \d+
+
+ps_pskyc_verification_delete_bulk:
+  path: /pskyc/verification/delete/bulk
+  methods: [POST]
+  defaults:
+    _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::deleteBulkAction'
+
+ps_pskyc_verification_approve_bulk:
+  path: /pskyc/verification/approve/bulk
+  methods: [POST]
+  defaults:
+    _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::approveBulkAction'
+
+ps_pskyc_verification_reject_bulk:
+  path: /pskyc/verification/reject/bulk
+  methods: [POST]
+  defaults:
+    _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::rejectBulkAction'
+
+ps_pskyc_verification_export:
+  path: /pskyc/verification/export
   methods: [GET]
   defaults:
-    _controller: PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::statsAction
+    _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::exportAction'
