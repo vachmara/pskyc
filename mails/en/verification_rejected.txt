@@ -1,0 +1,18 @@
+Dear {customer_name},
+
+We regret to inform you that your KYC verification has been rejected.
+
+Verification ID: #{verification_id}
+Status: Rejected
+Date: {date_submitted}
+
+{if $admin_note}
+Reason for rejection: {admin_note}
+{/if}
+
+You can submit a new verification request with corrected documents at any time.
+
+Submit new verification: {shop_url}
+
+---
+This is an automated message from {shop_name}. Please do not reply to this email.

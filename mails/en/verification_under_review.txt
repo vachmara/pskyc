@@ -1,0 +1,18 @@
+Dear {customer_name},
+
+Your KYC verification documents are currently under review by our team.
+
+Verification ID: #{verification_id}
+Status: Under Review
+Date Submitted: {date_submitted}
+
+Our verification team is carefully reviewing your submitted documents. This process typically takes 24-48 hours.
+
+You will receive an email notification as soon as the review is complete.
+
+Thank you for your patience.
+
+Visit our store: {shop_url}
+
+---
+This is an automated message from {shop_name}. Please do not reply to this email.

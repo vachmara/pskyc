@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>KYC Verification Expiring Soon</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #fd7e14;">KYC Verification Expiring Soon</h2>
+        
+        <p>Dear {customer_name},</p>
+        
+        <p>Your KYC verification will <strong>expire in {days_until_expiry} days</strong>.</p>
+        
+        <div style="background: #f8f9fa; padding: 15px; border-left: 4px solid #fd7e14; margin: 20px 0;">
+            <p><strong>Verification ID:</strong> #{verification_id}</p>
+            <p><strong>Expiry Date:</strong> {expiry_date}</p>
+            <p><strong>Days Remaining:</strong> {days_until_expiry}</p>
+        </div>
+        
+        <div style="background: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <p><strong>⚠️ Action Required:</strong> To avoid service interruption, please renew your verification before it expires.</p>
+        </div>
+        
+        <p>Renewing your verification is quick and easy. Simply upload your updated documents.</p>
+        
+        <p>
+            <a href="{renewal_url}" style="background: #fd7e14; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Renew Now</a>
+        </p>
+        
+        <hr style="margin: 30px 0;">
+        <p style="font-size: 12px; color: #666;">
+            This is an automated message from {shop_name}. Please do not reply to this email.
+        </p>
+    </div>
+</body>
+</html>

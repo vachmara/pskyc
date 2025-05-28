@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>New KYC Verification Request</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #ffc107;">New KYC Verification Request</h2>
+        
+        <p>A new KYC verification request has been submitted and requires review.</p>
+        
+        <div style="background: #f8f9fa; padding: 15px; border-left: 4px solid #ffc107; margin: 20px 0;">
+            <p><strong>Customer:</strong> {customer_name} ({customer_email})</p>
+            <p><strong>Customer ID:</strong> #{customer_id}</p>
+            <p><strong>Verification ID:</strong> #{verification_id}</p>
+            <p><strong>Date Submitted:</strong> {date_submitted}</p>
+        </div>
+        
+        <p>Please review the submitted documents and update the verification status.</p>
+        
+        <p>
+            <a href="{admin_url}" style="background: #007cba; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Review in Admin Panel</a>
+        </p>
+        
+        <hr style="margin: 30px 0;">
+        <p style="font-size: 12px; color: #666;">
+            This is an automated message from {shop_name}.
+        </p>
+    </div>
+</body>
+</html>

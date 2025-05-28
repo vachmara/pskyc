@@ -49,10 +49,10 @@ class NotificationService
      * 
      * @param array $verification Verification record from database
      * @param array $customer Customer record from database
-     * @param string $previousStatus The previous verification status
+     * @param string|null $previousStatus Previous verification status (if applicable)
      * @return bool True if email was sent successfully, false otherwise
      */
-    public function sendStatusChangeNotification(array $verification, array $customer, string $previousStatus): bool
+    public function sendStatusChangeNotification(array $verification, array $customer, ?string $previousStatus = null): bool
     {
         try {
             $templateVars = [
@@ -69,8 +69,11 @@ class NotificationService
             $template = $this->getEmailTemplate($verification['status']);
             $subject = $this->getEmailSubject($verification['status']);
 
+            // Handle missing id_lang with proper fallback
+            $customerLang = $customer['id_lang'] ?? Configuration::get('PS_LANG_DEFAULT');
+
             return Mail::Send(
-                $customer['id_lang'],
+                $customerLang,
                 $template,
                 $subject,
                 $templateVars,
@@ -84,7 +87,7 @@ class NotificationService
             );
 
         } catch (\Exception $e) {
-            PrestaShopLogger::addLog('KYC notification error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            \PrestaShopLogger::addLog('KYC notification error: ' . $e->getMessage(), 3, null, 'Pskyc');
             return false;
         }
     }

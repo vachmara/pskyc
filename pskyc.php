@@ -73,11 +73,8 @@ class Pskyc extends Module
         Configuration::updateValue('PSKYC_ADMIN_EMAILS', Configuration::get('PS_SHOP_EMAIL'));
         Configuration::updateValue('PSKYC_AUTO_NOTIFICATIONS', true);
 
-        // Generate encryption key
-        if (!Configuration::get('PSKYC_ENCRYPTION_KEY')) {
-            $key = base64_encode(random_bytes(32));
-            Configuration::updateValue('PSKYC_ENCRYPTION_KEY', $key);
-        }
+        // Generate encryption key - MUST be hexadecimal for EncryptionService
+        $this->generateEncryptionKey();
 
         require_once __DIR__ . '/sql/install.php';
 
@@ -330,15 +327,34 @@ class Pskyc extends Module
     }
 
     /**
-     * Ensure encryption key exists
+     * Generate encryption key
+     * 
+     * Generates a new 256-bit encryption key in hexadecimal format
+     * This method ensures the key is always compatible with EncryptionService
+     * 
+     * @return void
+     */
+    private function generateEncryptionKey()
+    {
+        $key = bin2hex(random_bytes(32)); // 256-bit key as hexadecimal string
+        Configuration::updateValue('PSKYC_ENCRYPTION_KEY', $key);
+    }
+
+    /**
+     * Ensure encryption key exists and is valid
+     * 
+     * Checks if encryption key exists and is valid hex format.
+     * If not, generates a new one.
      * 
      * @return void
      */
     private function ensureEncryptionKey()
     {
-        if (!Configuration::get('PSKYC_ENCRYPTION_KEY')) {
-            $key = base64_encode(random_bytes(32)); // 256-bit key
-            Configuration::updateValue('PSKYC_ENCRYPTION_KEY', $key);
+        $key = Configuration::get('PSKYC_ENCRYPTION_KEY');
+        
+        // Check if key exists and is valid hex (64 characters for 32 bytes)
+        if (empty($key) || !ctype_xdigit($key) || strlen($key) !== 64) {
+            $this->generateEncryptionKey();
         }
     }
 

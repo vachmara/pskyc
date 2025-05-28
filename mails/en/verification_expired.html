@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>KYC Verification Expired</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #dc3545;">KYC Verification Expired</h2>
+        
+        <p>Dear {customer_name},</p>
+        
+        <p>Your KYC verification has <strong>expired</strong> and needs to be renewed.</p>
+        
+        <div style="background: #f8f9fa; padding: 15px; border-left: 4px solid #dc3545; margin: 20px 0;">
+            <p><strong>Verification ID:</strong> #{verification_id}</p>
+            <p><strong>Status:</strong> Expired</p>
+            <p><strong>Date Submitted:</strong> {date_submitted}</p>
+        </div>
+        
+        <p>To continue using services that require identity verification, please submit new documents.</p>
+        
+        <div style="background: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <p><strong>⚠️ Important:</strong> Your access to verified features may be restricted until you complete the renewal process.</p>
+        </div>
+        
+        <p>
+            <a href="{shop_url}" style="background: #dc3545; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Renew Verification</a>
+        </p>
+        
+        <hr style="margin: 30px 0;">
+        <p style="font-size: 12px; color: #666;">
+            This is an automated message from {shop_name}. Please do not reply to this email.
+        </p>
+    </div>
+</body>
+</html>
