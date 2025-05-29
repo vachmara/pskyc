@@ -125,7 +125,7 @@
                     {{ document.type|trans({}, 'Modules.Pskyc.Admin') }}
                   </td>
                   <td>
-                    {% if document.mime_type is defined and document.mime_type starts with 'image/' %}
+                    {% if document.mime is defined and document.mime starts with 'image/' %}
                       <img src="{{ path('ps_pskyc_document_download', {documentId: document.id_kyc_document, preview: 1}) }}" alt="Preview" style="max-width:120px;max-height:120px;">
                     {% else %}
                       <span class="text-muted">{{ 'No preview'|trans({}, 'Modules.Pskyc.Admin') }}</span>

@@ -4,6 +4,7 @@ namespace PrestaShop\Module\Pskyc\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 
 class DocumentController extends FrameworkBundleAdminController
@@ -14,20 +15,27 @@ class DocumentController extends FrameworkBundleAdminController
         $document = $documentRepository->findById($documentId);
 
         if (!$document) {
-            throw $this->createNotFoundException('Document not found');
+            return new JsonResponse([
+                'error' => 'Document not found',
+                'documentId' => $documentId
+            ], 404);
         }
 
-        $filePath = _PS_MODULE_DIR_ . 'pskyc/secure_upload/' . $document['filename'];
+        // Generate the stored filename (must match upload logic)
+        $storedFilename = 'doc_' . $document['id_kyc_document'] . '_' . hash('md5', $document['filename']);
+        $filePath = _PS_MODULE_DIR_ . 'pskyc/secure_upload/' . $storedFilename;
 
         if (!file_exists($filePath)) {
-            throw $this->createNotFoundException('File not found');
+            return new JsonResponse([
+                'error' => 'File not found',
+                'filename' => $storedFilename
+            ], 404);
         }
 
         // Decrypt file content
         $encryptionService = $this->get('PrestaShop\Module\Pskyc\Service\EncryptionService');
         $encryptedContent = file_get_contents($filePath);
 
-        // You may need to pass IV and other params depending on your encryption implementation
         $decryptedContent = $encryptionService->decrypt(
             $encryptedContent,
             $document['iv'] ?? null,

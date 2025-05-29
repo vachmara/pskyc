@@ -104,16 +104,22 @@ class DocumentService
                 }
             }
 
-            // Generate unique filename
+            // Generate stored filename (consistent with retrieval)
+            $tempDocument = [
+                'id_kyc_document' => 0, // Will be replaced after insert
+                'filename' => $fileData['name'],
+            ];
+            // Temporarily use 0 for id_kyc_document, will update after insert
+
+            // Encrypt and save file (use a temp name, will rename after DB insert)
             $extension = $this->getFileExtension($fileData['name']);
             $sidePrefix = $side ? $side . '_' : '';
-            $filename = uniqid('kyc_' . $sidePrefix) . '_' . time() . '.' . $extension;
-            $uploadPath = $this->getUploadDirectory() . '/' . $filename;
+            $tempStoredFilename = 'doc_tmp_' . uniqid() . '.' . $extension;
+            $uploadPath = $this->getUploadDirectory() . '/' . $tempStoredFilename;
 
-            // Encrypt and save file
             $encryptionResult = $this->encryptionService->encryptFile($fileData['tmp_name'], $uploadPath);
 
-            // Save document metadata to database
+            // Save document metadata to database (original filename)
             $documentData = [
                 'verification_id' => $verificationId,
                 'type' => $documentType,
@@ -129,10 +135,21 @@ class DocumentService
 
             $documentId = $this->documentRepository->create($documentData);
 
+            // Now generate the final stored filename
+            $finalDocument = [
+                'id_kyc_document' => $documentId,
+                'filename' => $fileData['name'],
+            ];
+            $storedFilename = $this->generateStoredFilename($finalDocument);
+            $finalPath = $this->getUploadDirectory() . '/' . $storedFilename;
+
+            // Rename the temp file to the final stored filename
+            rename($uploadPath, $finalPath);
+
             return [
                 'success' => true,
                 'document_id' => $documentId,
-                'filename' => $filename,
+                'filename' => $storedFilename,
                 'side' => $side
             ];
 
