@@ -20,6 +20,14 @@ if (!defined('_PS_VERSION_')) {
  */
 class Document
 {
+
+    public const STATUS_PENDING        = 'pending';
+    public const STATUS_UNDER_REVIEW   = 'under_review';
+    public const STATUS_APPROVED       = 'approved';
+    public const STATUS_REJECTED       = 'rejected';
+    public const STATUS_EXPIRED        = 'expired';
+    public const STATUS_MORE_INFO      = 'requested_more_info';
+
     /**
      * @var int
      * @ORM\Id
@@ -93,6 +101,18 @@ class Document
      * @ORM\Column(name="expires_at", type="datetime", nullable=true)
      */
     private $expiresAt;
+
+    /**
+     * @var string
+     * @ORM\Column(name="status", type="string", length=32)
+     */
+    private $status = self::STATUS_PENDING;
+
+    /**
+     * @var string|null
+     * @ORM\Column(name="admin_note", type="text", nullable=true)
+     */
+    private $adminNote;
 
     /**
      * Get document ID
@@ -361,5 +381,49 @@ class Document
         if ($this->getDateUploaded() === null) {
             $this->setDateUploaded($now);
         }
+    }
+
+    /**
+     * Get verification status
+     * 
+     * @return string Current verification status
+     */
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+    
+    /**
+     * Set verification status
+     * 
+     * @param string $status The status to set (use STATUS_* constants)
+     * @return self
+     */
+    public function setStatus(string $status): self
+    {
+        $this->status = $status;
+        return $this;
+    }
+
+    /**
+     * Get admin note
+     * 
+     * @return string|null Admin note/comment about this verification
+     */
+    public function getAdminNote(): ?string
+    {
+        return $this->adminNote;
+    }
+    
+    /**
+     * Set admin note
+     * 
+     * @param string|null $note Admin note/comment to set
+     * @return self
+     */
+    public function setAdminNote(?string $note): self
+    {
+        $this->adminNote = $note;
+        return $this;
     }
 }

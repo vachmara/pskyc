@@ -38,6 +38,8 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'kyc_document` (
     `encrypted`           TINYINT(1)      NOT NULL DEFAULT 1,
     `date_uploaded`       DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `expires_at`          DATETIME        NULL,
+    `status`              VARCHAR(32)     NOT NULL DEFAULT "pending",
+    `admin_note`          TEXT            NULL,
     PRIMARY KEY (`id_kyc_document`),
     KEY `idx_verif` (`id_kyc_verification`),
     CONSTRAINT `fk_kyc_document_verification` FOREIGN KEY (`id_kyc_verification`) REFERENCES `' . _DB_PREFIX_ . 'kyc_verification` (`id_kyc_verification`) ON DELETE CASCADE
