@@ -354,7 +354,7 @@ class VerificationService
      */
     private function calculateExpiryDate(): string|null
     {
-        $validityDays = (int) Configuration::get('PSKYC_VALIDITY_DAYS', 365);
+        $validityDays = (int) Configuration::get('PSKYC_RETENTION_DAYS');
         if ($validityDays <= 0) {
             // If 0 or negative, set expiry to NULL (no expiry)
             return null;
