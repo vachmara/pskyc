@@ -86,4 +86,3 @@ services:
   PrestaShop\Module\Pskyc\Service\NotificationService:
     arguments:
       - '@translator'
-      - '@templating'

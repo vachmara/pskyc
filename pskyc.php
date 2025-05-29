@@ -4,8 +4,12 @@
  * Copyright (c) 2025 Valentin Chmara
  */
 
- use PrestaShop\Module\Pskyc\Service\VerificationService;
- 
+use PrestaShop\Module\Pskyc\Service\VerificationService;
+use PrestaShop\PrestaShop\Core\MailTemplate\Layout\Layout;
+use PrestaShop\PrestaShop\Core\MailTemplate\ThemeCatalogInterface;
+use PrestaShop\PrestaShop\Core\MailTemplate\ThemeCollectionInterface;
+use PrestaShop\PrestaShop\Core\MailTemplate\ThemeInterface;
+
 /**
  * Class Pskyc
  * 
@@ -90,7 +94,8 @@ class Pskyc extends Module
             $this->registerHook('actionValidateOrder') &&
             $this->registerHook('displayAdminCustomers') &&
             $this->registerHook('displayAdminOrder') &&
-            $this->registerHook('displayCustomerAccount');
+            $this->registerHook('displayCustomerAccount') &&
+            $this->registerHook(ThemeCatalogInterface::LIST_MAIL_THEMES_HOOK);
     }
 
     /**
@@ -107,7 +112,8 @@ class Pskyc extends Module
         Configuration::deleteByName('PSKYC_RETENTION_DAYS');
         Configuration::deleteByName('PSKYC_ALLOWED_CATEGORIES');
 
-        return parent::uninstall();
+        return parent::uninstall() &&
+            $this->unregisterHook(ThemeCatalogInterface::LIST_MAIL_THEMES_HOOK);
     }
 
     /**
@@ -239,7 +245,7 @@ class Pskyc extends Module
                     [
                         'type' => 'html',
                         'name' => 'encryption_info',
-                        'html_content' => '<div class="alert alert-info"><strong>' . $this->l('Security Note:') . '</strong> ' . 
+                        'html_content' => '<div class="alert alert-info"><strong>' . $this->l('Security Note:') . '</strong> ' .
                             $this->l('All uploaded documents are automatically encrypted using AES-256-CBC encryption. The encryption key is automatically generated and stored securely.') . '</div>'
                     ]
                 ],
@@ -303,8 +309,8 @@ class Pskyc extends Module
             $categoryIds = Tools::getValue('PSKYC_ALLOWED_CATEGORIES');
             if (is_array($categoryIds)) {
                 // Remove any invalid category IDs
-                $categoryIds = array_filter($categoryIds, function($id) {
-                    return is_numeric($id) && (int)$id > 0;
+                $categoryIds = array_filter($categoryIds, function ($id) {
+                    return is_numeric($id) && (int) $id > 0;
                 });
                 Configuration::updateValue('PSKYC_ALLOWED_CATEGORIES', json_encode(array_values($categoryIds)));
             } else {
@@ -314,7 +320,7 @@ class Pskyc extends Module
             // Handle other configuration values
             Configuration::updateValue('PSKYC_RETENTION_DAYS', $retentionDays);
             Configuration::updateValue('PSKYC_ADMIN_EMAILS', $adminEmails);
-            Configuration::updateValue('PSKYC_AUTO_NOTIFICATIONS', (bool)Tools::getValue('PSKYC_AUTO_NOTIFICATIONS'));
+            Configuration::updateValue('PSKYC_AUTO_NOTIFICATIONS', (bool) Tools::getValue('PSKYC_AUTO_NOTIFICATIONS'));
 
             // Ensure encryption key exists
             $this->ensureEncryptionKey();
@@ -351,7 +357,7 @@ class Pskyc extends Module
     private function ensureEncryptionKey()
     {
         $key = Configuration::get('PSKYC_ENCRYPTION_KEY');
-        
+
         // Check if key exists and is valid hex (64 characters for 32 bytes)
         if (empty($key) || !ctype_xdigit($key) || strlen($key) !== 64) {
             $this->generateEncryptionKey();
@@ -461,5 +467,80 @@ class Pskyc extends Module
         ]);
 
         return $this->fetch('module:' . $this->name . '/views/templates/front/account/box.tpl');
+    }
+
+    /**
+     * @param array $hookParams
+     */
+    public function hookActionListMailThemes(array $hookParams)
+    {
+        if (!isset($hookParams['mailThemes'])) {
+            return;
+        }
+
+        /** @var ThemeCollectionInterface $themes */
+        $themes = $hookParams['mailThemes'];
+
+        /** @var ThemeInterface $theme */
+        foreach ($themes as $theme) {
+            if (!in_array($theme->getName(), ['classic', 'modern'])) {
+                continue;
+            }
+
+            $this->addLayoutsToTheme($theme, $theme->getName());
+        }
+    }
+
+    /**
+     * Add KYC layouts to a specific theme
+     * Waiting this to be resolved in PrestaShop 9: https://github.com/PrestaShop/PrestaShop/issues/35214
+     * 
+     * 
+     * @param ThemeInterface $theme
+     * @param string $themeName
+     * @return void
+     */
+    private function addLayoutsToTheme(ThemeInterface $theme, string $themeName)
+    {
+        $moduleLayoutsPath = __DIR__ . "/mails/layouts/{$themeName}/";
+
+        // Define our KYC layouts
+        $layouts = [
+            'verification_status' => [
+                'name' => 'verification_status',
+                'htmlTemplate' => $moduleLayoutsPath . 'verification_status.html.twig',
+
+            ],
+            'verification_expiry_warning' => [
+                'name' => 'verification_expiry_warning',
+                'htmlTemplate' => $moduleLayoutsPath . 'verification_expiry_warning.html.twig',
+
+            ],
+            'document_upload_confirmation' => [
+                'name' => 'document_upload_confirmation',
+                'htmlTemplate' => $moduleLayoutsPath . 'document_upload_confirmation.html.twig',
+
+            ],
+            'admin_new_verification' => [
+                'name' => 'admin_new_verification',
+                'htmlTemplate' => $moduleLayoutsPath . 'admin_new_verification.html.twig',
+
+            ],
+        ];
+
+        // Add each layout to the theme
+        foreach ($layouts as $layoutConfig) {
+            // Check if templates exist before adding
+            if (file_exists($layoutConfig['htmlTemplate'])) {
+                $layout = new Layout(
+                    $layoutConfig['name'],
+                    $layoutConfig['htmlTemplate'],
+                    '',
+                    $this->name
+                );
+
+                $theme->getLayouts()->add($layout);
+            }
+        }
     }
 }
