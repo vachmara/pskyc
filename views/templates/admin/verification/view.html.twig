@@ -160,7 +160,7 @@
           </div>
         {% endif %}
 
-        <form method="post" action="{{ path('ps_pskyc_verification_update_note', {verificationId: verification.id_kyc_verification}) }}">
+        <form method="post">
           <div class="form-group">
             <label for="admin_note">{{ 'Add/Update Note'|trans({}, 'Modules.Pskyc.Admin') }}:</label>
             <textarea name="admin_note" id="admin_note" class="form-control" rows="3" 

@@ -180,39 +180,6 @@ class VerificationGridDefinitionFactory extends AbstractGridDefinitionFactory
                         'route_param_field' => 'id_kyc_verification',
                         'clickable_row' => true,
                     ])
-            )
-            ->add(
-                (new LinkRowAction('approve'))
-                    ->setName($this->trans('Approve', [], 'Modules.Pskyc.Admin'))
-                    ->setIcon('check')
-                    ->setOptions([
-                        'route' => 'ps_pskyc_verification_approve',
-                        'route_param_name' => 'verificationId',
-                        'route_param_field' => 'id_kyc_verification',
-                        'confirm_message' => $this->trans('Are you sure you want to approve this verification?', [], 'Modules.Pskyc.Admin'),
-                    ])
-            )
-            ->add(
-                (new LinkRowAction('reject'))
-                    ->setName($this->trans('Reject', [], 'Modules.Pskyc.Admin'))
-                    ->setIcon('close')
-                    ->setOptions([
-                        'route' => 'ps_pskyc_verification_reject',
-                        'route_param_name' => 'verificationId',
-                        'route_param_field' => 'id_kyc_verification',
-                        'confirm_message' => $this->trans('Are you sure you want to reject this verification?', [], 'Modules.Pskyc.Admin'),
-                    ])
-            )
-            ->add(
-                (new LinkRowAction('delete'))
-                    ->setName($this->trans('Delete', [], 'Admin.Actions'))
-                    ->setIcon('delete')
-                    ->setOptions([
-                        'route' => 'ps_pskyc_verification_delete',
-                        'route_param_name' => 'verificationId',
-                        'route_param_field' => 'id_kyc_verification',
-                        'confirm_message' => $this->trans('Delete selected item?', [], 'Admin.Notifications.Warning'),
-                    ])
             );
     }
 }
