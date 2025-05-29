@@ -350,11 +350,17 @@ class VerificationService
      * 
      * Returns the date when an approved verification should expire
      * 
-     * @return string Expiry date in MySQL datetime format
+     * @return string|null Returns the expiry date in 'Y-m-d H:i:s' format or null if no expiry
      */
-    private function calculateExpiryDate(): string
+    private function calculateExpiryDate(): string|null
     {
         $validityDays = (int) Configuration::get('PSKYC_VALIDITY_DAYS', 365);
-        return date('Y-m-d H:i:s', strtotime('+' . $validityDays . ' days'));
+        if ($validityDays <= 0) {
+            // If 0 or negative, set expiry to NULL (no expiry)
+            return null;
+        }
+        $now = new \DateTimeImmutable('now');
+        $expiry = $now->add(new \DateInterval('P' . $validityDays . 'D'));
+        return $expiry->format('Y-m-d H:i:s');
     }
 }

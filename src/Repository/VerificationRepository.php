@@ -299,10 +299,10 @@ class VerificationRepository
      * Update expiration date for verification
      * 
      * @param int $id The verification ID to update
-     * @param string $expirationDate The new expiration date in MySQL datetime format 
+     * @param string|null $expirationDate The new expiration date in 'Y-m-d H:i:s' format
      * @return bool True if update was successful
      */
-    public function updateExpirationDate(int $id, string $expirationDate): bool
+    public function updateExpiryDate(int $id, ?string $expirationDate): bool
     {
         $qb = $this->connection->createQueryBuilder();
         $qb->update(_DB_PREFIX_ . 'kyc_verification')
@@ -310,7 +310,7 @@ class VerificationRepository
             ->set('date_validated', 'NOW()')
             ->where('id_kyc_verification = :id')
             ->setParameters([
-                'expiration_date' => $expirationDate,
+                'expiration_date' => $expirationDate ?? null,
                 'id' => $id,
             ]);
 
