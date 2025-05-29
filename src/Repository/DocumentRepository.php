@@ -218,4 +218,29 @@ class DocumentRepository
     $result = $query->execute();
     return $result->fetchAllAssociative();
   }
+
+  /**
+   * Update status and note for a document
+   * 
+   * @param int $documentId The document ID to update
+   * @param string $status New status for the document
+   * @param string|null $note Optional note to attach to the document
+   * @return bool True if update was successful, false otherwise
+   */
+  public function updateStatusAndNote(int $documentId, string $status, ?string $note = null): bool
+  {
+    $qb = $this->connection->createQueryBuilder();
+    $qb->update(_DB_PREFIX_ . 'kyc_document')
+        ->set('status', ':status')
+        ->where('id_kyc_document = :document_id')
+        ->setParameter('status', $status)
+        ->setParameter('document_id', $documentId);
+
+    if ($note !== null) {
+        $qb->set('admin_note', ':admin_note')
+           ->setParameter('admin_note', $note);
+    }
+
+    return (bool) $qb->execute();
+  }
 }

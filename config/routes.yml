@@ -19,30 +19,6 @@ ps_pskyc_verification_view:
   requirements:
     verificationId: \d+
 
-ps_pskyc_verification_approve:
-  path: /pskyc/verification/{verificationId}/approve
-  methods: [POST]
-  defaults:
-    _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::approveAction'
-  requirements:
-    verificationId: \d+
-
-ps_pskyc_verification_reject:
-  path: /pskyc/verification/{verificationId}/reject
-  methods: [POST]
-  defaults:
-    _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::rejectAction'
-  requirements:
-    verificationId: \d+
-
-ps_pskyc_verification_request_info:
-  path: /pskyc/verification/{verificationId}/request-info
-  methods: [POST]
-  defaults:
-    _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::requestInfoAction'
-  requirements:
-    verificationId: \d+
-
 ps_pskyc_verification_update_note:
   path: /pskyc/verification/{verificationId}/update-note
   methods: [POST]
@@ -60,3 +36,11 @@ ps_pskyc_document_download:
   requirements:
     documentId: '\d+'
     preview: '\d+'
+
+ps_pskyc_document_update_status:
+  path: /pskyc/verification/{verificationId}/documents/update-status
+  methods: [POST]
+  defaults:
+    _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\DocumentController::updateStatusAction'
+  requirements:
+    verificationId: \d+

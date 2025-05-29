@@ -296,6 +296,27 @@ class VerificationRepository
     }
 
     /**
+     * Update expiration date for verification
+     * 
+     * @param int $id The verification ID to update
+     * @param string $expirationDate The new expiration date in MySQL datetime format 
+     * @return bool True if update was successful
+     */
+    public function updateExpirationDate(int $id, string $expirationDate): bool
+    {
+        $qb = $this->connection->createQueryBuilder();
+        $qb->update(_DB_PREFIX_ . 'kyc_verification')
+            ->set('date_expiry', ':expiration_date')
+            ->where('id_kyc_verification = :id')
+            ->setParameters([
+                'expiration_date' => $expirationDate,
+                'id' => $id,
+            ]);
+
+        return $qb->execute() > 0;
+    }
+
+    /**
      * Delete verification by ID
      * 
      * @param int $id The verification ID to delete
