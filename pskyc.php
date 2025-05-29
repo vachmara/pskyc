@@ -40,10 +40,13 @@ class Pskyc extends Module
 
         parent::__construct();
 
-        $this->displayName = $this->l('KYC Secure Upload');
-        $this->description = $this->l('Open source KYC document verification and encrypted storage for PrestaShop. GDPR compliant.');
+        $this->displayName = $this->trans('KYC Secure Upload', [], 'Modules.Pskyc.Admin');
+        $this->description = $this->trans('Open source KYC document verification and encrypted storage for PrestaShop. GDPR compliant.', [], 'Modules.Pskyc.Admin');
 
-        $this->confirmUninstall = $this->l('All KYC verification data and associated documents will be permanently deleted. This action cannot be undone.');
+        $warning = $this->trans('All KYC verification data and associated documents will be permanently deleted. This action cannot be undone.', [], 'Modules.Pskyc.Admin');
+
+        $this->confirmUninstall = $warning;
+        $this->confirmReset = $warning;
 
         $this->ps_versions_compliancy = array('min' => '1.7.8', 'max' => _PS_VERSION_);
 
@@ -88,9 +91,6 @@ class Pskyc extends Module
         }
 
         return parent::install() &&
-            $this->registerHook('header') &&
-            $this->registerHook('displayBackOfficeHeader') &&
-            $this->registerHook('actionAdminControllerSetMedia') &&
             $this->registerHook('actionValidateOrder') &&
             $this->registerHook('displayAdminCustomers') &&
             $this->registerHook('displayAdminOrder') &&
@@ -362,16 +362,6 @@ class Pskyc extends Module
         if (empty($key) || !ctype_xdigit($key) || strlen($key) !== 64) {
             $this->generateEncryptionKey();
         }
-    }
-
-    /**
-     * Hook executed when admin controller sets media
-     * 
-     * @return void
-     */
-    public function hookActionAdminControllerSetMedia()
-    {
-        /* Place your code here. */
     }
 
     /**

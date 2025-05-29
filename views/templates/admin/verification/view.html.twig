@@ -119,6 +119,7 @@
 									<tr>
 										<th>{{ 'Document Type'|trans({}, 'Modules.Pskyc.Admin') }}</th>
 										<th>{{ 'Preview'|trans({}, 'Modules.Pskyc.Admin') }}</th>
+										<th>{{ 'Side'|trans({}, 'Modules.Pskyc.Admin') }}</th>
 										<th>{{ 'Upload Date'|trans({}, 'Modules.Pskyc.Admin') }}</th>
 										<th>{{ 'Actions'|trans({}, 'Admin.Actions') }}</th>
 									</tr>
@@ -145,6 +146,15 @@
 													</a>
 												{% else %}
 													<span class="text-muted">{{ 'No preview'|trans({}, 'Modules.Pskyc.Admin') }}</span>
+												{% endif %}
+											</td>
+											<td>
+												{% if document.side == 'front' %}
+													<span class="badge badge-primary">{{ 'Front'|trans({}, 'Modules.Pskyc.Admin') }}</span>
+												{% elseif document.side == 'back' %}
+													<span class="badge badge-secondary">{{ 'Back'|trans({}, 'Modules.Pskyc.Admin') }}</span>
+												{% else %}
+												-
 												{% endif %}
 											</td>
 											<td>{{ document.date_uploaded|date('Y-m-d H:i:s') }}</td>
