@@ -267,11 +267,12 @@ class VerificationService
     private function isValidStatusTransition(string $fromStatus, string $toStatus): bool
     {
         $validTransitions = [
-            'pending' => ['under_review', 'rejected', 'approved'],
-            'under_review' => ['approved', 'rejected', 'pending'],
-            'rejected' => ['under_review', 'pending'],
+            'pending' => ['under_review', 'rejected', 'approved', 'requested_more_info'],
+            'under_review' => ['approved', 'rejected', 'pending', 'requested_more_info'],
+            'rejected' => ['under_review', 'pending', 'requested_more_info'],
             'approved' => ['expired'],
-            'expired' => ['pending']
+            'expired' => ['pending'],
+            'requested_more_info' => ['pending', 'under_review', 'rejected', 'approved'],
         ];
 
         return isset($validTransitions[$fromStatus]) &&

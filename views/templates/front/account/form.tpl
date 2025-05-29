@@ -6,35 +6,42 @@
 <div class="kyc-verification-form">
   {* Current Status Section *}
   {if isset($verification) && $verification}
-    <div class="alert alert-info kyc-status">
-      <h4><i class="material-icons">info</i> {l s='Current Verification Status' d='Modules.Pskyc.Shop'}</h4>
-      <p>
-        <strong>{l s='Status:' d='Modules.Pskyc.Shop'}</strong>
-        <span class="status-badge status-{$verification.status|escape:'html':'UTF-8'}">
-          {if $verification.status == 'pending'}
-            {l s='Pending Review' d='Modules.Pskyc.Shop'}
-          {elseif $verification.status == 'under_review'}
-            {l s='Under Review' d='Modules.Pskyc.Shop'}
-          {elseif $verification.status == 'approved'}
-            {l s='Approved' d='Modules.Pskyc.Shop'}
-          {elseif $verification.status == 'rejected'}
-            {l s='Rejected' d='Modules.Pskyc.Shop'}
-          {elseif $verification.status == 'requested_more_info'}
-            {l s='More Information Required' d='Modules.Pskyc.Shop'}
-          {elseif $verification.status == 'expired'}
-            {l s='Expired' d='Modules.Pskyc.Shop'}
-          {else}
-            {$verification.status|escape:'html':'UTF-8'}
-          {/if}
-        </span>
-      </p>
-      {if $verification.admin_note}
-        <p><strong>{l s='Admin Note:' d='Modules.Pskyc.Shop'}</strong></p>
-        <p class="admin-note">{$verification.admin_note|escape:'html':'UTF-8'|nl2br}</p>
-      {/if}
-      <p><small>{l s='Submitted on:' d='Modules.Pskyc.Shop'}
-          {$verification.date_submitted|date_format:'%B %e, %Y at %H:%M'}</small></p>
-    </div>
+    {if $verification.status == 'approved'}
+      <div class="alert alert-success kyc-status">
+        <h4><i class="material-icons">check_circle</i> {l s='Your identity has been successfully verified!' d='Modules.Pskyc.Shop'}</h4>
+        <p>
+          <strong>{l s='Status:' d='Modules.Pskyc.Shop'}</strong>
+          <span class="status-badge status-approved">{l s='Approved' d='Modules.Pskyc.Shop'}</span>
+        </p>
+        {if $verification.date_expiry}
+          <p><strong>{l s='Valid until:' d='Modules.Pskyc.Shop'}</strong> {$verification.date_expiry|date_format:'%B %e, %Y at %H:%M'}</p>
+        {/if}
+        <p><small>{l s='Submitted on:' d='Modules.Pskyc.Shop'} {$verification.date_submitted|date_format:'%B %e, %Y at %H:%M'}</small></p>
+      </div>
+    {else}
+      <div class="alert alert-info kyc-status">
+        <h4><i class="material-icons">info</i> {l s='Current Verification Status' d='Modules.Pskyc.Shop'}</h4>
+        <p>
+          <strong>{l s='Status:' d='Modules.Pskyc.Shop'}</strong>
+          <span class="status-badge status-{$verification.status|escape:'html':'UTF-8'}">
+            {if $verification.status == 'pending'}
+              {l s='Pending Review' d='Modules.Pskyc.Shop'}
+            {elseif $verification.status == 'under_review'}
+              {l s='Under Review' d='Modules.Pskyc.Shop'}
+            {elseif $verification.status == 'rejected'}
+              {l s='Rejected' d='Modules.Pskyc.Shop'}
+            {elseif $verification.status == 'requested_more_info'}
+              {l s='More Information Required' d='Modules.Pskyc.Shop'}
+            {elseif $verification.status == 'expired'}
+              {l s='Expired' d='Modules.Pskyc.Shop'}
+            {else}
+              {$verification.status|escape:'html':'UTF-8'}
+            {/if}
+          </span>
+        </p>
+        <p><small>{l s='Submitted on:' d='Modules.Pskyc.Shop'} {$verification.date_submitted|date_format:'%B %e, %Y at %H:%M'}</small></p>
+      </div>
+    {/if}
 
     {* Existing Documents *}
     {if isset($documents) && $documents}
@@ -48,11 +55,44 @@
                 <span class="document-name">{$document.filename|escape:'html':'UTF-8'}</span>
                 <span class="document-size">{($document.filesize/1024)|string_format:"%.1f"} KB</span>
                 <span class="document-date">{$document.date_uploaded|date_format:'%B %e, %Y'}</span>
+                <span class="document-status status-badge status-{$document.status|escape:'html':'UTF-8'}">
+                  {if $document.status == 'pending'}{l s='Pending' d='Modules.Pskyc.Shop'}
+                  {elseif $document.status == 'valid'}{l s='Valid' d='Modules.Pskyc.Shop'}
+                  {elseif $document.status == 'rejected'}{l s='Rejected' d='Modules.Pskyc.Shop'}
+                  {elseif $document.status == 'request_change'}{l s='Needs Update' d='Modules.Pskyc.Shop'}
+                  {else}{$document.status|escape:'html':'UTF-8'}{/if}
+                </span>
               </div>
               <div class="document-actions">
-                <i class="material-icons document-icon">
-                  {if $document.mime|strpos:'image' !== false}image{elseif $document.mime|strpos:'pdf' !== false}picture_as_pdf{else}description{/if}
-                </i>
+                {if $document.status == 'rejected' || $document.status == 'request_change'}
+                  <div class="alert alert-warning mt-1">
+                    <strong>{l s='Action required:' d='Modules.Pskyc.Shop'}</strong>
+                    {if $document.status == 'rejected'}{l s='This document was rejected.' d='Modules.Pskyc.Shop'}{/if}
+                    {if $document.status == 'request_change'}{l s='This document needs to be updated.' d='Modules.Pskyc.Shop'}{/if}
+                  </div>
+                  {if $document.admin_note}
+                    <div class="text-muted mt-2">
+                      <strong>{l s='Note:' d='Modules.Pskyc.Shop'}</strong>
+                      {$document.admin_note|escape:'html':'UTF-8'|nl2br}
+                    </div>
+                  {/if}
+                  <form method="post" enctype="multipart/form-data" class="reupload-form mt-2" action="{$smarty.server.REQUEST_URI|escape:'html':'UTF-8'}">
+                    <input type="hidden" name="action" value="reupload_document" />
+                    <input type="hidden" name="token" value="{$token|escape:'html':'UTF-8'}" />
+                    <input type="hidden" name="document_id" value="{$document.id_kyc_document|escape:'html':'UTF-8'}" />
+                    <div class="form-group">
+                      <label for="reupload_file_{$document.id_kyc_document}">{l s='Re-upload file' d='Modules.Pskyc.Shop'}</label>
+                      <input type="file" name="reupload_file" id="reupload_file_{$document.id_kyc_document}" class="form-control-file" accept="image/*,.pdf" required />
+                    </div>
+                    <button type="submit" class="btn btn-warning btn-sm">
+                      <i class="material-icons">cloud_upload</i> {l s='Re-upload' d='Modules.Pskyc.Shop'}
+                    </button>
+                  </form>
+                {else}
+                  <i class="material-icons document-icon">
+                    {if $document.mime|strpos:'image' !== false}image{elseif $document.mime|strpos:'pdf' !== false}picture_as_pdf{else}description{/if}
+                  </i>
+                {/if}
               </div>
             </div>
           {/foreach}
@@ -394,14 +434,6 @@
   .required::after {
     content: " *";
     color: #e74c3c;
-  }
-
-  .admin-note {
-    background: #f8f9fa;
-    padding: 10px;
-    border-radius: 4px;
-    border-left: 4px solid #17a2b8;
-    margin-top: 5px;
   }
 
   @media (max-width: 768px) {

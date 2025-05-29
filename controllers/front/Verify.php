@@ -118,6 +118,9 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
             case 'upload_documents':
                 $this->processDocumentUpload();
                 break;
+            case 'reupload_document':
+                $this->processReuploadDocument();
+                break;
             default:
                 $this->errors[] = $this->trans('Invalid action.', [], 'Modules.Pskyc.Shop');
         }
@@ -296,6 +299,31 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
                 $errors[] = 'Address document: ' . ($addressDocumentResult['message'] ?? 'Unknown error');
             }
             $this->errors[] = implode('. ', $errors);
+        }
+    }
+
+    /**
+     * Process re-upload of a single document
+     *
+     * @return void
+     */
+    protected function processReuploadDocument()
+    {
+        $documentId = (int)Tools::getValue('document_id');
+        $file = $_FILES['reupload_file'] ?? null;
+        if (!$documentId || !$file || $file['error'] !== UPLOAD_ERR_OK) {
+            $this->errors[] = $this->trans('Please select a file to re-upload.', [], 'Modules.Pskyc.Shop');
+            return;
+        }
+        if (!$this->validateUploadedFile($file)) {
+            return;
+        }
+        $result = $this->documentService->replaceDocument($documentId, $file);
+        if (!empty($result['success'])) {
+            $this->success[] = $this->trans('Document re-uploaded successfully. It will be reviewed by our team.', [], 'Modules.Pskyc.Shop');
+            Tools::redirect($this->context->link->getModuleLink($this->module->name, 'verify', [], true));
+        } else {
+            $this->errors[] = $result['message'] ?? $this->trans('Failed to re-upload document.', [], 'Modules.Pskyc.Shop');
         }
     }
 

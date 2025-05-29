@@ -542,4 +542,52 @@ class DocumentService
 
         return 'unknown';
     }
+
+    /**
+     * Replace an existing document with a new upload (for re-upload by customer)
+     *
+     * @param int $documentId The document ID to replace
+     * @param array $file The new uploaded file (from $_FILES)
+     * @return array Result array with success status and message
+     */
+    public function replaceDocument(int $documentId, array $file): array
+    {
+        try {
+            $document = $this->documentRepository->findById($documentId);
+            if (!$document) {
+                return ['success' => false, 'message' => 'Document not found'];
+            }
+            // Remove old file
+            $oldFilePath = $this->getUploadDirectory() . '/' . $this->generateStoredFilename($document);
+            if (file_exists($oldFilePath)) {
+                $this->encryptionService->secureDelete($oldFilePath);
+            }
+            // Update filename in DB first (so generateStoredFilename will match new file)
+            $updateData = [
+                'filename' => $file['name'],
+                'filesize' => $file['size'],
+                'mime' => $this->getMimeType($file['tmp_name']),
+                'date_uploaded' => date('Y-m-d H:i:s'),
+                'status' => 'pending',
+                'admin_note' => null
+            ];
+            $this->documentRepository->updateDocumentFields($documentId, $updateData);
+            // Encrypt and save new file with correct name
+            $newDocument = $this->documentRepository->findById($documentId);
+            $newFilePath = $this->getUploadDirectory() . '/' . $this->generateStoredFilename($newDocument);
+            $encryptionResult = $this->encryptionService->encryptFile($file['tmp_name'], $newFilePath);
+            // Update encryption fields
+            $this->documentRepository->updateDocumentFields($documentId, [
+                'sha256' => $encryptionResult['sha256'],
+                'iv' => $encryptionResult['iv'],
+                'encrypted' => 1
+            ]);
+            // Also update the parent verification status to pending
+            $this->verificationRepository->updateStatus($document['id_kyc_verification'], 'pending');
+            return ['success' => true];
+        } catch (\Exception $e) {
+            PrestaShopLogger::addLog('Document re-upload error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            return ['success' => false, 'message' => 'Failed to replace document'];
+        }
+    }
 }

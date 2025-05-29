@@ -307,6 +307,7 @@ class VerificationRepository
         $qb = $this->connection->createQueryBuilder();
         $qb->update(_DB_PREFIX_ . 'kyc_verification')
             ->set('date_expiry', ':expiration_date')
+            ->set('date_validated', 'NOW()')
             ->where('id_kyc_verification = :id')
             ->setParameters([
                 'expiration_date' => $expirationDate,

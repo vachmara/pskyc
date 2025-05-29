@@ -243,4 +243,24 @@ class DocumentRepository
 
     return (bool) $qb->execute();
   }
+
+  /**
+   * Update multiple fields for a document
+   *
+   * @param int $documentId The document ID to update
+   * @param array $fields Associative array of fields to update
+   * @return bool True if update was successful, false otherwise
+   */
+  public function updateDocumentFields(int $documentId, array $fields): bool
+  {
+    $qb = $this->connection->createQueryBuilder();
+    $qb->update(_DB_PREFIX_ . 'kyc_document');
+    foreach ($fields as $field => $value) {
+        $qb->set($field, ':' . $field);
+        $qb->setParameter($field, $value);
+    }
+    $qb->where('id_kyc_document = :document_id')
+        ->setParameter('document_id', $documentId);
+    return (bool) $qb->execute();
+  }
 }
