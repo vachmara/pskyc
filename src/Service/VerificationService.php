@@ -256,30 +256,6 @@ class VerificationService
     }
 
     /**
-     * Validate status transition
-     * 
-     * Checks if a status transition is valid according to business rules
-     * 
-     * @param string $fromStatus Current status
-     * @param string $toStatus Target status
-     * @return bool True if transition is valid, false otherwise
-     */
-    private function isValidStatusTransition(string $fromStatus, string $toStatus): bool
-    {
-        $validTransitions = [
-            'pending' => ['under_review', 'rejected', 'approved', 'requested_more_info'],
-            'under_review' => ['approved', 'rejected', 'pending', 'requested_more_info'],
-            'rejected' => ['under_review', 'pending', 'requested_more_info'],
-            'approved' => ['expired'],
-            'expired' => ['pending'],
-            'requested_more_info' => ['pending', 'under_review', 'rejected', 'approved'],
-        ];
-
-        return isset($validTransitions[$fromStatus]) &&
-            in_array($toStatus, $validTransitions[$fromStatus]);
-    }
-
-    /**
      * Check if verification is expired
      * 
      * Determines if a verification has passed its expiry date
@@ -340,11 +316,6 @@ class VerificationService
             $verification = $this->verificationRepository->findById($verificationId);
             if (!$verification) {
                 return false; // Verification not found
-            }
-
-            // Validate status transition
-            if (!$this->isValidStatusTransition($verification['status'], $newStatus)) {
-                return false; // Invalid transition
             }
 
             // Update status in the repository
