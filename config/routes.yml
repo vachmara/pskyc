@@ -35,44 +35,28 @@ ps_pskyc_verification_reject:
   requirements:
     verificationId: \d+
 
-ps_pskyc_verification_delete:
-  path: /pskyc/verification/{verificationId}/delete
-  methods: [POST, DELETE]
+ps_pskyc_verification_request_info:
+  path: /pskyc/verification/{verificationId}/request-info
+  methods: [POST]
   defaults:
-    _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::deleteAction'
+    _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::requestInfoAction'
   requirements:
     verificationId: \d+
 
-ps_pskyc_verification_delete_bulk:
-  path: /pskyc/verification/delete/bulk
+ps_pskyc_verification_update_note:
+  path: /pskyc/verification/{verificationId}/update-note
   methods: [POST]
   defaults:
-    _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::deleteBulkAction'
-
-ps_pskyc_verification_approve_bulk:
-  path: /pskyc/verification/approve/bulk
-  methods: [POST]
-  defaults:
-    _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::approveBulkAction'
-
-ps_pskyc_verification_reject_bulk:
-  path: /pskyc/verification/reject/bulk
-  methods: [POST]
-  defaults:
-    _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::rejectBulkAction'
-
-ps_pskyc_verification_export:
-  path: /pskyc/verification/export
-  methods: [GET]
-  defaults:
-    _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::exportAction'
+    _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::updateNoteAction'
+  requirements:
+    verificationId: \d+
 
 ps_pskyc_document_download:
-    path: /pskyc/document/{documentId}/{preview}
-    methods: [GET]
-    defaults:
-        _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\DocumentController::downloadAction'
-        preview: 0
-    requirements:
-        documentId: '\d+'
-        preview: '\d+'
+  path: /pskyc/document/{documentId}/{preview}
+  methods: [GET]
+  defaults:
+    _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\DocumentController::downloadAction'
+    preview: 0
+  requirements:
+    documentId: '\d+'
+    preview: '\d+'

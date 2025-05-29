@@ -296,6 +296,84 @@ class VerificationService
     }
 
     /**
+     * Update admin note for a verification
+     * 
+     * @param int $verificationId The verification ID
+     * @param string $note The admin note to set
+     * @return bool True on success, false on failure
+     */
+    public function updateAdminNote(int $verificationId, string $note): bool
+    {
+        try {
+            $result = $this->verificationRepository->updateNote($verificationId, $note);
+            if ($result) {
+                // Log the note update
+                $verification = $this->verificationRepository->findById($verificationId);
+                $this->logAction(
+                    $verificationId,
+                    null,
+                    null,
+                    'admin_note_updated',
+                    'Admin note updated: ' . $note
+                );
+            }
+            return $result;
+        } catch (\Exception $e) {
+            PrestaShopLogger::addLog('Update admin note error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            return false;
+        }
+    }
+
+    /**
+     * Update verification status
+     * 
+     * @param int $verificationId The verification ID
+     * @param string $newStatus The new status to set
+     * @param string|null $note Optional admin note for the status change
+     * @return bool True on success, false on failure
+     */
+    public function updateStatus(int $verificationId, string $newStatus, ?string $note = null): bool
+    {
+        try {
+            // Get current verification data
+            $verification = $this->verificationRepository->findById($verificationId);
+            if (!$verification) {
+                return false; // Verification not found
+            }
+
+            // Validate status transition
+            if (!$this->isValidStatusTransition($verification['status'], $newStatus)) {
+                return false; // Invalid transition
+            }
+
+            // Update status in the repository
+            $result = $this->verificationRepository->updateStatus($verificationId, $newStatus, $note);
+
+            if ($result) {
+                // Log the status change
+                $this->logAction(
+                    $verificationId,
+                    null,
+                    null,
+                    'status_updated',
+                    'Verification status updated to: ' . $newStatus
+                );
+
+                // If approved, set expiry date
+                if ($newStatus === 'approved') {
+                    $expiryDate = $this->calculateExpiryDate();
+                    $this->verificationRepository->updateExpiryDate($verificationId, $expiryDate);
+                }
+            }
+
+            return $result;
+        } catch (\Exception $e) {
+            PrestaShopLogger::addLog('Update status error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            return false;
+        }
+    }
+
+    /**
      * Calculate expiry date for approved verification
      * 
      * Returns the date when an approved verification should expire

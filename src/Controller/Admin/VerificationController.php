@@ -92,6 +92,46 @@ class VerificationController extends FrameworkBundleAdminController
         );
     }
 
+    public function approveAction(int $verificationId, Request $request): Response
+    {
+        $note = $request->request->get('admin_note');
+        $verificationRepository = $this->get('PrestaShop\Module\Pskyc\Repository\VerificationRepository');
+        $verificationRepository->updateStatus($verificationId, 'approved', $note);
+
+        $this->addFlash('success', $this->trans('Verification approved.', 'Modules.Pskyc.Admin'));
+        return $this->redirectToRoute('ps_pskyc_verification_view', ['verificationId' => $verificationId]);
+    }
+
+    public function rejectAction(int $verificationId, Request $request): Response
+    {
+        $note = $request->request->get('admin_note');
+        $verificationRepository = $this->get('PrestaShop\Module\Pskyc\Repository\VerificationRepository');
+        $verificationRepository->updateStatus($verificationId, 'rejected', $note);
+
+        $this->addFlash('success', $this->trans('Verification rejected.', 'Modules.Pskyc.Admin'));
+        return $this->redirectToRoute('ps_pskyc_verification_view', ['verificationId' => $verificationId]);
+    }
+
+    public function requestInfoAction(int $verificationId, Request $request): Response
+    {
+        $note = $request->request->get('admin_note');
+        $verificationRepository = $this->get('PrestaShop\Module\Pskyc\Repository\VerificationRepository');
+        $verificationRepository->updateStatus($verificationId, 'requested_more_info', $note);
+
+        $this->addFlash('success', $this->trans('Requested more information from customer.', 'Modules.Pskyc.Admin'));
+        return $this->redirectToRoute('ps_pskyc_verification_view', ['verificationId' => $verificationId]);
+    }
+
+    public function updateNoteAction(int $verificationId, Request $request): Response
+    {
+        $note = $request->request->get('admin_note');
+        $verificationRepository = $this->get('PrestaShop\Module\Pskyc\Repository\VerificationRepository');
+        $verificationRepository->updateAdminNote($verificationId, $note);
+
+        $this->addFlash('success', $this->trans('Note updated.', 'Modules.Pskyc.Admin'));
+        return $this->redirectToRoute('ps_pskyc_verification_view', ['verificationId' => $verificationId]);
+    }
+
     private function getToolbarButtons(): array
     {
         return [
