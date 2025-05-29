@@ -492,17 +492,15 @@ class Pskyc extends Module
     }
 
     /**
-     * Add KYC layouts to a specific theme
-     * Waiting this to be resolved in PrestaShop 9: https://github.com/PrestaShop/PrestaShop/issues/35214
-     * 
-     * 
+     * Add KYC layouts to a specific theme 
      * @param ThemeInterface $theme
      * @param string $themeName
      * @return void
      */
     private function addLayoutsToTheme(ThemeInterface $theme, string $themeName)
     {
-        $moduleLayoutsPath = __DIR__ . "/mails/layouts/{$themeName}/";
+        // Waiting this to be resolved in PrestaShop 9: https://github.com/PrestaShop/PrestaShop/issues/35214
+        $moduleLayoutsPath = "@Modules/" . $this->name . "/mails/layouts/{$themeName}/";
 
         // Define our KYC layouts
         $layouts = [

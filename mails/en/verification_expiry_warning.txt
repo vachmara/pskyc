@@ -1,0 +1,15 @@
+Dear {firstname} {lastname},
+
+Your KYC verification is approaching its expiry date.
+
+Verification ID: {verification_id}
+Current Status: Approved
+Expires On: {expiry_date}
+Days Remaining: {days_remaining}
+
+To maintain uninterrupted access to our services, please renew your KYC verification before the expiry date.
+
+Renew Verification: {renewal_url}
+
+If you have any questions, please contact our support team.
+This is an automated message. Please do not reply to this email.

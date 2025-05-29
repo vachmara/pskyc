@@ -1,0 +1,12 @@
+A new KYC verification request has been submitted and requires admin review.
+
+Customer: {customer_name} ({customer_email})
+Customer ID: #{customer_id}
+Verification ID: #{verification_id}
+Documents Count: {documents_count}
+
+Please review the submitted documents and update the verification status in the admin panel. 
+
+Review in Admin Panel: {admin_verification_url}
+
+This is an automated admin notification.

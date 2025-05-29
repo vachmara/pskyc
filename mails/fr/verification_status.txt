@@ -1,0 +1,9 @@
+Cher {prénom} {nom},
+
+Le statut de votre vérification KYC a été mis à jour.
+
+ID de vérification : {verification_id}
+Statut : {status_label}
+Date de soumission : {date_submitted}
+
+Message : {status_message}

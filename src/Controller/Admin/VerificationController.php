@@ -25,7 +25,7 @@ class VerificationController extends FrameworkBundleAdminController
     ): Response {
         /** @var GridFactoryInterface $verificationGridFactory */
         $verificationGridFactory = $this->get('prestashop.module.pskyc.grid.factory.verifications');
-        
+
         return $this->render(
             '@Modules/pskyc/views/templates/admin/verification/index.html.twig',
             [
@@ -42,7 +42,7 @@ class VerificationController extends FrameworkBundleAdminController
     ): RedirectResponse {
         /** @var GridDefinitionFactoryInterface $verificationGridDefinitionFactory */
         $verificationGridDefinitionFactory = $this->get('prestashop.module.pskyc.grid.definition.factory.verifications');
-        
+
         return $this->buildSearchResponse(
             $verificationGridDefinitionFactory,
             $request,
@@ -56,7 +56,7 @@ class VerificationController extends FrameworkBundleAdminController
     ): Response {
         /** @var VerificationRepository $verificationRepository */
         $verificationRepository = $this->get('PrestaShop\Module\Pskyc\Repository\VerificationRepository');
-        
+
         try {
             $verification = $verificationRepository->findOneById($verificationId);
         } catch (\Exception $e) {
@@ -88,13 +88,13 @@ class VerificationController extends FrameworkBundleAdminController
     ): RedirectResponse {
         /** @var VerificationRepository $verificationRepository */
         $verificationRepository = $this->get('PrestaShop\Module\Pskyc\Repository\VerificationRepository');
-        
+
         try {
             $verification = $verificationRepository->findOneById($verificationId);
-            
+
             if (null !== $verification) {
                 $verificationRepository->updateStatus($verificationId, 'approved');
-                
+
                 $this->addFlash(
                     'success',
                     $this->trans('Verification successfully approved.', 'Modules.Pskyc.Admin')
@@ -124,13 +124,13 @@ class VerificationController extends FrameworkBundleAdminController
     ): RedirectResponse {
         /** @var VerificationRepository $verificationRepository */
         $verificationRepository = $this->get('PrestaShop\Module\Pskyc\Repository\VerificationRepository');
-        
+
         try {
             $verification = $verificationRepository->findOneById($verificationId);
-            
+
             if (null !== $verification) {
                 $verificationRepository->updateStatus($verificationId, 'rejected');
-                
+
                 $this->addFlash(
                     'success',
                     $this->trans('Verification successfully rejected.', 'Modules.Pskyc.Admin')
@@ -160,13 +160,13 @@ class VerificationController extends FrameworkBundleAdminController
     ): RedirectResponse {
         /** @var VerificationRepository $verificationRepository */
         $verificationRepository = $this->get('PrestaShop\Module\Pskyc\Repository\VerificationRepository');
-        
+
         try {
             $verification = $verificationRepository->findOneById($verificationId);
-            
+
             if (null !== $verification) {
                 $verificationRepository->delete($verificationId);
-                
+
                 $this->addFlash(
                     'success',
                     $this->trans('Successful deletion.', 'Admin.Notifications.Success'),
@@ -196,9 +196,9 @@ class VerificationController extends FrameworkBundleAdminController
     ): RedirectResponse {
         /** @var VerificationRepository $verificationRepository */
         $verificationRepository = $this->get('PrestaShop\Module\Pskyc\Repository\VerificationRepository');
-        
+
         $verificationIds = $request->request->all('verification_bulk');
-        
+
         if (!empty($verificationIds)) {
             try {
                 $deletedCount = 0;
@@ -237,9 +237,9 @@ class VerificationController extends FrameworkBundleAdminController
     ): RedirectResponse {
         /** @var VerificationRepository $verificationRepository */
         $verificationRepository = $this->get('PrestaShop\Module\Pskyc\Repository\VerificationRepository');
-        
+
         $verificationIds = $request->request->all('verification_bulk');
-        
+
         if (!empty($verificationIds)) {
             try {
                 $approvedCount = 0;
@@ -278,9 +278,9 @@ class VerificationController extends FrameworkBundleAdminController
     ): RedirectResponse {
         /** @var VerificationRepository $verificationRepository */
         $verificationRepository = $this->get('PrestaShop\Module\Pskyc\Repository\VerificationRepository');
-        
+
         $verificationIds = $request->request->all('verification_bulk');
-        
+
         if (!empty($verificationIds)) {
             try {
                 $rejectedCount = 0;
@@ -317,11 +317,6 @@ class VerificationController extends FrameworkBundleAdminController
     private function getToolbarButtons(): array
     {
         return [
-            'export' => [
-                'desc' => $this->trans('Export verifications', 'Modules.Pskyc.Admin'),
-                'icon' => 'cloud_download',
-                'href' => $this->generateUrl('ps_pskyc_verification_export'),
-            ],
         ];
     }
 }

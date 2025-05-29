@@ -1,0 +1,14 @@
+Une nouvelle demande de vérification KYC a été soumise et doit être examinée par l'administrateur.
+
+Client : {customer_name} ({customer_email})
+Identifiant client : #{customer_id}
+Identifiant de vérification : #{verification_id}
+Nombre de documents : {documents_count}
+
+Veuillez examiner les documents soumis et mettre à jour le statut de vérification dans le panneau d'administration. 
+
+Examen dans le panneau d'administration : {admin_verification_url}
+
+Il s'agit d'une notification administrative automatisée.
+
+Traduit avec DeepL.com (version gratuite)

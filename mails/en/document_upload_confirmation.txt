@@ -1,0 +1,13 @@
+Dear {firstname} {lastname},
+
+Thank you for uploading your KYC verification documents.
+
+Verification ID: {verification_id}
+Upload Date: {upload_date}
+Number of Documents: {document_count}
+
+Our verification team will review your documents within 24-48 hours. You will receive an email notification once the review is complete.
+
+Check Status: {verification_status_url}
+
+This is an automated message. Please do not reply to this email.
