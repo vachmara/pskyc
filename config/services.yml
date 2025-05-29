@@ -9,6 +9,9 @@ services:
   PrestaShop\Module\Pskyc\Controller\Admin\VerificationController:
     tags: ['controller.service_arguments']
 
+  PrestaShop\Module\Pskyc\Controller\Admin\DocumentController:
+    tags: ['controller.service_arguments']
+
   # Grid Definition Factory (explicitly define public since it has a parent)
   prestashop.module.pskyc.grid.definition.factory.verifications:
     class: 'PrestaShop\Module\Pskyc\Grid\Definition\Factory\VerificationGridDefinitionFactory'

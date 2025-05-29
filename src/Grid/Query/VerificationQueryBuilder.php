@@ -55,6 +55,8 @@ class VerificationQueryBuilder extends AbstractDoctrineQueryBuilder
             ->addSelect('v.`date_submitted`, v.`date_validated`, v.`admin_note`')
             ->addSelect('c.`email` AS `customer_email`')
             ->addSelect('CONCAT(c.`firstname`, " ", c.`lastname`) AS `customer_name`')
+            // Add document count
+            ->addSelect('(SELECT COUNT(d.id_kyc_document) FROM ' . $this->dbPrefix . 'kyc_document d WHERE d.id_kyc_verification = v.id_kyc_verification) AS documents_count')
         ;
 
         $this->searchCriteriaApplicator

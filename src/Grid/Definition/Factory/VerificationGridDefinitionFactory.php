@@ -89,6 +89,20 @@ class VerificationGridDefinitionFactory extends AbstractGridDefinitionFactory
                     ])
             )
             ->add(
+                (new DataColumn('customer_name'))
+                    ->setName($this->trans('Customer Name', [], 'Modules.Pskyc.Admin'))
+                    ->setOptions([
+                        'field' => 'customer_name',
+                    ])
+            )
+            ->add(
+                (new DataColumn('documents_count'))
+                    ->setName($this->trans('Documents', [], 'Modules.Pskyc.Admin'))
+                    ->setOptions([
+                        'field' => 'documents_count',
+                    ])
+            )
+            ->add(
                 (new ActionColumn('actions'))
                     ->setName($this->trans('Actions', [], 'Admin.Actions'))
                     ->setOptions([

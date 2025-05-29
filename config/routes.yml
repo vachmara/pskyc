@@ -66,3 +66,13 @@ ps_pskyc_verification_export:
   methods: [GET]
   defaults:
     _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::exportAction'
+
+ps_pskyc_document_download:
+    path: /pskyc/document/{documentId}/{preview}
+    methods: [GET]
+    defaults:
+        _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\DocumentController::downloadAction'
+        preview: 0
+    requirements:
+        documentId: '\d+'
+        preview: '\d+'

@@ -59,6 +59,15 @@ class VerificationController extends FrameworkBundleAdminController
 
         try {
             $verification = $verificationRepository->findOneById($verificationId);
+
+            // Fetch customer info using CustomerRepository
+            $customerRepository = $this->get('PrestaShop\Module\Pskyc\Repository\CustomerRepository');
+            $customer = $customerRepository->getCustomerData($verification['id_customer']);
+            $verification['customer'] = $customer;
+
+            $documentRepository = $this->get('PrestaShop\Module\Pskyc\Repository\DocumentRepository');
+            $documents = $documentRepository->findByVerificationId($verificationId);
+            $verification['documents'] = $documents;
         } catch (\Exception $e) {
             $this->addFlash(
                 'error',
