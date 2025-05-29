@@ -58,7 +58,7 @@ class LogRepository
             'id_customer' => ':customer_id',
             'action' => ':action',
             'message' => ':message',
-            'ip_address' => 'INET6_ATON(:ip_address)',
+            'ip_address' => ':ip_address',
             'user_agent' => ':user_agent',
             'date_add' => 'NOW()'
         ])
