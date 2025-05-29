@@ -82,6 +82,7 @@ services:
   PrestaShop\Module\Pskyc\Service\DocumentService:
     arguments:
       - '@PrestaShop\Module\Pskyc\Repository\DocumentRepository'
+      - '@PrestaShop\Module\Pskyc\Repository\VerificationRepository'
       - '@PrestaShop\Module\Pskyc\Service\EncryptionService'
 
   PrestaShop\Module\Pskyc\Service\EncryptionService: ~

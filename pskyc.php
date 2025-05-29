@@ -365,34 +365,6 @@ class Pskyc extends Module
     }
 
     /**
-     * Add the CSS & JavaScript files you want to be loaded in the BO
-     * 
-     * Hook executed on back office header display
-     * 
-     * @return void
-     */
-    public function hookDisplayBackOfficeHeader()
-    {
-        if (Tools::getValue('configure') == $this->name) {
-            $this->context->controller->addJS($this->_path . 'views/js/back.js');
-            $this->context->controller->addCSS($this->_path . 'views/css/back.css');
-        }
-    }
-
-    /**
-     * Add the CSS & JavaScript files you want to be added on the FO
-     * 
-     * Hook executed on front office header display
-     * 
-     * @return void
-     */
-    public function hookHeader()
-    {
-        $this->context->controller->addJS($this->_path . '/views/js/front.js');
-        $this->context->controller->addCSS($this->_path . '/views/css/front.css');
-    }
-
-    /**
      * Hook executed when admin controller sets media
      * 
      * @return void
@@ -430,12 +402,14 @@ class Pskyc extends Module
         /** @var VerificationService $verificationService */
         $verificationService = $this->get('PrestaShop\Module\Pskyc\Service\VerificationService');
         $verifications = $verificationService->getVerificationsByCustomerId($customerId);
-        $this->context->smarty->assign([
+
+        // Render the Twig template instead of Smarty
+      
+        return $this->get('twig')->render('@Modules/pskyc/views/templates/admin/customers/kyc_status.html.twig', [
             'verifications' => $verifications,
             'count' => count($verifications ?? []),
             'customerId' => $customerId,
         ]);
-        return $this->fetch('module:' . $this->name . '/views/templates/admin/customers/kyc_status.tpl');
     }
 
     /**
