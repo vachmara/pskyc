@@ -11,16 +11,35 @@ namespace PrestaShop\Module\Pskyc\Controller\Admin;
 use PrestaShop\Module\Pskyc\Grid\Definition\Factory\VerificationGridDefinitionFactory;
 use PrestaShop\Module\Pskyc\Grid\Filters\VerificationFilters;
 use PrestaShop\Module\Pskyc\Repository\VerificationRepository;
-use PrestaShop\PrestaShop\Core\Grid\Definition\Factory\GridDefinitionFactoryInterface;
 use PrestaShop\PrestaShop\Core\Grid\GridFactoryInterface;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
+use PrestaShopBundle\Service\Grid\ResponseBuilder;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * KYC Verification Admin Controller
+ * 
+ * Manages KYC verification records in the PrestaShop back office.
+ * Provides grid listing, search, view, and status management functionality.
+ */
 class VerificationController extends FrameworkBundleAdminController
 {
+    /**
+     * Display KYC verifications listing page with grid
+     *
+     * @Route(
+     *     "/pskyc/verification",
+     *     name="ps_pskyc_verification_index",
+     *     methods={"GET", "POST"}
+     * )
+     *
+     * @param VerificationFilters $filters Grid filters for pagination and search
+     * @return Response Rendered verification grid page
+     */
     public function indexAction(
         VerificationFilters $filters
     ): Response {
@@ -38,13 +57,27 @@ class VerificationController extends FrameworkBundleAdminController
         );
     }
 
-    public function searchAction(
-        Request $request
-    ): RedirectResponse {
-        /** @var GridDefinitionFactoryInterface $verificationGridDefinitionFactory */
+    /**
+     * Handle grid search form submission
+     *
+     * @Route(
+     *     "/pskyc/verification/search",
+     *     name="ps_pskyc_verification_search",
+     *     methods={"POST"}
+     * )
+     *
+     * @param Request $request HTTP request containing search filters
+     * @return RedirectResponse Redirect to index with applied filters
+     */
+    public function searchAction(Request $request): RedirectResponse
+    {
+          /** @var GridDefinitionFactoryInterface $verificationGridDefinitionFactory */
         $verificationGridDefinitionFactory = $this->get('prestashop.module.pskyc.grid.definition.factory.verifications');
 
-        return $this->buildSearchResponse(
+        /** @var ResponseBuilder $responseBuilder */
+        $responseBuilder = $this->get('prestashop.bundle.grid.response_builder');
+
+        return $responseBuilder->buildSearchResponse(
             $verificationGridDefinitionFactory,
             $request,
             VerificationGridDefinitionFactory::GRID_ID,
@@ -52,6 +85,19 @@ class VerificationController extends FrameworkBundleAdminController
         );
     }
 
+    /**
+     * View detailed verification information
+     *
+     * @Route(
+     *     "/pskyc/verification/{verificationId}/view",
+     *     name="ps_pskyc_verification_view",
+     *     methods={"GET"},
+     *     requirements={"verificationId"="\d+"}
+     * )
+     *
+     * @param int $verificationId The verification ID to view
+     * @return Response Rendered verification detail page
+     */
     public function viewAction(
         int $verificationId
     ): Response {
@@ -93,36 +139,20 @@ class VerificationController extends FrameworkBundleAdminController
         );
     }
 
-    public function approveAction(int $verificationId, Request $request): Response
-    {
-        $note = $request->request->get('admin_note');
-        $verificationRepository = $this->get('PrestaShop\Module\Pskyc\Repository\VerificationRepository');
-        $verificationRepository->updateStatus($verificationId, 'approved', $note);
-
-        $this->addFlash('success', $this->trans('Verification approved.', 'Modules.Pskyc.Admin'));
-        return $this->redirectToRoute('ps_pskyc_verification_view', ['verificationId' => $verificationId]);
-    }
-
-    public function rejectAction(int $verificationId, Request $request): Response
-    {
-        $note = $request->request->get('admin_note');
-        $verificationRepository = $this->get('PrestaShop\Module\Pskyc\Repository\VerificationRepository');
-        $verificationRepository->updateStatus($verificationId, 'rejected', $note);
-
-        $this->addFlash('success', $this->trans('Verification rejected.', 'Modules.Pskyc.Admin'));
-        return $this->redirectToRoute('ps_pskyc_verification_view', ['verificationId' => $verificationId]);
-    }
-
-    public function requestInfoAction(int $verificationId, Request $request): Response
-    {
-        $note = $request->request->get('admin_note');
-        $verificationRepository = $this->get('PrestaShop\Module\Pskyc\Repository\VerificationRepository');
-        $verificationRepository->updateStatus($verificationId, 'requested_more_info', $note);
-
-        $this->addFlash('success', $this->trans('Requested more information from customer.', 'Modules.Pskyc.Admin'));
-        return $this->redirectToRoute('ps_pskyc_verification_view', ['verificationId' => $verificationId]);
-    }
-
+    /**
+     * Update admin note for a verification
+     *
+     * @Route(
+     *     "/pskyc/verification/{verificationId}/update-note",
+     *     name="ps_pskyc_verification_update_note",
+     *     methods={"POST"},
+     *     requirements={"verificationId"="\d+"}
+     * )
+     *
+     * @param int $verificationId The verification ID to update note for
+     * @param Request $request HTTP request containing admin note
+     * @return Response Redirect response with success message
+     */
     public function updateNoteAction(int $verificationId, Request $request): Response
     {
         $note = $request->request->get('admin_note');
@@ -133,6 +163,17 @@ class VerificationController extends FrameworkBundleAdminController
         return $this->redirectToRoute('ps_pskyc_verification_view', ['verificationId' => $verificationId]);
     }
 
+    /**
+     * Export verification logs as CSV
+     *
+     * @Route(
+     *     "/pskyc/verification/export-logs",
+     *     name="ps_pskyc_verification_export_logs",
+     *     methods={"GET"}
+     * )
+     *
+     * @return Response Streamed CSV file response
+     */
     public function exportLogsAction(): Response
     {
         /** @var VerificationRepository $verificationRepository */
@@ -200,6 +241,11 @@ class VerificationController extends FrameworkBundleAdminController
         return $response;
     }
 
+    /**
+     * Get toolbar buttons for the verification pages
+     *
+     * @return array Array of toolbar button configurations
+     */
     private function getToolbarButtons(): array
     {
         return [

@@ -1,17 +1,18 @@
 {% extends '@PrestaShop/Admin/layout.html.twig' %}
 
 {% block content %}
-    {% block verification_list_panel %}
-        <div class="row">
-            <div class="col">
-                {% include '@PrestaShop/Admin/Common/Grid/grid_panel.html.twig' with {'grid': verificationGrid} %}
-            </div>
-        </div>
-    {% endblock %}
+	{% block verification_list_panel %}
+		<div class="row">
+			<div class="col">
+				{% include '@PrestaShop/Admin/Common/Grid/grid_panel.html.twig' with {'grid': verificationGrid} %}
+			</div>
+		</div>
+	{% endblock %}
 {% endblock %}
 
 {% block javascripts %}
-    {{ parent() }}
-    
-    <script src="{{ asset('themes/default/js/bundle/pagination.js') }}"></script>
+	{{ parent() }}
+
+	<script src="{{ asset('themes/default/js/bundle/pagination.js') }}"></script>
+	<script src="{{ asset('../modules/pskyc/views/js/admin/grid.js') }}"></script>
 {% endblock %}

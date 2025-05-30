@@ -50,12 +50,15 @@ class VerificationQueryBuilder extends AbstractDoctrineQueryBuilder
     public function getSearchQueryBuilder(SearchCriteriaInterface $searchCriteria): QueryBuilder
     {
         $qb = $this->getQueryBuilder($searchCriteria->getFilters());
+        
+        // Debug logging
+        error_log('KYC Grid Filters: ' . json_encode($searchCriteria->getFilters()));
+        
         $qb
             ->select('v.`id_kyc_verification`, v.`id_customer`, v.`status`')
             ->addSelect('v.`date_submitted`, v.`date_validated`, v.`admin_note`')
             ->addSelect('c.`email` AS `customer_email`')
             ->addSelect('CONCAT(c.`firstname`, " ", c.`lastname`) AS `customer_name`')
-            // Add document count
             ->addSelect('(SELECT COUNT(d.id_kyc_document) FROM ' . $this->dbPrefix . 'kyc_document d WHERE d.id_kyc_verification = v.id_kyc_verification) AS documents_count')
         ;
 
@@ -63,6 +66,10 @@ class VerificationQueryBuilder extends AbstractDoctrineQueryBuilder
             ->applyPagination($searchCriteria, $qb)
             ->applySorting($searchCriteria, $qb)
         ;
+
+        // Debug the final SQL
+        error_log('KYC Grid SQL: ' . $qb->getSQL());
+        error_log('KYC Grid Params: ' . json_encode($qb->getParameters()));
 
         return $qb;
     }
@@ -122,6 +129,7 @@ class VerificationQueryBuilder extends AbstractDoctrineQueryBuilder
             )
         ;
 
+        // Apply filters even if empty to ensure proper form initialization
         if ($this->filterApplicator) {
             $this->filterApplicator->apply($qb, $sqlFilters, $filterValues);
         }

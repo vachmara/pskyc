@@ -9,8 +9,30 @@ use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
+/**
+ * KYC Document Admin Controller
+ *
+ * Manages KYC document operations in the PrestaShop back office.
+ * Handles document downloads, previews, and status updates.
+ */
 class DocumentController extends FrameworkBundleAdminController
 {
+    /**
+     * Download or preview a KYC document
+     *
+     * @Route(
+     *     "/pskyc/document/{documentId}/{preview}",
+     *     name="ps_pskyc_document_download",
+     *     methods={"GET"},
+     *     requirements={"documentId"="\d+", "preview"="\d+"},
+     *     defaults={"preview"=0}
+     * )
+     *
+     * @param int $documentId The document ID to download
+     * @param int $preview Whether to display inline (1) or as attachment (0)
+     * @param Request $request HTTP request object
+     * @return Response|JsonResponse Document file response or JSON error
+     */
     public function downloadAction(int $documentId, int $preview = 0, Request $request)
     {
         $documentRepository = $this->get('PrestaShop\Module\Pskyc\Repository\DocumentRepository');
@@ -58,11 +80,19 @@ class DocumentController extends FrameworkBundleAdminController
     }
 
     /**
+     * Update document statuses and admin notes for a verification
+     *
      * @Route(
      *     "/pskyc/verification/{verificationId}/documents/update-status",
      *     name="ps_pskyc_document_update_status",
-     *     methods={"POST"}
+     *     methods={"POST"},
+     *     requirements={"verificationId"="\d+"}
      * )
+     *
+     * @param int $verificationId The verification ID containing the documents
+     * @param Request $request HTTP request containing document updates
+     * @param CsrfTokenManagerInterface $csrfTokenManager CSRF token manager for security
+     * @return Response Redirect response with success/error message
      */
     public function updateStatusAction(int $verificationId, Request $request, CsrfTokenManagerInterface $csrfTokenManager)
     {
@@ -88,6 +118,13 @@ class DocumentController extends FrameworkBundleAdminController
         return $this->redirectToRoute('ps_pskyc_verification_view', ['verificationId' => $verificationId]);
     }
 
+    /**
+     * Recalculate verification status based on document statuses
+     *
+     * @param mixed $verificationService The verification service instance
+     * @param int $verificationId The verification ID to recalculate
+     * @return void
+     */
     private function recalculateVerificationStatus($verificationService, int $verificationId): void
     {
         $documents = $verificationService->getVerificationWithDocuments($verificationId)['documents'] ?? [];

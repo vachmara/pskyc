@@ -18,7 +18,7 @@ services:
     parent: 'prestashop.core.grid.definition.factory.abstract_grid_definition'
     public: true
 
-  # Query Builder - don't use parent, define it directly
+  # Query Builder - ensure filter applicator is properly injected
   PrestaShop\Module\Pskyc\Grid\Query\VerificationQueryBuilder:
     class: 'PrestaShop\Module\Pskyc\Grid\Query\VerificationQueryBuilder'
     public: true
@@ -28,16 +28,16 @@ services:
       - '@prestashop.core.query.doctrine_search_criteria_applicator'
       - '@prestashop.core.grid.query.filter.doctrine_filter_applicator'
 
-  # Grid Data Provider
+  # Grid Data Provider - Fix the class reference
   prestashop.module.pskyc.grid.data_provider.verifications:
-    class: '%prestashop.core.grid.data.factory.doctrine_grid_data_factory%'
+    class: 'PrestaShop\PrestaShop\Core\Grid\Data\Factory\DoctrineGridDataFactory'
     arguments:
       - '@PrestaShop\Module\Pskyc\Grid\Query\VerificationQueryBuilder'
       - '@prestashop.core.hook.dispatcher'
       - '@prestashop.core.grid.query.doctrine_query_parser'
       - 'verification'
 
-  # Grid Factory
+  # Grid Factory - ensure filter form factory is injected
   prestashop.module.pskyc.grid.factory.verifications:
     class: 'PrestaShop\PrestaShop\Core\Grid\GridFactory'
     arguments: 

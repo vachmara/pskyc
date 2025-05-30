@@ -1,12 +1,19 @@
 # KYC Verification routes
 ps_pskyc_verification_index:
   path: /pskyc/verification
-  methods: [GET, POST]
+  methods: [GET]
   defaults:
     _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::indexAction'
 
 ps_pskyc_verification_search:
-  path: /pskyc/verification/search
+  path: /pskyc/verification
+  methods: [POST]
+  defaults:
+    _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::searchAction'
+
+# Add a reset route for filters
+ps_pskyc_verification_reset:
+  path: /pskyc/verification/reset
   methods: [POST]
   defaults:
     _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::searchAction'
@@ -27,6 +34,12 @@ ps_pskyc_verification_update_note:
   requirements:
     verificationId: \d+
 
+ps_pskyc_verification_export_logs:
+  path: /pskyc/verification/export-logs
+  methods: [GET]
+  defaults:
+    _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::exportLogsAction'
+
 ps_pskyc_document_download:
   path: /pskyc/document/{documentId}/{preview}
   methods: [GET]
@@ -44,9 +57,3 @@ ps_pskyc_document_update_status:
     _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\DocumentController::updateStatusAction'
   requirements:
     verificationId: \d+
-
-ps_pskyc_verification_export_logs:
-    path: /verification/export-logs
-    methods: [GET]
-    defaults:
-        _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::exportLogsAction'
