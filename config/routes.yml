@@ -44,3 +44,9 @@ ps_pskyc_document_update_status:
     _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\DocumentController::updateStatusAction'
   requirements:
     verificationId: \d+
+
+ps_pskyc_verification_export_logs:
+    path: /verification/export-logs
+    methods: [GET]
+    defaults:
+        _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::exportLogsAction'

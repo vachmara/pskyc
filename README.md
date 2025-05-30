@@ -4,18 +4,19 @@ Open source, GDPR-compliant KYC document verification for PrestaShop.
 
 - Proof of identity (ID)
 - Proof of address (utility bill, bank statement, etc.)
-- Secure file upload
+- Secure file storage with encryption
+- Product order blocking until KYC is validated
 
 ## Features
 
 - [x] Secure KYC file uploads (ID, proof of address)
 - [x] End-to-end file encryption (OpenSSL)
 - [x] Front-office upload & status tracking
-- [ ] Back-office admin panel: validation, logs, messaging
+- [x] Back-office admin panel: validation, document checking, logs
+- [x] Order blocking for sensitive products until KYC is validated
+- [x] Easy installation, configuration, and uninstall
+- [x] Multi-language ready
 - [ ] Automated email notifications (status updates, rejections, deletions)
-- [ ] Order blocking for sensitive products until KYC is validated
-- [ ] Easy installation, configuration, and uninstall
-- [ ] Multi-language ready
 
 ## Installation
 

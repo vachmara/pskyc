@@ -17,6 +17,7 @@ use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class VerificationController extends FrameworkBundleAdminController
 {
@@ -132,9 +133,82 @@ class VerificationController extends FrameworkBundleAdminController
         return $this->redirectToRoute('ps_pskyc_verification_view', ['verificationId' => $verificationId]);
     }
 
+    public function exportLogsAction(): Response
+    {
+        /** @var VerificationRepository $verificationRepository */
+        $verificationRepository = $this->get('PrestaShop\Module\Pskyc\Repository\VerificationRepository');
+
+        try {
+            $verifications = $verificationRepository->findAllForExport();
+        } catch (\Exception $e) {
+            $this->addFlash('error', $this->trans('Error retrieving verification logs.', 'Modules.Pskyc.Admin'));
+            return $this->redirectToRoute('ps_pskyc_verification_index');
+        }
+
+        $response = new StreamedResponse();
+        $response->setCallback(function () use ($verifications) {
+            $handle = fopen('php://output', 'w+');
+
+            // Add CSV headers
+            fputcsv($handle, [
+                'Log ID',
+                'Verification ID',
+                'Action',
+                'Message',
+                'Customer ID',
+                'Customer Email',
+                'Employee Name',
+                'Verification Status',
+                'IP Address',
+                'User Agent',
+                'Date Added',
+                'Date Updated'
+            ]);
+
+            // Add data rows
+            foreach ($verifications as $log) {
+                $employeeName = '';
+                if (!empty($log['employee_firstname']) || !empty($log['employee_lastname'])) {
+                    $employeeName = trim($log['employee_firstname'] . ' ' . $log['employee_lastname']);
+                }
+
+                fputcsv($handle, [
+                    $log['log_id'],
+                    $log['verification_id'],
+                    $log['action'],
+                    $log['message'] ?? '',
+                    $log['id_customer'],
+                    $log['customer_email'] ?? 'N/A',
+                    $employeeName ?: 'System',
+                    $log['verification_status'] ?? '',
+                    $log['ip_address'] ?? '',
+                    $log['user_agent'] ?? '',
+                    $log['date_add'],
+                    $log['date_upd']
+                ]);
+            }
+
+            fclose($handle);
+        });
+
+        $filename = sprintf('kyc_verification_logs_%s.csv', date('Y-m-d_H-i-s'));
+        
+        $response->setStatusCode(200);
+        $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
+        $response->headers->set('Content-Disposition', sprintf('attachment; filename="%s"', $filename));
+
+        return $response;
+    }
+
     private function getToolbarButtons(): array
     {
         return [
+            'export_logs' => [
+                'href' => $this->generateUrl('ps_pskyc_verification_export_logs'),
+                'desc' => $this->trans('Export Verification Logs', 'Modules.Pskyc.Admin'),
+                'icon' => 'cloud_download',
+                'class' => 'btn btn-outline-secondary'
+            ]
         ];
     }
 }

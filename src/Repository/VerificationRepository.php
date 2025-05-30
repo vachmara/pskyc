@@ -332,4 +332,38 @@ class VerificationRepository
 
         return $qb->execute() > 0;
     }
+
+    /**
+     * Find all verification logs for export
+     *
+     * @return array
+     */
+    public function findAllForExport(): array
+    {
+        $qb = $this->connection->createQueryBuilder();
+        
+        $qb->select([
+                'l.id_kyc_log as log_id',
+                'l.id_kyc_verification as verification_id',
+                'l.action',
+                'l.message',
+                'l.ip_address',
+                'l.user_agent',
+                'l.date_add',
+                'l.date_upd',
+                'v.id_customer',
+                'v.status as verification_status',
+                'c.email as customer_email',
+                'e.firstname as employee_firstname',
+                'e.lastname as employee_lastname'
+            ])
+            ->from(_DB_PREFIX_ . 'kyc_log', 'l')
+            ->leftJoin('l', _DB_PREFIX_ . 'kyc_verification', 'v', 'l.id_kyc_verification = v.id_kyc_verification')
+            ->leftJoin('l', _DB_PREFIX_ . 'customer', 'c', 'l.id_customer = c.id_customer')
+            ->leftJoin('l', _DB_PREFIX_ . 'employee', 'e', 'l.id_employee = e.id_employee')
+            ->orderBy('l.date_add', 'DESC');
+
+        $result = $qb->execute();
+        return $result->fetchAllAssociative();
+    }
 }
