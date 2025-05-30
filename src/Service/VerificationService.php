@@ -363,4 +363,72 @@ class VerificationService
         $expiry = $now->add(new \DateInterval('P' . $validityDays . 'D'));
         return $expiry->format('Y-m-d H:i:s');
     }
+
+    /**
+     * Delete all the verifications and associated documents for a customer
+     * 
+     * @param int $customerId The customer ID
+     * @return bool True on success, false on failure
+     */
+    public function deleteVerificationsByCustomerId(int $customerId): bool
+    {
+        try {
+            // Get all verifications for the customer
+            $verifications = $this->verificationRepository->findAllByCustomerId($customerId);
+            if (empty($verifications)) {
+                return true; // Nothing to delete
+            }
+
+            foreach ($verifications as $verification) {
+                // Delete associated documents
+                $this->documentRepository->deleteByVerificationId($verification['id_kyc_verification']);
+                // Delete the verification itself
+                $this->verificationRepository->delete($verification['id_kyc_verification']);
+                // Log the deletion
+                $this->logAction(
+                    $verification['id_kyc_verification'],
+                    $customerId,
+                    null,
+                    'verification_deleted',
+                    'Verification deleted for customer ID: ' . $customerId
+                );
+            }
+
+            return true;
+        } catch (\Exception $e) {
+            PrestaShopLogger::addLog('Delete verifications error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            return false;
+        }
+    }
+
+    /**
+     * Get GDPR data concerning a customer's verifications and documents
+     * 
+     * @param int $customerId The customer ID
+     * @return array|null Returns an array with verification and document data or null if not found
+     */
+    public function getGdprData(int $customerId): ?array
+    {
+        try {
+            // Get all verifications for the customer
+            $verifications = $this->verificationRepository->findAllByCustomerId($customerId);
+            if (empty($verifications)) {
+                return null; // No verifications found
+            }
+
+            $gdprData = [];
+            foreach ($verifications as $verification) {
+                $documents = $this->documentRepository->findByVerificationId($verification['id_kyc_verification']);
+                $gdprData[] = [
+                    'verification' => $verification,
+                    'documents' => $documents
+                ];
+            }
+
+            return $gdprData;
+        } catch (\Exception $e) {
+            PrestaShopLogger::addLog('Get GDPR data error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            return null;
+        }
+    }
 }

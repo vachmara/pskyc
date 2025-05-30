@@ -590,4 +590,30 @@ class DocumentService
             return ['success' => false, 'message' => 'Failed to replace document'];
         }
     }
+
+    /**
+     * Delete all documents for a verification
+     * 
+     * @param int $verificationId The verification ID to delete documents for
+     * @return int Number of documents deleted
+     */
+    public function deleteByVerificationId(int $verificationId): int
+    {
+        try {
+            $documents = $this->documentRepository->findByVerificationId($verificationId);
+            $deletedCount = 0;
+
+            foreach ($documents as $doc) {
+                if ($this->deleteDocument($doc['id_kyc_document'])) {
+                    $deletedCount++;
+                }
+            }
+
+            return $deletedCount;
+
+        } catch (\Exception $e) {
+            PrestaShopLogger::addLog('Document deletion by verification error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            return 0;
+        }
+    }
 }

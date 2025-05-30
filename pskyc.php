@@ -95,6 +95,9 @@ class Pskyc extends Module
             $this->registerHook('displayAdminCustomers') &&
             $this->registerHook('displayAdminOrder') &&
             $this->registerHook('displayCustomerAccount') &&
+            $this->registerHook('registerGDPRConsent') &&
+            $this->registerHook('actionDeleteGDPRCustomer') &&
+            $this->registerHook('actionExportGDPRData') &&
             $this->registerHook(ThemeCatalogInterface::LIST_MAIL_THEMES_HOOK);
     }
 
@@ -112,8 +115,7 @@ class Pskyc extends Module
         Configuration::deleteByName('PSKYC_RETENTION_DAYS');
         Configuration::deleteByName('PSKYC_KYC_REQUIRED_CATEGORIES');
 
-        return parent::uninstall() &&
-            $this->unregisterHook(ThemeCatalogInterface::LIST_MAIL_THEMES_HOOK);
+        return parent::uninstall();
     }
 
     /**
@@ -383,7 +385,7 @@ class Pskyc extends Module
         $verifications = $verificationService->getVerificationsByCustomerId($customerId);
 
         // Render the Twig template instead of Smarty
-      
+
         return $this->get('twig')->render('@Modules/pskyc/views/templates/admin/customers/kyc_status.html.twig', [
             'verifications' => $verifications,
             'count' => count($verifications ?? []),
@@ -511,7 +513,7 @@ class Pskyc extends Module
 
         $checkoutProcess = $params['checkoutProcess'];
         $context = Context::getContext();
-        
+
         // Check if customer is logged in
         if (!$context->customer->id) {
             return;
@@ -519,7 +521,7 @@ class Pskyc extends Module
 
         // Check if KYC is required for cart products
         $kycRequired = $this->isKycRequiredForCart($context->cart);
-        
+
         if (!$kycRequired) {
             return;
         }
@@ -528,7 +530,7 @@ class Pskyc extends Module
         /** @var PrestaShop\Module\Pskyc\Service\VerificationService $verificationService */
         $verificationService = $this->get('PrestaShop\\Module\\Pskyc\\Service\\VerificationService');
         $verification = $verificationService->getMostRecentVerification($context->customer->id);
-        
+
         // Only add step if verification is not approved
         if ($verification && $verification['status'] === 'approved') {
             return;
@@ -539,9 +541,9 @@ class Pskyc extends Module
             $context,
             $this->getTranslator()
         );
-        
+
         $kycUrl = $context->link->getModuleLink($this->name, 'verify', [], true);
-        
+
         $kycStep
             ->setKycUrl($kycUrl)
             ->setReachable(true)
@@ -549,10 +551,10 @@ class Pskyc extends Module
 
         // Get current steps and insert KYC step after the first step
         $steps = $checkoutProcess->getSteps();
-        
+
         // Insert KYC step after personal information step (index 0)
         array_splice($steps, 1, 0, [$kycStep]);
-        
+
         // Set the modified steps array back to checkout process
         $checkoutProcess->setSteps($steps);
     }
@@ -566,20 +568,61 @@ class Pskyc extends Module
     private function isKycRequiredForCart($cart)
     {
         $kycRequiredCategories = json_decode(Configuration::get('PSKYC_KYC_REQUIRED_CATEGORIES') ?: '[]', true);
-        
+
         if (empty($kycRequiredCategories)) {
             return false;
         }
 
         $products = $cart->getProducts();
         $cartCategoryIds = [];
-        
+
         foreach ($products as $product) {
             if (!empty($product['id_category_default'])) {
-                $cartCategoryIds[] = (int)$product['id_category_default'];
+                $cartCategoryIds[] = (int) $product['id_category_default'];
             }
         }
-        
+
         return count(array_intersect($kycRequiredCategories, $cartCategoryIds)) > 0;
+    }
+
+    /**
+     * Hook to register GDPR consent
+     * 
+     */
+    public function hookRegisterGDPRConsent()
+    {
+        // This hook can be used to register GDPR consent for KYC document uploads
+        // For now, we don't need to do anything here, but it's available for future use
+        return true;
+    }
+
+    /**
+     * Hook to export GDPR data
+     * 
+     * @param Customer $customer
+     * @return string JSON encoded data
+     */
+    public function hookActionExportGDPRData($customer)
+    {
+        /** @var VerificationService $verificationService */
+        $verificationService = $this->get('PrestaShop\Module\Pskyc\Service\VerificationService');
+        $verifications = $verificationService->getGdprData($customer->id);
+
+        return json_encode($verifications) ?: '[]';
+    }
+
+    /**
+     * Hook to delete GDPR customer data
+     * 
+     * @param Customer $customer
+     * @return void
+     */
+    public function hookActionDeleteGDPRCustomer($customer)
+    {
+        // This hook can be used to delete KYC-related data when a customer is deleted
+        // For now, we don't need to do anything here, but it's available for future use
+        /** @var VerificationService $verificationService */
+        $verificationService = $this->get('PrestaShop\Module\Pskyc\Service\VerificationService');
+        $verificationService->deleteVerificationsByCustomerId($customer->id);
     }
 }
