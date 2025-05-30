@@ -279,13 +279,23 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
                 $this->success[] = $this->trans('Documents uploaded successfully. Additional documents may be required.', [], 'Modules.Pskyc.Shop');
             }
 
+            // Get customer data and verification with documents for notifications
             $customerData = $this->getCustomerData($this->context->customer->id);
             if ($customerData) {
                 $verification = $this->verificationService->getVerificationWithDocuments($verificationId);
-                $this->notificationService->sendStatusChangeNotification(
+                $documents = $verification['documents'] ?? [];
+
+                // Send document upload confirmation to customer
+                $this->notificationService->sendDocumentUploadConfirmation(
                     $verification,
                     $customerData,
-                    null
+                    $documents
+                );
+
+                // Send admin notification for new verification request
+                $this->notificationService->sendAdminNotification(
+                    $verification,
+                    $customerData
                 );
             }
 

@@ -257,9 +257,10 @@ class VerificationRepository
      * 
      * @param int $id The verification ID to update
      * @param string $status The new status
+     * @param string|null $note Optional admin note for the status change
      * @return bool True if update was successful
      */
-    public function updateStatus(int $id, string $status): bool
+    public function updateStatus(int $id, string $status, ?string $note = null): bool
     {
         $qb = $this->connection->createQueryBuilder();
         $qb->update(_DB_PREFIX_ . 'kyc_verification')
@@ -270,6 +271,12 @@ class VerificationRepository
                 'status' => $status,
                 'id' => $id,
             ]);
+
+        // Add admin note if provided
+        if ($note !== null) {
+            $qb->set('admin_note', ':note')
+               ->setParameter('note', $note);
+        }
 
         return $qb->execute() > 0;
     }
@@ -365,5 +372,63 @@ class VerificationRepository
 
         $result = $qb->execute();
         return $result->fetchAllAssociative();
+    }
+
+    /**
+     * Find verifications that will expire within specified days
+     * 
+     * @param int $days Number of days to look ahead for expiring verifications
+     * @return array Array of verifications that will expire within the specified days
+     */
+    public function findExpiringVerifications(int $days): array
+    {
+        $qb = $this->connection->createQueryBuilder();
+        $futureDate = date('Y-m-d H:i:s', strtotime("+{$days} days"));
+        
+        $query = $qb->select('*')
+            ->from(_DB_PREFIX_ . 'kyc_verification')
+            ->where('status = :status')
+            ->andWhere('date_expiry IS NOT NULL')
+            ->andWhere('date_expiry <= :future_date')
+            ->andWhere('date_expiry > NOW()')
+            ->setParameter('status', 'approved')
+            ->setParameter('future_date', $futureDate)
+            ->orderBy('date_expiry', 'ASC');
+
+        $result = $query->execute();
+        return $result->fetchAllAssociative();
+    }
+
+    /**
+     * Find verifications that have already expired but status hasn't been updated
+     * 
+     * @return array Array of expired verifications with status still 'approved'
+     */
+    public function findExpiredVerifications(): array
+    {
+        $qb = $this->connection->createQueryBuilder();
+        
+        $query = $qb->select('*')
+            ->from(_DB_PREFIX_ . 'kyc_verification')
+            ->where('status = :status')
+            ->andWhere('date_expiry IS NOT NULL')
+            ->andWhere('date_expiry < NOW()')
+            ->setParameter('status', 'approved')
+            ->orderBy('date_expiry', 'ASC');
+
+        $result = $query->execute();
+        return $result->fetchAllAssociative();
+    }
+
+    /**
+     * Update admin note for verification (alias method)
+     * 
+     * @param int $id The verification ID to update
+     * @param string|null $note The admin note
+     * @return bool True if update was successful
+     */
+    public function updateNote(int $id, ?string $note): bool
+    {
+        return $this->updateAdminNote($id, $note);
     }
 }

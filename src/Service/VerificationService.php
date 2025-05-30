@@ -4,6 +4,7 @@ namespace PrestaShop\Module\Pskyc\Service;
 use PrestaShop\Module\Pskyc\Repository\VerificationRepository;
 use PrestaShop\Module\Pskyc\Repository\DocumentRepository;
 use PrestaShop\Module\Pskyc\Repository\LogRepository;
+use PrestaShop\Module\Pskyc\Repository\CustomerRepository;
 use PrestaShopLogger;
 use Configuration;
 /**
@@ -40,6 +41,11 @@ class VerificationService
     private $notificationService;
 
     /**
+     * @var CustomerRepository
+     */
+    private $customerRepository;
+
+    /**
      * VerificationService constructor
      * 
      * @param VerificationRepository $verificationRepository Repository for verification data operations
@@ -47,19 +53,22 @@ class VerificationService
      * @param LogRepository $logRepository Repository for audit log operations
      * @param DocumentService $documentService Service for document management
      * @param NotificationService $notificationService Service for sending notifications
+     * @param CustomerRepository $customerRepository Repository for customer data operations
      */
     public function __construct(
         VerificationRepository $verificationRepository,
         DocumentRepository $documentRepository,
         LogRepository $logRepository,
         DocumentService $documentService,
-        NotificationService $notificationService
+        NotificationService $notificationService,
+        CustomerRepository $customerRepository
     ) {
         $this->verificationRepository = $verificationRepository;
         $this->documentRepository = $documentRepository;
         $this->logRepository = $logRepository;
         $this->documentService = $documentService;
         $this->notificationService = $notificationService;
+        $this->$customerRepository = $customerRepository;
     }
 
     /**
@@ -318,6 +327,8 @@ class VerificationService
                 return false; // Verification not found
             }
 
+            $previousStatus = $verification['status'];
+
             // Update status in the repository
             $result = $this->verificationRepository->updateStatus($verificationId, $newStatus, $note);
 
@@ -328,8 +339,25 @@ class VerificationService
                     null,
                     null,
                     'status_updated',
-                    'Verification status updated to: ' . $newStatus
+                    'Verification status updated from ' . $previousStatus . ' to ' . $newStatus
                 );
+
+                // Get updated verification and customer data for notifications
+                $updatedVerification = $this->verificationRepository->findById($verificationId);
+                if ($updatedVerification) {
+                    // Get customer data using CustomerRepository
+                    
+                    $customerData = $this->customerRepository->getCustomerData($updatedVerification['id_customer']);
+                    
+                    if ($customerData) {
+                        // Send status change notification to customer
+                        $this->notificationService->sendStatusChangeNotification(
+                            $updatedVerification,
+                            $customerData,
+                            $previousStatus
+                        );
+                    }
+                }
 
                 // If approved, set expiry date
                 if ($newStatus === 'approved') {

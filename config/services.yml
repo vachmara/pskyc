@@ -78,6 +78,7 @@ services:
       - '@PrestaShop\Module\Pskyc\Repository\LogRepository'
       - '@PrestaShop\Module\Pskyc\Service\DocumentService'
       - '@PrestaShop\Module\Pskyc\Service\NotificationService'
+      - '@PrestaShop\Module\Pskyc\Repository\CustomerRepository'
 
   PrestaShop\Module\Pskyc\Service\DocumentService:
     arguments:
