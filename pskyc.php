@@ -68,7 +68,7 @@ class Pskyc extends Module
      * Install the module
      * 
      * Creates database tables, sets default configuration,
-     * creates upload directory and registers hooks
+     * creates upload directory with .htaccess protection and registers hooks
      * 
      * @return bool True if installation successful, false otherwise
      */
@@ -85,8 +85,8 @@ class Pskyc extends Module
 
         require_once __DIR__ . '/sql/install.php';
 
-        $uploadDir = _PS_MODULE_DIR_ . $this->name . '/secure_upload/';
-        if (!is_dir($uploadDir) && !@mkdir($uploadDir, 0700, true)) {
+        // Create secure upload directory with proper permissions and .htaccess protection
+        if (!$this->createSecureUploadDirectory()) {
             return false;
         }
 
@@ -624,5 +624,43 @@ class Pskyc extends Module
         /** @var VerificationService $verificationService */
         $verificationService = $this->get('PrestaShop\Module\Pskyc\Service\VerificationService');
         $verificationService->deleteVerificationsByCustomerId($customer->id);
+    }
+
+    /**
+     * Create secure upload directory with .htaccess protection
+     * 
+     * @return bool True if directory created successfully, false otherwise
+     */
+    private function createSecureUploadDirectory()
+    {
+        $uploadDir = _PS_MODULE_DIR_ . $this->name . '/secure_upload/';
+
+        // Create directory if it doesn't exist
+        if (!is_dir($uploadDir)) {
+            if (!@mkdir($uploadDir, 0700, true)) {
+                return false;
+            }
+        }
+
+        // Create .htaccess file from template
+        $htaccessFile = $uploadDir . '.htaccess';
+        if (!file_exists($htaccessFile)) {
+            $templateFile = __DIR__ . '/htaccess_template';
+            
+            if (!file_exists($templateFile)) {
+                return false;
+            }
+            
+            $htaccessContent = file_get_contents($templateFile);
+            if ($htaccessContent === false) {
+                return false;
+            }
+            
+            if (file_put_contents($htaccessFile, $htaccessContent) === false) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

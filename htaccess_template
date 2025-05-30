@@ -1,0 +1,72 @@
+# KYC Secure Upload - Block direct access to uploaded documents
+# All document access must go through the module's secure download system
+
+# Deny all direct access
+<Files "*">
+    Order Deny,Allow
+    Deny from all
+</Files>
+
+# Alternative modern Apache 2.4+ syntax (uncomment if your server supports it)
+# <Files "*">
+#     Require all denied
+# </Files>
+
+# Prevent directory browsing
+Options -Indexes
+
+# Disable script execution
+<Files "*.php">
+    Order Deny,Allow
+    Deny from all
+</Files>
+
+<Files "*.php3">
+    Order Deny,Allow
+    Deny from all
+</Files>
+
+<Files "*.php4">
+    Order Deny,Allow
+    Deny from all
+</Files>
+
+<Files "*.php5">
+    Order Deny,Allow
+    Deny from all
+</Files>
+
+<Files "*.phtml">
+    Order Deny,Allow
+    Deny from all
+</Files>
+
+<Files "*.pl">
+    Order Deny,Allow
+    Deny from all
+</Files>
+
+<Files "*.py">
+    Order Deny,Allow
+    Deny from all
+</Files>
+
+<Files "*.jsp">
+    Order Deny,Allow
+    Deny from all
+</Files>
+
+<Files "*.asp">
+    Order Deny,Allow
+    Deny from all
+</Files>
+
+<Files "*.sh">
+    Order Deny,Allow
+    Deny from all
+</Files>
+
+<Files "*.cgi">
+    Order Deny,Allow
+    Deny from all
+</Files>
