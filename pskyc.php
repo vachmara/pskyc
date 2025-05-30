@@ -142,11 +142,28 @@ class Pskyc extends Module
             }
         }
 
+        // Check upload directory security status
+        $securityStatus = $this->checkUploadDirectorySecurity();
+        
+        // Display security warnings if any
+        if ($securityStatus['status'] === 'warning') {
+            foreach ($securityStatus['warnings'] as $warning) {
+                $output .= $this->displayWarning($this->l('Security Warning: ') . $warning);
+            }
+        } elseif ($securityStatus['status'] === 'error') {
+            foreach ($securityStatus['warnings'] as $warning) {
+                $output .= $this->displayError($this->l('Security Error: ') . $warning);
+            }
+        } elseif ($securityStatus['status'] === 'secure') {
+            $output .= $this->displayConfirmation($this->l('Upload directory security: All security measures are properly configured.'));
+        }
+
         // Assign template variables
         $this->context->smarty->assign([
             'module_dir' => $this->_path,
             'form_html' => $this->renderForm(),
             'errors' => $errors,
+            'security_status' => $securityStatus,
             'verification_url' => $this->get('router')->generate('ps_pskyc_verification_index'),
         ]);
 
@@ -627,9 +644,9 @@ class Pskyc extends Module
     }
 
     /**
-     * Create secure upload directory with .htaccess protection
+     * Create secure upload directory with comprehensive security measures
      * 
-     * @return bool True if directory created successfully, false otherwise
+     * @return bool True if directory created successfully with proper security, false otherwise
      */
     private function createSecureUploadDirectory()
     {
@@ -637,30 +654,181 @@ class Pskyc extends Module
 
         // Create directory if it doesn't exist
         if (!is_dir($uploadDir)) {
+            // Use 0700 for Unix/Linux (owner read/write/execute only)
             if (!@mkdir($uploadDir, 0700, true)) {
                 return false;
             }
         }
 
+        // Verify directory security
+        if (!$this->verifyDirectorySecurity($uploadDir)) {
+            return false;
+        }
+
         // Create .htaccess file from template
         $htaccessFile = $uploadDir . '.htaccess';
         if (!file_exists($htaccessFile)) {
-            $templateFile = __DIR__ . '/htaccess_template';
-            
-            if (!file_exists($templateFile)) {
+            if (!$this->createHtaccessFile($htaccessFile)) {
                 return false;
             }
-            
-            $htaccessContent = file_get_contents($templateFile);
-            if ($htaccessContent === false) {
-                return false;
-            }
-            
-            if (file_put_contents($htaccessFile, $htaccessContent) === false) {
+        }
+
+        // Create index.php to prevent directory listing fallback
+        $indexFile = $uploadDir . 'index.php';
+        if (!file_exists($indexFile)) {
+            if (!$this->createSecurityIndexFile($indexFile)) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    /**
+     * Verify directory security settings
+     * 
+     * @param string $uploadDir The upload directory path
+     * @return bool True if directory is secure, false otherwise
+     */
+    private function verifyDirectorySecurity(string $uploadDir): bool
+    {
+        // Check if directory is readable and writable by the web server
+        if (!is_readable($uploadDir) || !is_writable($uploadDir)) {
+            return false;
+        }
+
+        // Additional security checks for Unix/Linux systems
+        if (function_exists('fileperms') && DIRECTORY_SEPARATOR === '/') {
+            $perms = fileperms($uploadDir);
+            $octal = substr(sprintf('%o', $perms), -4);
+            
+            // Check if permissions are too permissive (should be 0700 or similar)
+            if (intval($octal) > 0755) {
+                // Try to fix permissions
+                if (!@chmod($uploadDir, 0700)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Create .htaccess file with proper security
+     * 
+     * @param string $htaccessFile Path to .htaccess file
+     * @return bool True if created successfully, false otherwise
+     */
+    private function createHtaccessFile(string $htaccessFile): bool
+    {
+        $templateFile = __DIR__ . '/secure_upload_htaccess_template.txt';
+        
+        if (!file_exists($templateFile)) {
+            return false;
+        }
+        
+        $htaccessContent = file_get_contents($templateFile);
+        if ($htaccessContent === false) {
+            return false;
+        }
+        
+        if (file_put_contents($htaccessFile, $htaccessContent) === false) {
+            return false;
+        }
+
+        // Set restrictive permissions on .htaccess file (Unix/Linux)
+        if (DIRECTORY_SEPARATOR === '/') {
+            @chmod($htaccessFile, 0644);
+        }
+
+        return true;
+    }
+
+    /**
+     * Create security index.php file to prevent directory listing
+     * 
+     * @param string $indexFile Path to index.php file
+     * @return bool True if created successfully, false otherwise
+     */
+    private function createSecurityIndexFile(string $indexFile): bool
+    {
+        $templateFile = __DIR__ . '/index.php';
+        
+        if (!file_exists($templateFile)) {
+            return false;
+        }
+        
+        $indexContent = file_get_contents($templateFile);
+        if ($indexContent === false) {
+            return false;
+        }
+
+        if (file_put_contents($indexFile, $indexContent) === false) {
+            return false;
+        }
+
+        // Set restrictive permissions on index.php file (Unix/Linux)
+        if (DIRECTORY_SEPARATOR === '/') {
+            @chmod($indexFile, 0644);
+        }
+
+        return true;
+    }
+
+    /**
+     * Verify upload directory security on each configuration page load
+     * 
+     * @return array Security status with warnings if any
+     */
+    private function checkUploadDirectorySecurity(): array
+    {
+        $uploadDir = _PS_MODULE_DIR_ . $this->name . '/secure_upload/';
+        $warnings = [];
+        $status = 'secure';
+
+        // Check if directory exists
+        if (!is_dir($uploadDir)) {
+            return [
+                'status' => 'error',
+                'warnings' => ['Upload directory does not exist']
+            ];
+        }
+
+        // Check .htaccess file
+        $htaccessFile = $uploadDir . '.htaccess';
+        if (!file_exists($htaccessFile)) {
+            $warnings[] = '.htaccess file is missing - directory may be accessible via web';
+            $status = 'warning';
+        }
+
+        // Check index.php file
+        $indexFile = $uploadDir . 'index.php';
+        if (!file_exists($indexFile)) {
+            $warnings[] = 'Security index.php file is missing';
+            $status = 'warning';
+        }
+
+        // Check directory permissions (Unix/Linux)
+        if (function_exists('fileperms') && DIRECTORY_SEPARATOR === '/') {
+            $perms = fileperms($uploadDir);
+            $octal = substr(sprintf('%o', $perms), -4);
+            
+            if (intval($octal) > 0755) {
+                $warnings[] = 'Directory permissions may be too permissive (' . $octal . ')';
+                $status = 'warning';
+            }
+        }
+
+        // Check if directory is writable
+        if (!is_writable($uploadDir)) {
+            $warnings[] = 'Directory is not writable - file uploads will fail';
+            $status = 'error';
+        }
+
+        return [
+            'status' => $status,
+            'warnings' => $warnings
+        ];
     }
 }
