@@ -34,10 +34,10 @@ class OrderRepository
      * Retrieves all distinct default category IDs for products currently in the customer's cart.
      * This information can be used for KYC risk assessment based on product categories.
      * 
-     * @param CustomerId $customerId The customer ID to search for
+     * @param int $customerId Customer ID to filter the cart products
      * @return array Array of category IDs from the customer's cart products
      */
-    public function findProductsCartsCategoriesByCustomerId(CustomerId $customerId): array
+    public function findProductsCartsCategoriesByCustomerId(int $customerId): array
     {
         try {
           $qb = $this->connection->createQueryBuilder();
@@ -46,7 +46,7 @@ class OrderRepository
               ->from(_DB_PREFIX_ . 'cart_product', 'cp')
               ->innerJoin('cp', _DB_PREFIX_ . 'cart', 'c', 'c.id_cart = cp.id_cart') 
               ->where('c.id_customer = :customerId')
-              ->setParameter('customerId', (int) $customerId->getValue());
+              ->setParameter('customerId', (int) $customerId);
 
           $result = $query->execute();
 

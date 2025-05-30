@@ -22,7 +22,7 @@ $ok &= $db->execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.'kyc_verification`');
 
 /* 3. Remove module configuration values */
 $ok &= Configuration::deleteByName('PSKYC_RETENTION_DAYS');
-$ok &= Configuration::deleteByName('PSKYC_ALLOWED_CATEGORIES');
+$ok &= Configuration::deleteByName('PSKYC_KYC_REQUIRED_CATEGORIES ');
 // …add any other config keys you create
 
 /* 4. Purge stored encrypted files */

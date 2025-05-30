@@ -57,13 +57,8 @@
             <div class="col-md-6">
                 <h4>{l s='Quick Actions' mod='pskyc'}</h4>
                 <p>
-                    <a href="#" class="btn btn-default" onclick="alert('Feature coming soon!');">
+                    <a href="{$verification_url}" class="btn btn-default">
                         <i class="icon-list"></i> {l s='View Verifications' mod='pskyc'}
-                    </a>
-                </p>
-                <p>
-                    <a href="#" class="btn btn-default" onclick="alert('Feature coming soon!');">
-                        <i class="icon-cogs"></i> {l s='Manage Documents' mod='pskyc'}
                     </a>
                 </p>
             </div>

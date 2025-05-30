@@ -76,7 +76,7 @@ class Pskyc extends Module
     {
         // Set default configuration values
         Configuration::updateValue('PSKYC_RETENTION_DAYS', 365);
-        Configuration::updateValue('PSKYC_ALLOWED_CATEGORIES', json_encode([]));
+        Configuration::updateValue('PSKYC_KYC_REQUIRED_CATEGORIES', json_encode([]));
         Configuration::updateValue('PSKYC_ADMIN_EMAILS', Configuration::get('PS_SHOP_EMAIL'));
         Configuration::updateValue('PSKYC_AUTO_NOTIFICATIONS', true);
 
@@ -91,7 +91,7 @@ class Pskyc extends Module
         }
 
         return parent::install() &&
-            $this->registerHook('actionValidateOrder') &&
+            $this->registerHook('actionCheckoutRender') &&
             $this->registerHook('displayAdminCustomers') &&
             $this->registerHook('displayAdminOrder') &&
             $this->registerHook('displayCustomerAccount') &&
@@ -110,7 +110,7 @@ class Pskyc extends Module
         require_once __DIR__ . '/sql/uninstall.php';
 
         Configuration::deleteByName('PSKYC_RETENTION_DAYS');
-        Configuration::deleteByName('PSKYC_ALLOWED_CATEGORIES');
+        Configuration::deleteByName('PSKYC_KYC_REQUIRED_CATEGORIES');
 
         return parent::uninstall() &&
             $this->unregisterHook(ThemeCatalogInterface::LIST_MAIL_THEMES_HOOK);
@@ -145,6 +145,7 @@ class Pskyc extends Module
             'module_dir' => $this->_path,
             'form_html' => $this->renderForm(),
             'errors' => $errors,
+            'verification_url' => $this->get('router')->generate('ps_pskyc_verification_index'),
         ]);
 
         $output .= $this->context->smarty->fetch($this->local_path . 'views/templates/admin/configure.tpl');
@@ -209,12 +210,12 @@ class Pskyc extends Module
                     ],
                     [
                         'type' => 'categories',
-                        'name' => 'PSKYC_ALLOWED_CATEGORIES',
+                        'name' => 'PSKYC_KYC_REQUIRED_CATEGORIES',
                         'label' => $this->l('Categories requiring KYC'),
                         'desc' => $this->l('Select product categories that require KYC verification before purchase. Leave empty to disable automatic order blocking.'),
                         'tree' => [
                             'id' => 'categories-tree',
-                            'selected_categories' => json_decode(Configuration::get('PSKYC_ALLOWED_CATEGORIES') ?: '[]', true),
+                            'selected_categories' => json_decode(Configuration::get('PSKYC_KYC_REQUIRED_CATEGORIES') ?: '[]', true),
                             'root_category' => (int) Configuration::get('PS_HOME_CATEGORY'),
                             'use_checkbox' => true,
                             'use_search' => true,
@@ -266,7 +267,7 @@ class Pskyc extends Module
     {
         return [
             'PSKYC_RETENTION_DAYS' => (int) Configuration::get('PSKYC_RETENTION_DAYS'),
-            'PSKYC_ALLOWED_CATEGORIES' => json_decode(Configuration::get('PSKYC_ALLOWED_CATEGORIES') ?: '[]', true),
+            'PSKYC_KYC_REQUIRED_CATEGORIES' => json_decode(Configuration::get('PSKYC_KYC_REQUIRED_CATEGORIES') ?: '[]', true),
             'PSKYC_ADMIN_EMAILS' => Configuration::get('PSKYC_ADMIN_EMAILS'),
             'PSKYC_AUTO_NOTIFICATIONS' => (bool) Configuration::get('PSKYC_AUTO_NOTIFICATIONS'),
         ];
@@ -306,15 +307,15 @@ class Pskyc extends Module
         // If validation passed, save the values
         if ($success) {
             // Handle categories specifically
-            $categoryIds = Tools::getValue('PSKYC_ALLOWED_CATEGORIES');
+            $categoryIds = Tools::getValue('PSKYC_KYC_REQUIRED_CATEGORIES');
             if (is_array($categoryIds)) {
                 // Remove any invalid category IDs
                 $categoryIds = array_filter($categoryIds, function ($id) {
                     return is_numeric($id) && (int) $id > 0;
                 });
-                Configuration::updateValue('PSKYC_ALLOWED_CATEGORIES', json_encode(array_values($categoryIds)));
+                Configuration::updateValue('PSKYC_KYC_REQUIRED_CATEGORIES', json_encode(array_values($categoryIds)));
             } else {
-                Configuration::updateValue('PSKYC_ALLOWED_CATEGORIES', json_encode([]));
+                Configuration::updateValue('PSKYC_KYC_REQUIRED_CATEGORIES', json_encode([]));
             }
 
             // Handle other configuration values
@@ -362,18 +363,6 @@ class Pskyc extends Module
         if (empty($key) || !ctype_xdigit($key) || strlen($key) !== 64) {
             $this->generateEncryptionKey();
         }
-    }
-
-    /**
-     * Hook executed when an order is validated
-     * 
-     * Can be used to check KYC status before order completion
-     * 
-     * @return void
-     */
-    public function hookActionValidateOrder()
-    {
-        /* Place your code here. */
     }
 
     /**
@@ -504,5 +493,93 @@ class Pskyc extends Module
                 $theme->getLayouts()->add($layout);
             }
         }
+    }
+
+    /**
+     * Hook executed during checkout rendering
+     * 
+     * Adds KYC step to checkout process if KYC verification is required
+     * 
+     * @param array $params
+     * @return void
+     */
+    public function hookActionCheckoutRender($params)
+    {
+        if (!isset($params['checkoutProcess'])) {
+            return;
+        }
+
+        $checkoutProcess = $params['checkoutProcess'];
+        $context = Context::getContext();
+        
+        // Check if customer is logged in
+        if (!$context->customer->id) {
+            return;
+        }
+
+        // Check if KYC is required for cart products
+        $kycRequired = $this->isKycRequiredForCart($context->cart);
+        
+        if (!$kycRequired) {
+            return;
+        }
+
+        // Get customer's verification status
+        /** @var PrestaShop\Module\Pskyc\Service\VerificationService $verificationService */
+        $verificationService = $this->get('PrestaShop\\Module\\Pskyc\\Service\\VerificationService');
+        $verification = $verificationService->getMostRecentVerification($context->customer->id);
+        
+        // Only add step if verification is not approved
+        if ($verification && $verification['status'] === 'approved') {
+            return;
+        }
+
+        // Create KYC step
+        $kycStep = new \PrestaShop\Module\Pskyc\Checkout\KycStep(
+            $context,
+            $this->getTranslator()
+        );
+        
+        $kycUrl = $context->link->getModuleLink($this->name, 'verify', [], true);
+        
+        $kycStep
+            ->setKycUrl($kycUrl)
+            ->setReachable(true)
+            ->setComplete(false);
+
+        // Get current steps and insert KYC step after the first step
+        $steps = $checkoutProcess->getSteps();
+        
+        // Insert KYC step after personal information step (index 0)
+        array_splice($steps, 1, 0, [$kycStep]);
+        
+        // Set the modified steps array back to checkout process
+        $checkoutProcess->setSteps($steps);
+    }
+
+    /**
+     * Check if KYC is required for products in cart
+     * 
+     * @param Cart $cart
+     * @return bool
+     */
+    private function isKycRequiredForCart($cart)
+    {
+        $kycRequiredCategories = json_decode(Configuration::get('PSKYC_KYC_REQUIRED_CATEGORIES') ?: '[]', true);
+        
+        if (empty($kycRequiredCategories)) {
+            return false;
+        }
+
+        $products = $cart->getProducts();
+        $cartCategoryIds = [];
+        
+        foreach ($products as $product) {
+            if (!empty($product['id_category_default'])) {
+                $cartCategoryIds[] = (int)$product['id_category_default'];
+            }
+        }
+        
+        return count(array_intersect($kycRequiredCategories, $cartCategoryIds)) > 0;
     }
 }
