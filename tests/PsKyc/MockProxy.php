@@ -85,3 +85,8 @@ class Order extends MockProxy
 {
     protected static $mock;
 }
+
+class PrestaShopLogger extends MockProxy
+{
+    protected static $mock;
+}

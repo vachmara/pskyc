@@ -209,14 +209,17 @@ class EncryptionService
             return false;
         }
 
-        // Overwrite with random data
-        $handle = fopen($filePath, 'r+b');
-        if ($handle === false) {
-            return false;
-        }
+        // For zero-byte files, skip the overwrite step and just delete
+        if ($fileSize > 0) {
+            // Overwrite with random data
+            $handle = fopen($filePath, 'r+b');
+            if ($handle === false) {
+                return false;
+            }
 
-        fwrite($handle, openssl_random_pseudo_bytes($fileSize));
-        fclose($handle);
+            fwrite($handle, openssl_random_pseudo_bytes($fileSize));
+            fclose($handle);
+        }
 
         return unlink($filePath);
     }

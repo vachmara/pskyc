@@ -3,8 +3,17 @@
 // Load Composer autoloader
 require_once __DIR__ . '/../vendor/autoload.php';
 
-// Load MockProxy system
+// Load mock classes first
 require_once __DIR__ . '/PsKyc/MockProxy.php';
+
+// Load interface before implementations
+require_once __DIR__ . '/PsKyc/Interface/FileSystemInterface.php';
+
+// Load virtual file system classes
+require_once __DIR__ . '/PsKyc/Mock/VirtualFileSystem.php';
+require_once __DIR__ . '/PsKyc/Mock/VirtualFileSystemAdapter.php';
+
+define('_PS_MODULE_DIR_', __DIR__ . '/../modules/pskyc/');
 
 function pSQL($string, $htmlOK = false)
 {
