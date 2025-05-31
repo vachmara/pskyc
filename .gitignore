@@ -7,5 +7,9 @@ config_*.xml
 .php_cs.cache
 .idea
 .php-cs-fixer.cache
+.phpunit.result.cache
 
 secure_upload/
+tests/coverage/
+tests/results/
+tests/temp/

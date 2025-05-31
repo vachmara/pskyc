@@ -54,7 +54,7 @@ class DocumentService
     public function __construct(
         DocumentRepository $documentRepository,
         VerificationRepository $verificationRepository,
-        EncryptionService $encryptionService,
+        EncryptionService $encryptionService
     ) {
         $this->documentRepository = $documentRepository;
         $this->encryptionService = $encryptionService;
@@ -104,16 +104,9 @@ class DocumentService
                 }
             }
 
-            // Generate stored filename (consistent with retrieval)
-            $tempDocument = [
-                'id_kyc_document' => 0, // Will be replaced after insert
-                'filename' => $fileData['name'],
-            ];
-            // Temporarily use 0 for id_kyc_document, will update after insert
 
             // Encrypt and save file (use a temp name, will rename after DB insert)
             $extension = $this->getFileExtension($fileData['name']);
-            $sidePrefix = $side ? $side . '_' : '';
             $tempStoredFilename = 'doc_tmp_' . uniqid() . '.' . $extension;
             $uploadPath = $this->getUploadDirectory() . '/' . $tempStoredFilename;
 
@@ -323,7 +316,7 @@ class DocumentService
      * @param string $filePath Path to the file
      * @return string The MIME type
      */
-    private function getMimeType(string $filePath): string
+    protected function getMimeType(string $filePath): string
     {
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $mimeType = finfo_file($finfo, $filePath);
@@ -337,7 +330,7 @@ class DocumentService
      * @param string $filename The filename
      * @return string The file extension (without dot)
      */
-    private function getFileExtension(string $filename): string
+    protected function getFileExtension(string $filename): string
     {
         return strtolower(pathinfo($filename, PATHINFO_EXTENSION));
     }
@@ -349,7 +342,7 @@ class DocumentService
      * 
      * @return string The upload directory path
      */
-    private function getUploadDirectory(): string
+    protected function getUploadDirectory(): string
     {
         return _PS_MODULE_DIR_ . 'pskyc/secure_upload';
     }
@@ -362,7 +355,7 @@ class DocumentService
      * @param array $document Document record from database
      * @return string The generated filename
      */
-    private function generateStoredFilename(array $document): string
+    protected function generateStoredFilename(array $document): string
     {
         return 'doc_' . $document['id_kyc_document'] . '_' . hash('md5', $document['filename']);
     }

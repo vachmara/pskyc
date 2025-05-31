@@ -32,7 +32,8 @@
   },
   "autoload": {
     "psr-4": {
-      "PrestaShop\\Module\\Pskyc\\": "src/"
+      "PrestaShop\\Module\\Pskyc\\": "src/",
+      "PrestaShop\\Module\\Pskyc\\Tests\\": "tests/PsKyc"
     },
     "classmap": [
       "pskyc.php"
@@ -44,11 +45,5 @@
     }
   },
   "scripts": {
-    "test": "phpunit",
-    "test-coverage": "phpunit --coverage-html coverage",
-    "test-coverage-text": "phpunit --coverage-text",
-    "phpstan": "phpstan analyse src/ --level=5",
-    "cs-check": "phpcs --standard=PSR12 src/",
-    "cs-fix": "phpcbf --standard=PSR12 src/"
   }
 }

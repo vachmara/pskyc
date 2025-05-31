@@ -68,7 +68,7 @@ class VerificationService
         $this->logRepository = $logRepository;
         $this->documentService = $documentService;
         $this->notificationService = $notificationService;
-        $this->$customerRepository = $customerRepository;
+        $this->customerRepository = $customerRepository;
     }
 
     /**
@@ -188,7 +188,7 @@ class VerificationService
     public function getMostRecentVerification(int $customerId): array
     {
         try {
-            return $this->verificationRepository->findByCustomerId(customerId: $customerId) ?: [];
+            return $this->verificationRepository->findByCustomerId($customerId) ?: [];
         } catch (\Exception $e) {
             PrestaShopLogger::addLog('Get customer verifications error: ' . $e->getMessage(), 3, null, 'Pskyc');
             return [];
@@ -380,7 +380,7 @@ class VerificationService
      * 
      * @return string|null Returns the expiry date in 'Y-m-d H:i:s' format or null if no expiry
      */
-    private function calculateExpiryDate(): string|null
+    private function calculateExpiryDate(): ?string
     {
         $validityDays = (int) Configuration::get('PSKYC_RETENTION_DAYS');
         if ($validityDays <= 0) {

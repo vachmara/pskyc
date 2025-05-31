@@ -69,6 +69,11 @@ class EncryptionService
         $key = $this->getEncryptionKey();
         $ivBinary = base64_decode($iv);
 
+        // Validate IV length
+        if (strlen($ivBinary) !== self::IV_LENGTH) {
+            throw new \RuntimeException('Invalid IV length. Expected ' . self::IV_LENGTH . ' bytes.');
+        }
+
         $encrypted = openssl_encrypt($data, self::ENCRYPTION_METHOD, $key, 0, $ivBinary);
 
         if ($encrypted === false) {
@@ -92,6 +97,16 @@ class EncryptionService
     {
         $key = $this->getEncryptionKey();
         $ivBinary = base64_decode($iv);
+
+        // Validate IV length
+        if (strlen($ivBinary) !== self::IV_LENGTH) {
+            throw new \RuntimeException('Invalid IV length. Expected ' . self::IV_LENGTH . ' bytes.');
+        }
+
+        // Validate encrypted data
+        if (empty($encryptedData)) {
+            throw new \RuntimeException('Encrypted data cannot be empty');
+        }
 
         $decrypted = openssl_decrypt($encryptedData, self::ENCRYPTION_METHOD, $key, 0, $ivBinary);
 

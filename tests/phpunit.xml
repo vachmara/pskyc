@@ -1,0 +1,18 @@
+<phpunit bootstrap="bootstrap.php">
+  <php>
+    <const name="_DB_PREFIX_" value="PS_" />
+    <const name="_PS_VERSION_" value="PsKycVersion" />
+  </php>
+
+  <testsuites>
+    <testsuite name="PsKyc">
+      <directory>.</directory>
+    </testsuite>
+  </testsuites>
+
+  <filter>
+    <whitelist>
+      <directory suffix=".php">../src/</directory>
+    </whitelist>
+  </filter>
+</phpunit>

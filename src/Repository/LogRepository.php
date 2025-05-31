@@ -80,6 +80,25 @@ class LogRepository
   }
 
   /**
+   * Create a new log entry (simplified interface)
+   * 
+   * @param array $data Log data array
+   * @return int|null The ID of the created log entry or null on failure
+   */
+  public function create(array $data): ?int
+  {
+    return $this->createLog(
+      $data['verification_id'],
+      $data['employee_id'] ?? null,
+      $data['customer_id'] ?? null,
+      $data['action'],
+      $data['details'] ?? $data['message'] ?? '',
+      $data['ip_address'] ?? '',
+      $data['user_agent'] ?? ''
+    );
+  }
+
+  /**
    * Find log entries by verification ID
    * 
    * Retrieves all log entries for a specific verification request
