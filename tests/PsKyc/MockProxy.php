@@ -34,6 +34,20 @@ class MockProxy
 class Context extends MockProxy
 {
     protected static $mock;
+
+    /**
+     * Get the current context
+     *
+     * @return Context
+     */
+    public static function getContext()
+    {
+        if (!static::$mock) {
+            static::$mock = new static();
+        }
+
+        return static::$mock;
+    }
 }
 
 class Db extends MockProxy
@@ -87,6 +101,11 @@ class Order extends MockProxy
 }
 
 class PrestaShopLogger extends MockProxy
+{
+    protected static $mock;
+}
+
+class Mail extends MockProxy
 {
     protected static $mock;
 }

@@ -326,7 +326,7 @@ class NotificationService
                 return [];
             }
 
-            return array_map(function($admin) {
+            return array_map(function ($admin) {
                 return [
                     'email' => $admin['email'],
                     'name' => $admin['name']
@@ -407,30 +407,28 @@ class NotificationService
         string $recipientName,
         int $langId
     ): bool {
-        try {
-            if (empty($recipientEmail)) {
-                return false;
-            }
 
-            // Use modern theme system if templating engine is available
-            if ($this->templating !== null) {
-                // Implementation would use PrestaShop 8's theme system
-                // For now, fall back to regular email sending
-            }
 
-            // Fall back to traditional email sending
-            return $this->sendThemeEmail(
-                $template,
-                $subject,
-                $templateVars,
-                $recipientEmail,
-                $recipientName,
-                $langId
-            );
-
-        } catch (\Exception $e) {
-            \PrestaShopLogger::addLog('Modern theme email error: ' . $e->getMessage(), 3, null, 'Pskyc');
+        if (empty($recipientEmail)) {
             return false;
         }
+
+        // Use modern theme system if templating engine is available
+        if ($this->templating !== null) {
+            // Implementation would use PrestaShop 8's theme system
+            // For now, fall back to regular email sending
+        }
+
+        // Fall back to traditional email sending
+        return $this->sendThemeEmail(
+            $template,
+            $subject,
+            $templateVars,
+            $recipientEmail,
+            $recipientName,
+            $langId
+        );
+
+
     }
 }
