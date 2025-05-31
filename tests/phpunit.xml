@@ -12,7 +12,8 @@
 
   <filter>
     <whitelist>
-      <directory suffix=".php">../src/</directory>
+      <directory suffix=".php">../src/Repository</directory>
+      <directory suffix=".php">../src/Service</directory>
     </whitelist>
   </filter>
 </phpunit>
