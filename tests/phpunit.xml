@@ -5,6 +5,10 @@
       <directory suffix=".php">../src/Repository</directory>
       <directory suffix=".php">../src/Service</directory>
     </include>
+    <exclude>
+      <file>../src/Repository/index.php</file>
+      <file>../src/Service/index.php</file>
+    </exclude>
   </coverage>
   <php>
     <const name="_DB_PREFIX_" value="PS_"/>
