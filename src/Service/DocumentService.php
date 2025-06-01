@@ -600,7 +600,7 @@ class DocumentService
                 'encrypted' => 1,
             ]);
             // Also update the parent verification status to pending
-            $this->verificationRepository->updateStatus($document['id_kyc_verification'], 'pending');
+            $this->verificationRepository->updateStatus($document['id_kyc_verification'], 'pending', null);
 
             return ['success' => true];
         } catch (\Exception $e) {

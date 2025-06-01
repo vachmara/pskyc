@@ -272,14 +272,16 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
             $identityUploadResults['single'] = $this->documentService->uploadDocument(
                 $verificationId,
                 $idDocument,
-                $documentType
+                $documentType,
+                null
             );
         }
 
         $addressDocumentResult = $this->documentService->uploadDocument(
             $verificationId,
             $addressDocument,
-            Tools::getValue('address_document_type')
+            Tools::getValue('address_document_type'),
+            null
         );
 
         // Check if all uploads were successful

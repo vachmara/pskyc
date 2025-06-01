@@ -101,7 +101,7 @@ class MaintenanceService
 
         try {
             // Task 1: Send expiry warnings
-            $results['tasks']['expiry_warnings'] = $this->sendExpiryWarnings();
+            $results['tasks']['expiry_warnings'] = $this->sendExpiryWarnings(null);
 
             // Task 2: Update expired verifications
             $results['tasks']['expired_verifications'] = $this->updateExpiredVerifications();
@@ -110,7 +110,7 @@ class MaintenanceService
             $results['tasks']['cleanup_documents'] = $this->cleanupExpiredDocuments();
 
             // Task 4: Cleanup old logs
-            $results['tasks']['cleanup_logs'] = $this->cleanupOldLogs();
+            $results['tasks']['cleanup_logs'] = $this->cleanupOldLogs(null);
 
             // Task 5: Cleanup temporary files
             $results['tasks']['cleanup_temp_files'] = $this->cleanupTempFiles();
