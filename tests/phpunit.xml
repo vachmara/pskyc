@@ -1,19 +1,18 @@
-<phpunit bootstrap="bootstrap.php">
+<?xml version="1.0"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" bootstrap="bootstrap.php" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+  <coverage>
+    <include>
+      <directory suffix=".php">../src/Repository</directory>
+      <directory suffix=".php">../src/Service</directory>
+    </include>
+  </coverage>
   <php>
-    <const name="_DB_PREFIX_" value="PS_" />
-    <const name="_PS_VERSION_" value="PsKycVersion" />
+    <const name="_DB_PREFIX_" value="PS_"/>
+    <const name="_PS_VERSION_" value="PsKycVersion"/>
   </php>
-
   <testsuites>
     <testsuite name="PsKyc">
       <directory>.</directory>
     </testsuite>
   </testsuites>
-
-  <filter>
-    <whitelist>
-      <directory suffix=".php">../src/Repository</directory>
-      <directory suffix=".php">../src/Service</directory>
-    </whitelist>
-  </filter>
 </phpunit>

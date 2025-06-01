@@ -113,3 +113,7 @@ class Mail extends MockProxy
 {
     protected static $mock;
 }
+
+class PrestaShopException extends \Exception
+{
+}

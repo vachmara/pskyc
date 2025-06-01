@@ -5,6 +5,78 @@
 {% extends '@PrestaShop/Admin/layout.html.twig' %}
 
 {% block content %}
+	{# Display Cron URL Collapsible Section #}
+	{% if cronUrl is defined and cronUrl is not empty %}
+		<div class="row mb-3">
+			<div class="col">
+				<div class="card">
+					<div class="card-header" id="cronConfigHeading">
+						<h5 class="mb-0">
+							<button class="btn btn-link text-decoration-none collapsed" type="button" data-toggle="collapse" data-target="#cronConfigCollapse" aria-expanded="false" aria-controls="cronConfigCollapse">
+								<i class="material-icons me-2">schedule</i>
+								{{ 'Cron Job Configuration'|trans({}, 'Modules.Pskyc.Admin') }}
+								<i class="material-icons float-end collapse-icon">expand_more</i>
+							</button>
+						</h5>
+					</div>
+					<div id="cronConfigCollapse" class="collapse" aria-labelledby="cronConfigHeading">
+						<div class="card-body">
+							<p class="text-muted mb-3">
+								{{ 'Configure your server\'s cron job for automatic KYC maintenance tasks including expiry warnings, document cleanup, and verification updates.'|trans({}, 'Modules.Pskyc.Admin') }}
+							</p>
+							
+							<div class="form-group">
+								<label for="cronUrl" class="form-label">
+									<strong>{{ 'Cron URL:'|trans({}, 'Modules.Pskyc.Admin') }}</strong>
+								</label>
+								<div class="input-group">
+									<input type="text" class="form-control font-monospace" id="cronUrl" value="{{ cronUrl }}" readonly>
+									<div class="input-group-append">
+										<button class="btn btn-outline-primary" type="button" id="cronCopy" title="{{ 'Copy to clipboard'|trans({}, 'Admin.Actions') }}">
+											<i class="material-icons">content_copy</i>
+											{{ 'Copy'|trans({}, 'Admin.Actions') }}
+										</button>
+									</div>
+								</div>
+							</div>
+
+							<div class="row mt-4">
+								<div class="col-md-6">
+									<h6 class="text-primary">
+										<i class="material-icons me-1">info</i>
+										{{ 'Recommended Schedule'|trans({}, 'Modules.Pskyc.Admin') }}
+									</h6>
+									<ul class="list-unstyled small text-muted">
+										<li><strong>{{ 'Frequency:'|trans({}, 'Modules.Pskyc.Admin') }}</strong> {{ 'Daily'|trans({}, 'Modules.Pskyc.Admin') }}</li>
+										<li><strong>{{ 'Time:'|trans({}, 'Modules.Pskyc.Admin') }}</strong> {{ '8:00 AM (server time)'|trans({}, 'Modules.Pskyc.Admin') }}</li>
+										<li><strong>{{ 'Method:'|trans({}, 'Modules.Pskyc.Admin') }}</strong> {{ 'HTTP GET request'|trans({}, 'Modules.Pskyc.Admin') }}</li>
+									</ul>
+								</div>
+								<div class="col-md-6">
+									<h6 class="text-primary">
+										<i class="material-icons me-1">code</i>
+										{{ 'Example Cron Entry'|trans({}, 'Modules.Pskyc.Admin') }}
+									</h6>
+									<div class="bg-light p-2 rounded">
+										<code class="small text-dark">0 2 * * * curl -s "{{ cronUrl }}"</code>
+									</div>
+									<small class="text-muted">
+										{{ 'Add this line to your server\'s crontab'|trans({}, 'Modules.Pskyc.Admin') }}
+									</small>
+								</div>
+							</div>
+
+							<div class="alert alert-warning mt-3" role="alert">
+								<strong>{{ 'Security Note:'|trans({}, 'Modules.Pskyc.Admin') }}</strong>
+								{{ 'The URL includes a security token. Keep it confidential and do not share it publicly.'|trans({}, 'Modules.Pskyc.Admin') }}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	{% endif %}
+
 	{% block verification_list_panel %}
 		<div class="row">
 			<div class="col">
@@ -19,4 +91,5 @@
 
 	<script src="{{ asset('themes/default/js/bundle/pagination.js') }}"></script>
 	<script src="{{ asset('../modules/pskyc/views/js/admin/grid.js') }}"></script>
+
 {% endblock %}

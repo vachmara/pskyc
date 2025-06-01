@@ -12,6 +12,7 @@ namespace PrestaShop\Module\Pskyc\Controller\Admin;
 use PrestaShop\Module\Pskyc\Grid\Definition\Factory\VerificationGridDefinitionFactory;
 use PrestaShop\Module\Pskyc\Grid\Filters\VerificationFilters;
 use PrestaShop\Module\Pskyc\Repository\VerificationRepository;
+use PrestaShop\Module\Pskyc\Service\MaintenanceService;
 use PrestaShop\PrestaShop\Core\Grid\GridFactoryInterface;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 use PrestaShopBundle\Service\Grid\ResponseBuilder;
@@ -43,10 +44,16 @@ class VerificationController extends FrameworkBundleAdminController
      * @return Response Rendered verification grid page
      */
     public function indexAction(
-        VerificationFilters $filters,
+        VerificationFilters $filters
     ): Response {
         /** @var GridFactoryInterface $verificationGridFactory */
         $verificationGridFactory = $this->get('prestashop.module.pskyc.grid.factory.verifications');
+
+        /** @var MaintenanceService $maintenanceService */
+        $maintenanceService = $this->get('prestashop.module.pskyc.service.maintenance');
+
+        // Generate the cron URL for the verification process
+        $cronUrl = $maintenanceService->generateCronUrl('daily_maintenance');
 
         return $this->render(
             '@Modules/pskyc/views/templates/admin/verification/index.html.twig',
@@ -55,6 +62,7 @@ class VerificationController extends FrameworkBundleAdminController
                 'layoutTitle' => $this->trans('KYC Verifications', 'Modules.Pskyc.Admin'),
                 'layoutHeaderToolbarBtn' => $this->getToolbarButtons(),
                 'verificationGrid' => $this->presentGrid($verificationGridFactory->getGrid($filters)),
+                'cronUrl' => $cronUrl, // Pass the cron URL to the template
             ]
         );
     }
@@ -103,7 +111,7 @@ class VerificationController extends FrameworkBundleAdminController
      * @return Response Rendered verification detail page
      */
     public function viewAction(
-        int $verificationId,
+        int $verificationId
     ): Response {
         /** @var VerificationRepository $verificationRepository */
         $verificationRepository = $this->get('PrestaShop\Module\Pskyc\Repository\VerificationRepository');

@@ -73,7 +73,7 @@ class MaintenanceService
         DocumentRepository $documentRepository,
         CustomerRepository $customerRepository,
         LogRepository $logRepository,
-        ?string $uploadDir = null,
+        ?string $uploadDir = null
     ) {
         $this->verificationService = $verificationService;
         $this->documentService = $documentService;
@@ -433,12 +433,33 @@ class MaintenanceService
         // Fallback in case encryption key is missing (shouldn't happen in normal operation)
         if (empty($encryptionKey)) {
             \PrestaShopLogger::addLog('PSKYC encryption key missing for cron token generation', 3, null, 'Pskyc');
-            throw new PrestaShopException('Encryption key not available');
+            throw new \PrestaShopException('Encryption key not available');
         }
 
         // Generate token using the encryption key + cron identifier
         $tokenData = $encryptionKey . 'pskyc_cron_token';
 
-        return substr(Tools::hash($tokenData), 0, 10);
+        return substr(\Tools::hash($tokenData), 0, 10);
+    }
+
+    /**
+     * Generate the complete cron URL with token for a specific action
+     *
+     * @param string $action The maintenance action to run ('daily_maintenance', 'cleanup_documents', etc.)
+     *
+     * @return string Complete cron URL with security token
+     */
+    public function generateCronUrl(string $action = 'daily_maintenance'): string
+    {
+        $token = $this->getCronToken();
+        $shopUrl = \Tools::getShopDomainSsl(true, true);
+        
+        // Build the cron URL pointing to your module's cron endpoint
+        return sprintf(
+            '%s/modules/pskyc/cron.php?token=%s&action=%s',
+            rtrim($shopUrl, '/'),
+            $token,
+            urlencode($action)
+        );
     }
 }

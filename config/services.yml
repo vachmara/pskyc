@@ -100,3 +100,8 @@ services:
       - '@PrestaShop\Module\Pskyc\Repository\DocumentRepository'
       - '@PrestaShop\Module\Pskyc\Repository\CustomerRepository'
       - '@PrestaShop\Module\Pskyc\Repository\LogRepository'
+
+  # Service aliases for easier access
+  prestashop.module.pskyc.service.maintenance:
+    alias: 'PrestaShop\Module\Pskyc\Service\MaintenanceService'
+    public: true
