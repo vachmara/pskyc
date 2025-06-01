@@ -298,7 +298,8 @@ class VerificationRepository
                ->setParameter('note', $note);
         }
 
-        return $qb->execute() > 0;
+        $result = $qb->execute();
+        return is_int($result) ? $result > 0 : false;
     }
 
     /**
@@ -320,7 +321,8 @@ class VerificationRepository
                 'id' => $id,
             ]);
 
-        return $qb->execute() > 0;
+        $result = $qb->execute();
+        return is_int($result) ? $result > 0 : false;
     }
 
     /**
@@ -343,7 +345,8 @@ class VerificationRepository
                 'id' => $id,
             ]);
 
-        return $qb->execute() > 0;
+        $result = $qb->execute();
+        return is_int($result) ? $result > 0 : false;
     }
 
     /**
@@ -360,7 +363,8 @@ class VerificationRepository
             ->where('id_kyc_verification = :id')
             ->setParameter('id', $id);
 
-        return $qb->execute() > 0;
+        $result = $qb->execute();
+        return is_int($result) ? $result > 0 : false;
     }
 
     /**

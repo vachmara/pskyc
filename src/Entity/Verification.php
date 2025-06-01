@@ -36,13 +36,15 @@ class Verification
     public const STATUS_MORE_INFO = 'requested_more_info';
 
     /**
-     * @var int
+     * @var int|null
      *
      * @ORM\Id
      *
      * @ORM\Column(name="id_kyc_verification", type="integer")
      *
      * @ORM\GeneratedValue(strategy="AUTO")
+     *
+     * @phpstan-ignore-next-line property.onlyRead
      */
     private $id;
 

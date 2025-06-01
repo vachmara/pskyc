@@ -43,7 +43,7 @@ class VerificationController extends FrameworkBundleAdminController
      * @return Response Rendered verification grid page
      */
     public function indexAction(
-        VerificationFilters $filters,
+        VerificationFilters $filters
     ): Response {
         /** @var GridFactoryInterface $verificationGridFactory */
         $verificationGridFactory = $this->get('prestashop.module.pskyc.grid.factory.verifications');
@@ -74,7 +74,7 @@ class VerificationController extends FrameworkBundleAdminController
      */
     public function searchAction(Request $request): RedirectResponse
     {
-        /** @var GridDefinitionFactoryInterface $verificationGridDefinitionFactory */
+        /** @var VerificationGridDefinitionFactory $verificationGridDefinitionFactory */
         $verificationGridDefinitionFactory = $this->get('prestashop.module.pskyc.grid.definition.factory.verifications');
 
         /** @var ResponseBuilder $responseBuilder */
@@ -103,7 +103,7 @@ class VerificationController extends FrameworkBundleAdminController
      * @return Response Rendered verification detail page
      */
     public function viewAction(
-        int $verificationId,
+        int $verificationId
     ): Response {
         /** @var VerificationRepository $verificationRepository */
         $verificationRepository = $this->get('PrestaShop\Module\Pskyc\Repository\VerificationRepository');

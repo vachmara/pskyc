@@ -29,13 +29,15 @@ if (!defined('_PS_VERSION_')) {
 class Log
 {
     /**
-     * @var int
+     * @var int|null
      *
      * @ORM\Id
      *
      * @ORM\Column(name="id_kyc_log", type="integer")
      *
      * @ORM\GeneratedValue(strategy="AUTO")
+     *
+     * @phpstan-ignore-next-line property.onlyRead
      */
     private $id;
 
@@ -89,14 +91,14 @@ class Log
     private $userAgent;
 
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      *
      * @ORM\Column(name="date_add", type="datetime")
      */
     private $createdAt;
 
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      *
      * @ORM\Column(name="date_upd", type="datetime")
      */
@@ -285,7 +287,7 @@ class Log
      *
      * @return \DateTime When this log entry was created
      */
-    public function getCreatedAt(): \DateTime
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
@@ -309,7 +311,7 @@ class Log
      *
      * @return \DateTime When this log entry was last updated
      */
-    public function getUpdatedAt(): \DateTime
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }

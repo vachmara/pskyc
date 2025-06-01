@@ -296,7 +296,7 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
 
             // Get customer data and verification with documents for notifications
             $customerData = $this->getCustomerData($this->context->customer->id);
-            if ($customerData) {
+            if ($customerData !== null) {
                 $verification = $this->verificationService->getVerificationWithDocuments($verificationId);
                 $documents = $verification['documents'] ?? [];
 
@@ -364,7 +364,7 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
      */
     protected function validateUploadedFile($file)
     {
-        if (!is_array($file) || !isset($file['error'], $file['size'], $file['tmp_name'])) {
+        if (!isset($file['error'], $file['size'], $file['tmp_name'])) {
             $this->errors[] = $this->trans('Invalid file upload.', [], 'Modules.Pskyc.Shop');
 
             return false;
@@ -430,6 +430,9 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
     {
         try {
             $customerRepository = $this->module->get('PrestaShop\Module\Pskyc\Repository\CustomerRepository');
+            if ($customerRepository === false) {
+                return null;
+            }
             $customerData = $customerRepository->getCustomerData($customerId);
 
             return $customerData ?: null;

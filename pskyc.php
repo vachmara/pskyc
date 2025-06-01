@@ -22,6 +22,11 @@ class Pskyc extends Module
     protected $config_form = false;
 
     /**
+     * @var string|null
+     */
+    public $confirmReset;
+
+    /**
      * Module constructor
      *
      * Initializes module properties and configuration
@@ -159,13 +164,25 @@ class Pskyc extends Module
             $output .= $this->displayConfirmation($this->l('Upload directory security: All security measures are properly configured.'));
         }
 
+        // Get verification URL safely
+        $verificationUrl = '';
+        try {
+            $router = $this->get('router');
+            if ($router !== false) {
+                $verificationUrl = $router->generate('ps_pskyc_verification_index');
+            }
+        } catch (\Exception $e) {
+            // Fallback to admin link if router fails
+            $verificationUrl = $this->context->link->getAdminLink('AdminModules') . '&configure=pskyc';
+        }
+
         // Assign template variables
         $this->context->smarty->assign([
             'module_dir' => $this->_path,
             'form_html' => $this->renderForm(),
             'errors' => $errors,
             'security_status' => $securityStatus,
-            'verification_url' => $this->get('router')->generate('ps_pskyc_verification_index'),
+            'verification_url' => $verificationUrl,
         ]);
 
         $output .= $this->context->smarty->fetch($this->local_path . 'views/templates/admin/configure.tpl');
@@ -390,7 +407,7 @@ class Pskyc extends Module
      *
      * Can display KYC status for each customer
      *
-     * @return void
+     * @return string|void
      */
     public function hookDisplayAdminCustomers()
     {
@@ -403,8 +420,12 @@ class Pskyc extends Module
         $verifications = $verificationService->getVerificationsByCustomerId($customerId);
 
         // Render the Twig template instead of Smarty
+        $twig = $this->get('twig');
+        if ($twig === false) {
+            return;
+        }
 
-        return $this->get('twig')->render('@Modules/pskyc/views/templates/admin/customers/kyc_status.html.twig', [
+        return $twig->render('@Modules/pskyc/views/templates/admin/customers/kyc_status.html.twig', [
             'verifications' => $verifications,
             'count' => count($verifications ?? []),
             'customerId' => $customerId,

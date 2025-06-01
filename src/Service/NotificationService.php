@@ -29,21 +29,14 @@ class NotificationService
     private $context;
 
     /**
-     * @var EngineInterface
-     */
-    private $templating;
-
-    /**
      * NotificationService constructor
      *
      * @param TranslatorInterface $translator Translator service for internationalization
-     * @param EngineInterface $templating Templating engine for email rendering
      */
-    public function __construct(TranslatorInterface $translator, ?EngineInterface $templating = null)
+    public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
         $this->context = \Context::getContext();
-        $this->templating = $templating;
     }
 
     /**
@@ -356,7 +349,7 @@ class NotificationService
      * @param array $templateVars Template variables
      * @param string $recipientEmail Recipient email address
      * @param string $recipientName Recipient name
-     * @param int $langId Language ID
+     * @param string|int $langId Language ID
      *
      * @return bool True if email was sent successfully
      */
@@ -366,11 +359,17 @@ class NotificationService
         array $templateVars,
         string $recipientEmail,
         ?string $recipientName,
-        int $langId,
+        $langId
     ): bool {
         try {
             if (empty($recipientEmail)) {
                 return false;
+            }
+
+            // Ensure langId is an integer
+            $langId = (int) $langId;
+            if ($langId <= 0) {
+                $langId = (int) \Configuration::get('PS_LANG_DEFAULT');
             }
 
             // Use PrestaShop's Mail::Send method
@@ -385,7 +384,7 @@ class NotificationService
                 null, // from name (use default)
                 null, // file attachment
                 null, // mode_smtp
-                null, // template_path
+                _PS_MODULE_DIR_ . 'pskyc/mails/', // template_path
                 false, // die
                 null, // id_shop
                 null, // bcc
@@ -396,46 +395,5 @@ class NotificationService
 
             return false;
         }
-    }
-
-    /**
-     * Send email using PrestaShop 8's modern theme system
-     *
-     * @param string $template Template name
-     * @param string $subject Email subject
-     * @param array $templateVars Template variables
-     * @param string $recipientEmail Recipient email address
-     * @param string $recipientName Recipient name
-     * @param int $langId Language ID
-     *
-     * @return bool True if email was sent successfully
-     */
-    private function sendModernThemeEmail(
-        string $template,
-        string $subject,
-        array $templateVars,
-        string $recipientEmail,
-        string $recipientName,
-        int $langId,
-    ): bool {
-        if (empty($recipientEmail)) {
-            return false;
-        }
-
-        // Use modern theme system if templating engine is available
-        if ($this->templating !== null) {
-            // Implementation would use PrestaShop 8's theme system
-            // For now, fall back to regular email sending
-        }
-
-        // Fall back to traditional email sending
-        return $this->sendThemeEmail(
-            $template,
-            $subject,
-            $templateVars,
-            $recipientEmail,
-            $recipientName,
-            $langId
-        );
     }
 }

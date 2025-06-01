@@ -36,11 +36,6 @@ class VerificationService
     private $logRepository;
 
     /**
-     * @var DocumentService
-     */
-    private $documentService;
-
-    /**
      * @var NotificationService
      */
     private $notificationService;
@@ -56,7 +51,6 @@ class VerificationService
      * @param VerificationRepository $verificationRepository Repository for verification data operations
      * @param DocumentRepository $documentRepository Repository for document data operations
      * @param LogRepository $logRepository Repository for audit log operations
-     * @param DocumentService $documentService Service for document management
      * @param NotificationService $notificationService Service for sending notifications
      * @param CustomerRepository $customerRepository Repository for customer data operations
      */
@@ -64,14 +58,12 @@ class VerificationService
         VerificationRepository $verificationRepository,
         DocumentRepository $documentRepository,
         LogRepository $logRepository,
-        DocumentService $documentService,
         NotificationService $notificationService,
-        CustomerRepository $customerRepository,
+        CustomerRepository $customerRepository
     ) {
         $this->verificationRepository = $verificationRepository;
         $this->documentRepository = $documentRepository;
         $this->logRepository = $logRepository;
-        $this->documentService = $documentService;
         $this->notificationService = $notificationService;
         $this->customerRepository = $customerRepository;
     }

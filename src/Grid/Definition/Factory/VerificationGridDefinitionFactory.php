@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace PrestaShop\Module\Pskyc\Grid\Definition\Factory;
 
 use PrestaShop\PrestaShop\Core\Grid\Action\Row\RowActionCollection;
+use PrestaShop\PrestaShop\Core\Grid\Action\Row\RowActionCollectionInterface;
 use PrestaShop\PrestaShop\Core\Grid\Action\Row\Type\LinkRowAction;
 use PrestaShop\PrestaShop\Core\Grid\Column\ColumnCollection;
 use PrestaShop\PrestaShop\Core\Grid\Column\Type\Common\ActionColumn;
@@ -180,9 +181,9 @@ class VerificationGridDefinitionFactory extends AbstractGridDefinitionFactory
     /**
      * Get row actions for the grid
      *
-     * @return RowActionCollection
+     * @return RowActionCollectionInterface
      */
-    private function getRowActions(): RowActionCollection
+    private function getRowActions(): RowActionCollectionInterface
     {
         return (new RowActionCollection())
             ->add(

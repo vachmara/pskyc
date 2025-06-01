@@ -8,7 +8,7 @@
 namespace PrestaShop\Module\Pskyc\Repository;
 
 use Doctrine\DBAL\Connection;
-use Prestashop\Module\Pskyc\Entity\Log;
+use PrestaShop\Module\Pskyc\Entity\Log;
 
 /**
  * Class LogRepository
@@ -55,7 +55,7 @@ class LogRepository
         string $action,
         string $message,
         string $ipAddress,
-        string $userAgent,
+        string $userAgent
     ): ?int {
         $qb = $this->connection->createQueryBuilder();
         $qb->insert(_DB_PREFIX_ . 'kyc_log')

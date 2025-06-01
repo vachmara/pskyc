@@ -169,6 +169,26 @@ class DocumentRepository
     }
 
     /**
+     * Delete all documents for a verification
+     *
+     * Removes all document records and files associated with a verification
+     *
+     * @param int $verificationId The verification ID
+     *
+     * @return bool True if deletion was successful
+     */
+    public function deleteByVerificationId(int $verificationId): bool
+    {
+        $qb = $this->connection->createQueryBuilder();
+        $qb->delete(_DB_PREFIX_ . 'kyc_document')
+            ->where('id_kyc_verification = :verification_id')
+            ->setParameter('verification_id', $verificationId);
+
+        $result = $qb->execute();
+        return is_int($result) ? $result >= 0 : false;
+    }
+
+    /**
      * Find expired documents
      *
      * Retrieves all documents that have passed their expiration date

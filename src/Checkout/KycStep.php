@@ -7,7 +7,7 @@
 
 namespace PrestaShop\Module\Pskyc\Checkout;
 
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class KycStep
