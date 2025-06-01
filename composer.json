@@ -11,13 +11,7 @@
         }
     ],
     "require": {
-        "php": ">=8.1",
-        "ext-fileinfo": "*",
-        "ext-openssl": "*",
-        "ext-curl": "*",
-        "ext-gd": "*",
-        "ext-json": "*",
-        "ext-mbstring": "*"
+        "php": ">=8.1"
     },
     "require-dev": {
         "mikey179/vfsstream": "^1.6",
