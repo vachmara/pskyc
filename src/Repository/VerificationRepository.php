@@ -221,7 +221,7 @@ class VerificationRepository
      *
      * @return int The ID of the newly created verification
      */
-    public function create(int $customerId, string $status = 'pending', ?string $customerNote): int
+    public function create(int $customerId, ?string $customerNote, string $status = 'pending'): int
     {
         $qb = $this->connection->createQueryBuilder();
         $qb->insert(_DB_PREFIX_ . 'kyc_verification')
