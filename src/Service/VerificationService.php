@@ -337,7 +337,7 @@ class VerificationService
      *
      * @return bool True on success, false on failure
      */
-    public function updateStatus(int $verificationId, string $newStatus, ?string $note = null): bool
+    public function updateStatus(int $verificationId, string $newStatus, ?string $note): bool
     {
         try {
             // Get current verification data

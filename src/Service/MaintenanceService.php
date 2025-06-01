@@ -71,7 +71,7 @@ class MaintenanceService
         DocumentRepository $documentRepository,
         CustomerRepository $customerRepository,
         LogRepository $logRepository,
-        ?string $uploadDir = null,
+        ?string $uploadDir,
     ) {
         $this->documentService = $documentService;
         $this->notificationService = $notificationService;
@@ -132,7 +132,7 @@ class MaintenanceService
      *
      * @return array Results of the warning email task
      */
-    public function sendExpiryWarnings(?int $warningDays = null): array
+    public function sendExpiryWarnings(?int $warningDays): array
     {
         $warningDays = $warningDays ?? (int) \Configuration::get('PSKYC_EXPIRY_WARNING_DAYS', 30);
         $results = [
@@ -304,7 +304,7 @@ class MaintenanceService
      *
      * @return array Results of the log cleanup task
      */
-    public function cleanupOldLogs(?int $retentionDays = null): array
+    public function cleanupOldLogs(?int $retentionDays): array
     {
         $results = [
             'logs_deleted' => 0,

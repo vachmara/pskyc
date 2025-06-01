@@ -55,7 +55,7 @@ class NotificationService
      *
      * @return bool True if email was sent successfully, false otherwise
      */
-    public function sendStatusChangeNotification(array $verification, array $customer, ?string $previousStatus = null): bool
+    public function sendStatusChangeNotification(array $verification, array $customer, ?string $previousStatus): bool
     {
         try {
             $templateVars = [

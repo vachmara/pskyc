@@ -221,7 +221,7 @@ class VerificationRepository
      *
      * @return int The ID of the newly created verification
      */
-    public function create(int $customerId, string $status = 'pending', ?string $customerNote = null): int
+    public function create(int $customerId, string $status = 'pending', ?string $customerNote): int
     {
         $qb = $this->connection->createQueryBuilder();
         $qb->insert(_DB_PREFIX_ . 'kyc_verification')
@@ -286,7 +286,7 @@ class VerificationRepository
      *
      * @return bool True if update was successful
      */
-    public function updateStatus(int $id, string $status, ?string $note = null): bool
+    public function updateStatus(int $id, string $status, ?string $note): bool
     {
         $qb = $this->connection->createQueryBuilder();
         $qb->update(_DB_PREFIX_ . 'kyc_verification')

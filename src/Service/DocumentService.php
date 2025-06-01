@@ -82,7 +82,7 @@ class DocumentService
      *
      * @return array Result array with success status and document ID or error message
      */
-    public function uploadDocument(int $verificationId, array $fileData, string $documentType, ?string $side = null): array
+    public function uploadDocument(int $verificationId, array $fileData, string $documentType, ?string $side): array
     {
         try {
             // Validate file

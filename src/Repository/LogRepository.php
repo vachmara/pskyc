@@ -198,7 +198,7 @@ class LogRepository
      *
      * @return array Array of action counts
      */
-    public function getLogStats(?int $verificationId = null): array
+    public function getLogStats(?int $verificationId): array
     {
         $qb = $this->connection->createQueryBuilder();
         $query = $qb->select('action, COUNT(*) as count')
