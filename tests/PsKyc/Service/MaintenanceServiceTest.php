@@ -86,7 +86,7 @@ class MaintenanceServiceTest extends MockeryTestCase
         if (is_dir($this->tempUploadDir)) {
             $this->removeDirectory($this->tempUploadDir);
         }
-        
+
         parent::tearDown();
     }
 
@@ -138,7 +138,7 @@ class MaintenanceServiceTest extends MockeryTestCase
     public function testSendExpiryWarningsWithCustomWarningDays()
     {
         $customWarningDays = 7;
-        
+
         $this->verificationRepositoryMock->shouldReceive('findExpiringVerifications')
             ->once()
             ->with($customWarningDays)
@@ -156,8 +156,8 @@ class MaintenanceServiceTest extends MockeryTestCase
             [
                 'id_kyc_verification' => 1,
                 'id_customer' => 999,
-                'date_expiry' => date('Y-m-d H:i:s', time() + (5 * 86400))
-            ]
+                'date_expiry' => date('Y-m-d H:i:s', time() + (5 * 86400)),
+            ],
         ];
 
         $this->verificationRepositoryMock->shouldReceive('findExpiringVerifications')
@@ -182,8 +182,8 @@ class MaintenanceServiceTest extends MockeryTestCase
             [
                 'id_kyc_verification' => 1,
                 'id_customer' => 123,
-                'date_expiry' => date('Y-m-d H:i:s', time() + (5 * 86400))
-            ]
+                'date_expiry' => date('Y-m-d H:i:s', time() + (5 * 86400)),
+            ],
         ];
 
         $customerData = ['id_customer' => 123, 'email' => 'test@example.com'];
@@ -225,8 +225,8 @@ class MaintenanceServiceTest extends MockeryTestCase
         $expiredVerifications = [
             [
                 'id_kyc_verification' => 1,
-                'id_customer' => 123
-            ]
+                'id_customer' => 123,
+            ],
         ];
 
         $this->verificationRepositoryMock->shouldReceive('findExpiredVerifications')
@@ -248,8 +248,8 @@ class MaintenanceServiceTest extends MockeryTestCase
         $expiredVerifications = [
             [
                 'id_kyc_verification' => 1,
-                'id_customer' => 123
-            ]
+                'id_customer' => 123,
+            ],
         ];
 
         $this->verificationRepositoryMock->shouldReceive('findExpiredVerifications')
@@ -312,11 +312,11 @@ class MaintenanceServiceTest extends MockeryTestCase
         // Create test files with larger content to ensure measurable space freed
         $testFile1 = $this->tempUploadDir . '/doc_123_abcdef.pdf';
         $testFile2 = $this->tempUploadDir . '/doc_456_ghijkl.jpg';
-        
+
         // Create content larger than 1MB to ensure space_freed_mb > 0
         $testContent1 = str_repeat('test content 1 with more data for larger file size', 50000); // ~2.5MB
         $testContent2 = str_repeat('test content 2 with more data for larger file size', 50000); // ~2.5MB
-        
+
         file_put_contents($testFile1, $testContent1);
         file_put_contents($testFile2, $testContent2);
 
@@ -414,11 +414,11 @@ class MaintenanceServiceTest extends MockeryTestCase
         // Create temporary files with different ages and larger content
         $oldTempFile = $this->tempUploadDir . '/doc_tmp_old.pdf';
         $newTempFile = $this->tempUploadDir . '/doc_tmp_new.pdf';
-        
+
         // Create content larger than 1MB to ensure space_freed_mb > 0
         $oldContent = str_repeat('old temp content with more data for larger file size', 50000); // ~2.5MB
         $newContent = str_repeat('new temp content with more data for larger file size', 50000); // ~2.5MB
-        
+
         file_put_contents($oldTempFile, $oldContent);
         file_put_contents($newTempFile, $newContent);
 
@@ -476,7 +476,7 @@ class MaintenanceServiceTest extends MockeryTestCase
             'id_customer' => $customerId,
             'firstname' => 'John',
             'lastname' => 'Doe',
-            'email' => 'john@example.com'
+            'email' => 'john@example.com',
         ];
 
         $this->customerRepositoryMock->shouldReceive('getCustomerData')
@@ -526,7 +526,7 @@ class MaintenanceServiceTest extends MockeryTestCase
                 null,
                 'Pskyc'
             );
-        
+
         \PrestaShopLogger::setStaticExpectations($loggerMock);
 
         $this->customerRepositoryMock->shouldReceive('getCustomerData')
@@ -553,7 +553,7 @@ class MaintenanceServiceTest extends MockeryTestCase
         $configurationMock->shouldReceive('get')
             ->with('PSKYC_LOG_RETENTION_DAYS', 0)
             ->andReturn(30);
-        
+
         \Configuration::setStaticExpectations($configurationMock);
 
         // Mock all the individual maintenance tasks
@@ -590,13 +590,13 @@ class MaintenanceServiceTest extends MockeryTestCase
             [
                 'id_kyc_verification' => 1,
                 'id_customer' => 123,
-                'date_expiry' => date('Y-m-d H:i:s', time() + (5 * 86400))
+                'date_expiry' => date('Y-m-d H:i:s', time() + (5 * 86400)),
             ],
             [
                 'id_kyc_verification' => 2,
                 'id_customer' => 456,
-                'date_expiry' => date('Y-m-d H:i:s', time() + (10 * 86400))
-            ]
+                'date_expiry' => date('Y-m-d H:i:s', time() + (10 * 86400)),
+            ],
         ];
 
         $customerData1 = ['id_customer' => 123, 'email' => 'test1@example.com'];
@@ -634,8 +634,8 @@ class MaintenanceServiceTest extends MockeryTestCase
             [
                 'id_kyc_verification' => 1,
                 'id_customer' => 123,
-                'date_expiry' => date('Y-m-d H:i:s', time() + (5 * 86400))
-            ]
+                'date_expiry' => date('Y-m-d H:i:s', time() + (5 * 86400)),
+            ],
         ];
 
         $customerData = ['id_customer' => 123, 'email' => 'test@example.com'];
@@ -664,12 +664,12 @@ class MaintenanceServiceTest extends MockeryTestCase
         $expiredVerifications = [
             [
                 'id_kyc_verification' => 1,
-                'id_customer' => 123
+                'id_customer' => 123,
             ],
             [
                 'id_kyc_verification' => 2,
-                'id_customer' => 456
-            ]
+                'id_customer' => 456,
+            ],
         ];
 
         $customerData1 = ['id_customer' => 123, 'email' => 'test1@example.com'];
@@ -707,8 +707,8 @@ class MaintenanceServiceTest extends MockeryTestCase
         $expiredVerifications = [
             [
                 'id_kyc_verification' => 1,
-                'id_customer' => 123
-            ]
+                'id_customer' => 123,
+            ],
         ];
 
         $customerData = ['id_customer' => 123, 'email' => 'test@example.com'];
@@ -806,10 +806,10 @@ class MaintenanceServiceTest extends MockeryTestCase
         // Create a temp file and make it read-only to test file deletion failure scenarios
         $tempFile = $this->tempUploadDir . '/doc_tmp_readonly.pdf';
         file_put_contents($tempFile, 'test content');
-        
+
         // Set file modification time to be old
         touch($tempFile, time() - (25 * 3600));
-        
+
         // On Windows, we can't easily test unlink failure, so we'll test the normal case
         $result = $this->maintenanceService->cleanupTempFiles(24);
 
@@ -830,7 +830,7 @@ class MaintenanceServiceTest extends MockeryTestCase
             ->once()
             ->with('PSKYC_ENCRYPTION_KEY')
             ->andReturn($encryptionKey);
-        
+
         \Configuration::setStaticExpectations($configurationMock);
 
         // Mock Tools::hash() to return predictable hash
@@ -839,7 +839,7 @@ class MaintenanceServiceTest extends MockeryTestCase
             ->once()
             ->with($encryptionKey . 'pskyc_cron_token')
             ->andReturn($expectedHash);
-        
+
         \Tools::setStaticExpectations($toolsMock);
 
         $result = $this->maintenanceService->getCronToken();
@@ -856,7 +856,7 @@ class MaintenanceServiceTest extends MockeryTestCase
             ->once()
             ->with('PSKYC_ENCRYPTION_KEY')
             ->andReturn('');
-        
+
         \Configuration::setStaticExpectations($configurationMock);
 
         // Mock PrestaShopLogger::addLog() for the error log
@@ -864,7 +864,7 @@ class MaintenanceServiceTest extends MockeryTestCase
         $loggerMock->shouldReceive('addLog')
             ->once()
             ->with('PSKYC encryption key missing for cron token generation', 3, null, 'Pskyc');
-        
+
         \PrestaShopLogger::setStaticExpectations($loggerMock);
 
         $this->expectException(\PrestaShopException::class);
@@ -881,7 +881,7 @@ class MaintenanceServiceTest extends MockeryTestCase
             ->once()
             ->with('PSKYC_ENCRYPTION_KEY')
             ->andReturn(null);
-        
+
         \Configuration::setStaticExpectations($configurationMock);
 
         // Mock PrestaShopLogger::addLog() for the error log
@@ -889,7 +889,7 @@ class MaintenanceServiceTest extends MockeryTestCase
         $loggerMock->shouldReceive('addLog')
             ->once()
             ->with('PSKYC encryption key missing for cron token generation', 3, null, 'Pskyc');
-        
+
         \PrestaShopLogger::setStaticExpectations($loggerMock);
 
         $this->expectException(\PrestaShopException::class);
@@ -904,7 +904,7 @@ class MaintenanceServiceTest extends MockeryTestCase
         $testCases = [
             'short_key' => 'abcdefghij',
             'long_encryption_key_with_special_chars_123!@#' => 'klmnopqrst',
-            'another_different_key_456' => 'uvwxyz1234'
+            'another_different_key_456' => 'uvwxyz1234',
         ];
 
         foreach ($testCases as $encryptionKey => $expectedToken) {
@@ -914,7 +914,7 @@ class MaintenanceServiceTest extends MockeryTestCase
                 ->once()
                 ->with('PSKYC_ENCRYPTION_KEY')
                 ->andReturn($encryptionKey);
-            
+
             \Configuration::setStaticExpectations($configurationMock);
 
             // Mock Tools::hash() to return predictable hash
@@ -923,7 +923,7 @@ class MaintenanceServiceTest extends MockeryTestCase
                 ->once()
                 ->with($encryptionKey . 'pskyc_cron_token')
                 ->andReturn($expectedToken . 'extra_chars_to_be_truncated');
-            
+
             \Tools::setStaticExpectations($toolsMock);
 
             $result = $this->maintenanceService->getCronToken();
@@ -941,7 +941,7 @@ class MaintenanceServiceTest extends MockeryTestCase
         $configurationMock->shouldReceive('get')
             ->with('PSKYC_EXPIRY_WARNING_DAYS', 30)
             ->andThrow(new \Exception('Configuration system failure'));
-        
+
         \Configuration::setStaticExpectations($configurationMock);
 
         // Mock PrestaShopLogger for the exception log
@@ -954,7 +954,7 @@ class MaintenanceServiceTest extends MockeryTestCase
                 null,
                 'Pskyc'
             );
-        
+
         \PrestaShopLogger::setStaticExpectations($loggerMock);
 
         $result = $this->maintenanceService->runDailyMaintenance();
@@ -978,7 +978,7 @@ class MaintenanceServiceTest extends MockeryTestCase
             ->once()
             ->with('PSKYC_EXPIRY_WARNING_DAYS', 30)
             ->andReturn(15); // Different from default to test configuration is used
-        
+
         \Configuration::setStaticExpectations($configurationMock);
 
         $this->verificationRepositoryMock->shouldReceive('findExpiringVerifications')
@@ -1001,7 +1001,7 @@ class MaintenanceServiceTest extends MockeryTestCase
             ->once()
             ->with('PSKYC_LOG_RETENTION_DAYS', 0)
             ->andReturn(45); // Different from default to test configuration is used
-        
+
         \Configuration::setStaticExpectations($configurationMock);
 
         $this->logRepositoryMock->shouldReceive('deleteOldLogs')
@@ -1026,9 +1026,9 @@ class MaintenanceServiceTest extends MockeryTestCase
                 'expiry_warnings' => ['warnings_sent' => 2],
                 'expired_verifications' => ['verifications_expired' => 1],
                 'cleanup_documents' => ['documents_deleted' => 3, 'files_deleted' => 1],
-                'cleanup_temp_files' => ['temp_files_deleted' => 0]
+                'cleanup_temp_files' => ['temp_files_deleted' => 0],
             ],
-            'errors' => []
+            'errors' => [],
         ];
 
         // Mock PrestaShopLogger to expect the success log message
@@ -1041,12 +1041,12 @@ class MaintenanceServiceTest extends MockeryTestCase
                 null,
                 'Pskyc'
             );
-        
+
         \PrestaShopLogger::setStaticExpectations($loggerMock);
 
         // Test that the method executes without throwing exceptions
         $this->maintenanceService->logMaintenanceRun($results);
-        
+
         // Add an assertion to avoid the risky test warning
         $this->assertTrue(true);
     }
@@ -1061,9 +1061,9 @@ class MaintenanceServiceTest extends MockeryTestCase
                 'expiry_warnings' => ['warnings_sent' => 0],
                 'expired_verifications' => ['verifications_expired' => 0],
                 'cleanup_documents' => ['documents_deleted' => 0, 'files_deleted' => 0],
-                'cleanup_temp_files' => ['temp_files_deleted' => 0]
+                'cleanup_temp_files' => ['temp_files_deleted' => 0],
             ],
-            'errors' => ['Database connection failed', 'File system error']
+            'errors' => ['Database connection failed', 'File system error'],
         ];
 
         // Mock PrestaShopLogger to expect the failure log message
@@ -1076,12 +1076,12 @@ class MaintenanceServiceTest extends MockeryTestCase
                 null,
                 'Pskyc'
             );
-        
+
         \PrestaShopLogger::setStaticExpectations($loggerMock);
 
         // Test that the method executes without throwing exceptions
         $this->maintenanceService->logMaintenanceRun($results);
-        
+
         // Add an assertion to avoid the risky test warning
         $this->assertTrue(true);
     }
@@ -1092,25 +1092,16 @@ class MaintenanceServiceTest extends MockeryTestCase
         // We'll test by creating a file and then making it impossible to access its properties
         $problematicPath = $this->tempUploadDir . '/problematic';
         mkdir($problematicPath);
-        
+
         // Create a temp file that matches the pattern
         $tempFile = $problematicPath . '/doc_tmp_test.pdf';
         file_put_contents($tempFile, 'test content');
-        
+
         // Set the file to be old enough for cleanup
         touch($tempFile, time() - (25 * 3600));
-        
+
         // Create a service with a mock that will throw an exception when cleanup is called
-        $service = new class(
-            $this->verificationServiceMock,
-            $this->documentServiceMock,
-            $this->notificationServiceMock,
-            $this->verificationRepositoryMock,
-            $this->documentRepositoryMock,
-            $this->customerRepositoryMock,
-            $this->logRepositoryMock,
-            $problematicPath
-        ) extends MaintenanceService {
+        $service = new class($this->verificationServiceMock, $this->documentServiceMock, $this->notificationServiceMock, $this->verificationRepositoryMock, $this->documentRepositoryMock, $this->customerRepositoryMock, $this->logRepositoryMock, $problematicPath) extends MaintenanceService {
             public function cleanupTempFiles(int $maxAgeHours = 24): array
             {
                 $results = [
@@ -1148,9 +1139,9 @@ class MaintenanceServiceTest extends MockeryTestCase
                 'expiry_warnings' => ['warnings_sent' => 2],
                 'expired_verifications' => ['verifications_expired' => 1],
                 'cleanup_documents' => ['documents_deleted' => 3, 'files_deleted' => 1],
-                'cleanup_temp_files' => ['temp_files_deleted' => 0]
+                'cleanup_temp_files' => ['temp_files_deleted' => 0],
             ],
-            'errors' => []
+            'errors' => [],
         ];
 
         // Mock PrestaShopLogger to throw an exception during the first addLog call
@@ -1174,12 +1165,12 @@ class MaintenanceServiceTest extends MockeryTestCase
                 null,
                 'Pskyc'
             );
-        
+
         \PrestaShopLogger::setStaticExpectations($loggerMock);
 
         // The method should catch the exception and log it, then continue normally
         $this->maintenanceService->logMaintenanceRun($results);
-        
+
         // Test passes if no exception is thrown and both log calls are made
         $this->assertTrue(true);
     }
@@ -1198,7 +1189,7 @@ class MaintenanceServiceTest extends MockeryTestCase
             ->once()
             ->with('PSKYC_ENCRYPTION_KEY')
             ->andReturn($encryptionKey);
-        
+
         \Configuration::setStaticExpectations($configurationMock);
 
         // Mock Tools::hash() to return predictable hash
@@ -1207,13 +1198,13 @@ class MaintenanceServiceTest extends MockeryTestCase
             ->once()
             ->with($encryptionKey . 'pskyc_cron_token')
             ->andReturn($expectedToken . 'extra_chars_to_be_truncated');
-        
+
         // Mock Tools::getShopDomainSsl() to return shop URL
         $toolsMock->shouldReceive('getShopDomainSsl')
             ->once()
             ->with(true, true)
             ->andReturn($shopUrl);
-        
+
         \Tools::setStaticExpectations($toolsMock);
 
         $result = $this->maintenanceService->generateCronUrl($action);
@@ -1235,7 +1226,7 @@ class MaintenanceServiceTest extends MockeryTestCase
             ->once()
             ->with('PSKYC_ENCRYPTION_KEY')
             ->andReturn($encryptionKey);
-        
+
         \Configuration::setStaticExpectations($configurationMock);
 
         // Mock Tools::hash() to return predictable hash
@@ -1244,13 +1235,13 @@ class MaintenanceServiceTest extends MockeryTestCase
             ->once()
             ->with($encryptionKey . 'pskyc_cron_token')
             ->andReturn($expectedToken . 'more_chars');
-        
+
         // Mock Tools::getShopDomainSsl() to return shop URL
         $toolsMock->shouldReceive('getShopDomainSsl')
             ->once()
             ->with(true, true)
             ->andReturn($shopUrl);
-        
+
         \Tools::setStaticExpectations($toolsMock);
 
         $result = $this->maintenanceService->generateCronUrl($action);
@@ -1272,7 +1263,7 @@ class MaintenanceServiceTest extends MockeryTestCase
             ->once()
             ->with('PSKYC_ENCRYPTION_KEY')
             ->andReturn($encryptionKey);
-        
+
         \Configuration::setStaticExpectations($configurationMock);
 
         // Mock Tools::hash() to return predictable hash
@@ -1281,13 +1272,13 @@ class MaintenanceServiceTest extends MockeryTestCase
             ->once()
             ->with($encryptionKey . 'pskyc_cron_token')
             ->andReturn($expectedToken . 'suffix');
-        
+
         // Mock Tools::getShopDomainSsl() to return shop URL with trailing slash
         $toolsMock->shouldReceive('getShopDomainSsl')
             ->once()
             ->with(true, true)
             ->andReturn($shopUrl);
-        
+
         \Tools::setStaticExpectations($toolsMock);
 
         $result = $this->maintenanceService->generateCronUrl($action);
@@ -1309,7 +1300,7 @@ class MaintenanceServiceTest extends MockeryTestCase
             ->once()
             ->with('PSKYC_ENCRYPTION_KEY')
             ->andReturn($encryptionKey);
-        
+
         \Configuration::setStaticExpectations($configurationMock);
 
         // Mock Tools::hash() to return predictable hash
@@ -1318,13 +1309,13 @@ class MaintenanceServiceTest extends MockeryTestCase
             ->once()
             ->with($encryptionKey . 'pskyc_cron_token')
             ->andReturn($expectedToken . 'extra');
-        
+
         // Mock Tools::getShopDomainSsl() to return shop URL
         $toolsMock->shouldReceive('getShopDomainSsl')
             ->once()
             ->with(true, true)
             ->andReturn($shopUrl);
-        
+
         \Tools::setStaticExpectations($toolsMock);
 
         // Call without action parameter (should use default)
@@ -1342,7 +1333,7 @@ class MaintenanceServiceTest extends MockeryTestCase
             ->once()
             ->with('PSKYC_ENCRYPTION_KEY')
             ->andReturn('');
-        
+
         \Configuration::setStaticExpectations($configurationMock);
 
         // Mock PrestaShopLogger::addLog() for the error log
@@ -1350,7 +1341,7 @@ class MaintenanceServiceTest extends MockeryTestCase
         $loggerMock->shouldReceive('addLog')
             ->once()
             ->with('PSKYC encryption key missing for cron token generation', 3, null, 'Pskyc');
-        
+
         \PrestaShopLogger::setStaticExpectations($loggerMock);
 
         // The getCronToken() call should throw an exception

@@ -73,7 +73,7 @@ class MaintenanceService
         DocumentRepository $documentRepository,
         CustomerRepository $customerRepository,
         LogRepository $logRepository,
-        ?string $uploadDir = null
+        ?string $uploadDir = null,
     ) {
         $this->verificationService = $verificationService;
         $this->documentService = $documentService;
@@ -453,7 +453,7 @@ class MaintenanceService
     {
         $token = $this->getCronToken();
         $shopUrl = \Tools::getShopDomainSsl(true, true);
-        
+
         // Build the cron URL pointing to your module's cron endpoint
         return sprintf(
             '%s/modules/pskyc/cron.php?token=%s&action=%s',
