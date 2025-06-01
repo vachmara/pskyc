@@ -10,3 +10,5 @@ parameters:
 		- ../../upgrade/
 	reportUnmatchedIgnoredErrors: false
 	level: 5
+	ignoreErrors:
+		- '#Parameter \#2 \$translator of method AbstractCheckoutStepCore::__construct\(\) expects Symfony\\Component\\Translation\\TranslatorInterface, Symfony\\Contracts\\Translation\\TranslatorInterface given\.#'
