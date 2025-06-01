@@ -6,7 +6,10 @@
  */
 
 namespace PrestaShop\Module\Pskyc\Grid\Query;
-if (!defined('_PS_VERSION_')) { exit; }
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;

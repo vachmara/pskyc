@@ -4,8 +4,12 @@
  * MIT License
  * Copyright (c) 2025 Valentin Chmara
  */
+
 namespace PrestaShop\Module\Pskyc\Service;
-if (!defined('_PS_VERSION_')) { exit; }
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 use PrestaShop\Module\Pskyc\Repository\CustomerRepository;
 use PrestaShop\Module\Pskyc\Repository\DocumentRepository;
 use PrestaShop\Module\Pskyc\Repository\LogRepository;

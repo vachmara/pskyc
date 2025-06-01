@@ -6,7 +6,10 @@
  */
 
 namespace PrestaShop\Module\Pskyc\Checkout;
-if (!defined('_PS_VERSION_')) { exit; }
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
 use Symfony\Contracts\Translation\TranslatorInterface;
 

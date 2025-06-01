@@ -4,8 +4,9 @@
  * MIT License
  * Copyright (c) 2025 Valentin Chmara
  */
-
- if (!defined('_PS_VERSION_')) { exit; }
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
 /**
  * KYC Secure Upload Cron Controller

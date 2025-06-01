@@ -8,7 +8,10 @@
 declare(strict_types=1);
 
 namespace PrestaShop\Module\Pskyc\Controller\Admin;
-if (!defined('_PS_VERSION_')) { exit; }
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 use PrestaShop\Module\Pskyc\Grid\Definition\Factory\VerificationGridDefinitionFactory;
 use PrestaShop\Module\Pskyc\Grid\Filters\VerificationFilters;
 use PrestaShop\Module\Pskyc\Repository\VerificationRepository;

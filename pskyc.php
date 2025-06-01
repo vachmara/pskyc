@@ -4,7 +4,9 @@
  * MIT License
  * Copyright (c) 2025 Valentin Chmara
  */
-if (!defined('_PS_VERSION_')) { exit; }
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 use PrestaShop\Module\Pskyc\Service\VerificationService;
 use PrestaShop\PrestaShop\Core\MailTemplate\Layout\Layout;
 use PrestaShop\PrestaShop\Core\MailTemplate\ThemeCatalogInterface;
@@ -726,7 +728,7 @@ class Pskyc extends Module
             $octal = substr(sprintf('%o', $perms), -4);
 
             // Check if permissions are too permissive (should be 0700 or similar)
-            if ((int)$octal > 0755) {
+            if ((int) $octal > 0755) {
                 // Try to fix permissions
                 if (!@chmod($uploadDir, 0700)) {
                     return false;
@@ -839,7 +841,7 @@ class Pskyc extends Module
             $perms = fileperms($uploadDir);
             $octal = substr(sprintf('%o', $perms), -4);
 
-            if ((int)$octal > 0755) {
+            if ((int) $octal > 0755) {
                 $warnings[] = 'Directory permissions may be too permissive (' . $octal . ')';
                 $status = 'warning';
             }
