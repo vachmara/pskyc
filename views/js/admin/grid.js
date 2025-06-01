@@ -1,3 +1,7 @@
+/**
+ * MIT License
+ * Copyright (c) 2025 Valentin Chmara
+ */
 document.addEventListener('DOMContentLoaded', function () {
   const searchButton = document.querySelector('.grid-search-button');
   const resetButton = document.querySelector('.grid-reset-button');

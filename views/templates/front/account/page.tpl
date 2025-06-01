@@ -1,3 +1,7 @@
+{**
+ * MIT License
+ * Copyright (c) 2025 Valentin Chmara
+ *}
 {extends file='customer/page.tpl'}
 
 {block name='page_title'}

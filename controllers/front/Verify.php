@@ -1,4 +1,8 @@
 <?php
+/**
+ * MIT License
+ * Copyright (c) 2025 Valentin Chmara
+ */
 
 use PrestaShop\Module\Pskyc\Service\DocumentService;
 use PrestaShop\Module\Pskyc\Service\NotificationService;
