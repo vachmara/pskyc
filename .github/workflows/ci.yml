@@ -53,28 +53,8 @@ jobs:
       matrix:
         presta-versions: ['8.0', '8.1', 'latest']
     steps:
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.1'
-
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Cache vendor folder
-        uses: actions/cache@v4
-        with:
-          path: vendor
-          key: php-${{ hashFiles('composer.lock') }}
-
-      - name: Cache composer folder
-        uses: actions/cache@v4
-        with:
-          path: ~/.composer/cache
-          key: php-composer-cache
-
-      - name: Check composer
-        run: composer validate
 
       - name: Install dependencies
         run: composer install
