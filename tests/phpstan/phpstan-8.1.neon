@@ -1,0 +1,6 @@
+includes:
+	- phpstan.neon
+
+parameters:
+  # Override any PrestaShop 8.1 specific settings here if needed
+  level: 5

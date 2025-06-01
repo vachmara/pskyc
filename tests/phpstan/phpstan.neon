@@ -1,12 +1,9 @@
-includes:
-	- %currentWorkingDirectory%/vendor/prestashop/php-dev-tools/phpstan/ps-module-extension.neon
-
 parameters:
   paths:
-    # From PHPStan 0.12, paths to check are relative to the neon file
-    - ../../pskyc.php
-    - ../../controllers/
-    - ../../src/
+    # Paths are now absolute within the container
+    - /var/www/html/modules/pskyc/pskyc.php
+    - /var/www/html/modules/pskyc/controllers/
+    - /var/www/html/modules/pskyc/src/
   
   reportUnmatchedIgnoredErrors: false
   level: 5
@@ -21,6 +18,10 @@ parameters:
     - '#Call to an undefined method.*::get\(\)#'
     - '#Parameter \#1 \$hookParams of method.*::hookActionListMailThemes\(\) expects array, mixed given#'
     
-  # Bootstrap for better context
+  # Bootstrap for better context - use absolute path in container
   bootstrapFiles:
-    - ../../tests/bootstrap.php
+    - /var/www/html/modules/pskyc/tests/bootstrap.php
+  
+  # PrestaShop environment variable
+  scanDirectories:
+    - /var/www/html

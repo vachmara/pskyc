@@ -1,2 +1,6 @@
 includes:
-	- %currentWorkingDirectory%/tests/phpstan/phpstan.neon
+	- phpstan.neon
+
+parameters:
+  # Override any PrestaShop 8.0 specific settings here if needed
+  level: 5

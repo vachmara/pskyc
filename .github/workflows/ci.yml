@@ -71,6 +71,9 @@ jobs:
       - name: Install dependencies
         run: composer install
 
+      - name: Make phpstan script executable
+        run: chmod +x ./tests/phpstan.sh
+
       - name: Execute PHPStan on PrestaShop (Tag ${{ matrix.presta-versions }})
         run: ./tests/phpstan.sh ${{ matrix.presta-versions }}
 
