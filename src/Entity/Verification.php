@@ -175,7 +175,7 @@ class Verification
      *
      * @return self
      */
-    public function setAdminNote(string $note = null): self
+    public function setAdminNote(?string $note = null): self
     {
         $this->adminNote = $note;
 
@@ -199,7 +199,7 @@ class Verification
      *
      * @return self
      */
-    public function setCustomerNote(string $note = null): self
+    public function setCustomerNote(?string $note = null): self
     {
         $this->customerNote = $note;
 
