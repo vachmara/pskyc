@@ -44,7 +44,6 @@ class VerificationServiceTest extends MockeryTestCase
         $this->verificationRepositoryMock = \Mockery::mock(VerificationRepository::class);
         $this->documentRepositoryMock = \Mockery::mock(DocumentRepository::class);
         $this->logRepositoryMock = \Mockery::mock(LogRepository::class);
-        $this->documentServiceMock = \Mockery::mock(DocumentService::class);
         $this->notificationServiceMock = \Mockery::mock(NotificationService::class);
         $this->customerRepositoryMock = \Mockery::mock(CustomerRepository::class);
 
@@ -52,7 +51,6 @@ class VerificationServiceTest extends MockeryTestCase
             $this->verificationRepositoryMock,
             $this->documentRepositoryMock,
             $this->logRepositoryMock,
-            $this->documentServiceMock,
             $this->notificationServiceMock,
             $this->customerRepositoryMock
         );
@@ -79,7 +77,6 @@ class VerificationServiceTest extends MockeryTestCase
             $this->verificationRepositoryMock,
             $this->documentRepositoryMock,
             $this->logRepositoryMock,
-            $this->documentServiceMock,
             $this->notificationServiceMock,
             $this->customerRepositoryMock
         );
