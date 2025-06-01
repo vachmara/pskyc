@@ -87,15 +87,18 @@ flowchart TD
     
     X --> Y[Send Expiry Notification to Customer]
 
-    style A fill:#e1f5fe
-    style E fill:#c8e6c9
-    style G fill:#fff3e0
-    style N fill:#c8e6c9
-    style O fill:#ffcdd2
-    style P fill:#fff9c4
-    style Q fill:#e3f2fd
-    style U fill:#fff3e0
-    style Y fill:#ffcdd2
+    %% Simplified semantic color scheme (4 colors)
+    style A fill:#1976D2,stroke:#0D47A1,stroke-width:2px,color:#ffffff
+    style E fill:#388E3C,stroke:#1B5E20,stroke-width:2px,color:#ffffff
+    style F fill:#D32F2F,stroke:#B71C1C,stroke-width:2px,color:#ffffff
+    style G fill:#F57C00,stroke:#E65100,stroke-width:2px,color:#ffffff
+    style N fill:#388E3C,stroke:#1B5E20,stroke-width:2px,color:#ffffff
+    style O fill:#D32F2F,stroke:#B71C1C,stroke-width:2px,color:#ffffff
+    style P fill:#F57C00,stroke:#E65100,stroke-width:2px,color:#ffffff
+    style Q fill:#1976D2,stroke:#0D47A1,stroke-width:2px,color:#ffffff
+    style U fill:#F57C00,stroke:#E65100,stroke-width:2px,color:#ffffff
+    style Y fill:#D32F2F,stroke:#B71C1C,stroke-width:2px,color:#ffffff
+    style X fill:#D32F2F,stroke:#B71C1C,stroke-width:2px,color:#ffffff
 ```
 
 ## Email Types Summary
