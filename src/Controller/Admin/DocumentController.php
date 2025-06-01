@@ -33,12 +33,12 @@ class DocumentController extends FrameworkBundleAdminController
      * )
      *
      * @param int $documentId The document ID to download
-     * @param int $preview Whether to display inline (1) or as attachment (0)
      * @param Request $request HTTP request object
+     * @param int $preview Whether to display inline (1) or as attachment (0)
      *
      * @return Response|JsonResponse Document file response or JSON error
      */
-    public function downloadAction(int $documentId, int $preview = 0, Request $request)
+    public function downloadAction(int $documentId, Request $request, int $preview = 0)
     {
         $documentRepository = $this->get('PrestaShop\Module\Pskyc\Repository\DocumentRepository');
         $document = $documentRepository->findById($documentId);

@@ -13,5 +13,7 @@ secure_upload/
 tests/coverage/
 tests/results/
 tests/temp/
+scripts/
+docker-compose.lint.yml
 
 MIT.txt
