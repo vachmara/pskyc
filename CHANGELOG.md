@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0-beta] - 2025-06-01
+## [1.0.0] - 2025-06-01
 
 ### Added
 - KYC document verification system for PrestaShop 8
@@ -40,5 +40,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ready for PrestaShop 8.0+ environments
 - Please report any issues on GitHub
 
-[Unreleased]: https://github.com/vachmara/pskyc/compare/v1.0.0-beta...HEAD
-[1.0.0-beta]: https://github.com/vachmara/pskyc/releases/tag/v1.0.0-beta
+[Unreleased]: https://github.com/vachmara/pskyc/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/vachmara/pskyc/releases/tag/v1.0.0
