@@ -300,7 +300,7 @@ class EncryptionServiceTest extends MockeryTestCase
         // Since reliably simulating filesize() failure is extremely platform-dependent
         // and the actual failure scenarios are rare in real-world usage,
         // we'll test a more realistic scenario or skip on platforms where it's unreliable
-        
+
         $testFile = tempnam(sys_get_temp_dir(), 'test_secure_delete_');
         file_put_contents($testFile, 'test content');
 
@@ -309,13 +309,13 @@ class EncryptionServiceTest extends MockeryTestCase
             // Try to make the file unreadable by changing permissions
             // Note: This may not always cause filesize() to fail, but it's a realistic scenario
             chmod($testFile, 0000);
-            
+
             // Test if we can actually make filesize fail
             if (filesize($testFile) === false) {
                 // If filesize actually fails, test the error handling
                 $result = $this->encryptionService->secureDelete($testFile);
                 $this->assertFalse($result, 'secureDelete should return false when filesize fails');
-                
+
                 // Restore permissions and clean up
                 chmod($testFile, 0644);
                 if (file_exists($testFile)) {
