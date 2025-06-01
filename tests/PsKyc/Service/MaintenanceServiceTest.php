@@ -15,13 +15,9 @@ use PrestaShop\Module\Pskyc\Repository\VerificationRepository;
 use PrestaShop\Module\Pskyc\Service\DocumentService;
 use PrestaShop\Module\Pskyc\Service\MaintenanceService;
 use PrestaShop\Module\Pskyc\Service\NotificationService;
-use PrestaShop\Module\Pskyc\Service\VerificationService;
 
 class MaintenanceServiceTest extends MockeryTestCase
 {
-    /** @var VerificationService */
-    private $verificationServiceMock;
-
     /** @var DocumentService */
     private $documentServiceMock;
 
@@ -48,7 +44,6 @@ class MaintenanceServiceTest extends MockeryTestCase
 
     protected function setUp(): void
     {
-        $this->verificationServiceMock = \Mockery::mock(VerificationService::class);
         $this->documentServiceMock = \Mockery::mock(DocumentService::class);
         $this->notificationServiceMock = \Mockery::mock(NotificationService::class);
         $this->verificationRepositoryMock = \Mockery::mock(VerificationRepository::class);
@@ -61,7 +56,6 @@ class MaintenanceServiceTest extends MockeryTestCase
         mkdir($this->tempUploadDir, 0777, true);
 
         $this->maintenanceService = new MaintenanceService(
-            $this->verificationServiceMock,
             $this->documentServiceMock,
             $this->notificationServiceMock,
             $this->verificationRepositoryMock,
@@ -106,7 +100,6 @@ class MaintenanceServiceTest extends MockeryTestCase
     public function testConstructorWithDefaultUploadDir()
     {
         $service = new MaintenanceService(
-            $this->verificationServiceMock,
             $this->documentServiceMock,
             $this->notificationServiceMock,
             $this->verificationRepositoryMock,
@@ -122,7 +115,6 @@ class MaintenanceServiceTest extends MockeryTestCase
     {
         $customDir = '/custom/upload/dir';
         $service = new MaintenanceService(
-            $this->verificationServiceMock,
             $this->documentServiceMock,
             $this->notificationServiceMock,
             $this->verificationRepositoryMock,
@@ -346,7 +338,6 @@ class MaintenanceServiceTest extends MockeryTestCase
     public function testCleanupOrphanedFilesWithNonExistentDirectory()
     {
         $service = new MaintenanceService(
-            $this->verificationServiceMock,
             $this->documentServiceMock,
             $this->notificationServiceMock,
             $this->verificationRepositoryMock,
@@ -438,7 +429,6 @@ class MaintenanceServiceTest extends MockeryTestCase
     public function testCleanupTempFilesWithNonExistentDirectory()
     {
         $service = new MaintenanceService(
-            $this->verificationServiceMock,
             $this->documentServiceMock,
             $this->notificationServiceMock,
             $this->verificationRepositoryMock,
@@ -762,7 +752,6 @@ class MaintenanceServiceTest extends MockeryTestCase
     {
         // Create a service with a directory that will cause problems
         $service = new MaintenanceService(
-            $this->verificationServiceMock,
             $this->documentServiceMock,
             $this->notificationServiceMock,
             $this->verificationRepositoryMock,
@@ -1101,7 +1090,7 @@ class MaintenanceServiceTest extends MockeryTestCase
         touch($tempFile, time() - (25 * 3600));
 
         // Create a service with a mock that will throw an exception when cleanup is called
-        $service = new class($this->verificationServiceMock, $this->documentServiceMock, $this->notificationServiceMock, $this->verificationRepositoryMock, $this->documentRepositoryMock, $this->customerRepositoryMock, $this->logRepositoryMock, $problematicPath) extends MaintenanceService {
+        $service = new class($this->documentServiceMock, $this->notificationServiceMock, $this->verificationRepositoryMock, $this->documentRepositoryMock, $this->customerRepositoryMock, $this->logRepositoryMock, $problematicPath) extends MaintenanceService {
             public function cleanupTempFiles(int $maxAgeHours = 24): array
             {
                 $results = [

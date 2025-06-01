@@ -26,11 +26,6 @@ use PrestaShop\Module\Pskyc\Repository\VerificationRepository;
 class MaintenanceService
 {
     /**
-     * @var VerificationService
-     */
-    private $verificationService;
-
-    /**
      * @var DocumentService
      */
     private $documentService;
@@ -66,7 +61,6 @@ class MaintenanceService
     private $uploadDir;
 
     public function __construct(
-        VerificationService $verificationService,
         DocumentService $documentService,
         NotificationService $notificationService,
         VerificationRepository $verificationRepository,
@@ -75,7 +69,6 @@ class MaintenanceService
         LogRepository $logRepository,
         ?string $uploadDir = null,
     ) {
-        $this->verificationService = $verificationService;
         $this->documentService = $documentService;
         $this->notificationService = $notificationService;
         $this->verificationRepository = $verificationRepository;

@@ -93,7 +93,6 @@ services:
 
   PrestaShop\Module\Pskyc\Service\MaintenanceService:
     arguments:
-      - '@PrestaShop\Module\Pskyc\Service\VerificationService'
       - '@PrestaShop\Module\Pskyc\Service\DocumentService'
       - '@PrestaShop\Module\Pskyc\Service\NotificationService'
       - '@PrestaShop\Module\Pskyc\Repository\VerificationRepository'
