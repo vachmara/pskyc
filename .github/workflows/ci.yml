@@ -1,116 +1,109 @@
 name: CI Tests
 
-on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main, develop ]
-  workflow_dispatch:
+on: [push, pull_request]
 
 jobs:
-  test:
+  # PHP syntax checking using official PrestaShop actions
+  php-linter:
+    name: PHP Syntax check
     runs-on: ubuntu-latest
-    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: PHP syntax checker 8.1
+        uses: prestashop/github-action-php-lint/8.1@master
+
+      - name: PHP syntax checker 8.2
+        uses: prestashop/github-action-php-lint/8.2@master
+
+      - name: PHP syntax checker 8.3
+        uses: prestashop/github-action-php-lint/8.3@master
+
+  # Check the PHP code follows coding standards
+  php-cs-fixer:
+    name: PHP-CS-Fixer
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: php-${{ hashFiles('composer.lock') }}
+
+      - name: Install dependencies
+        run: composer install
+
+      - name: Run PHP-CS-Fixer
+        run: ./vendor/bin/php-cs-fixer fix --dry-run --diff --using-cache=no
+
+  # Run PHPStan against the module and PrestaShop releases
+  phpstan:
+    name: PHPStan
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        include:
-          # PrestaShop 8.0 compatibility
-          - php-version: '8.1'
-            prestashop-version: '8.0'
-          - php-version: '8.1'
-            prestashop-version: '8.1'
-          - php-version: '8.2'
-            prestashop-version: '8.1'
-          - php-version: '8.3'
-            prestashop-version: '8.1'
-    
+        presta-versions: ['8.0', '8.1', 'latest']
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: ${{ matrix.php-version }}
-        extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, dom, filter, gd, json, pdo, zip, curl
-        coverage: xdebug
-        tools: composer:v2
-    
-    - name: Validate composer.json
-      run: composer validate --strict
-    
-    - name: Cache Composer packages
-      uses: actions/cache@v4
-      with:
-        path: vendor
-        key: ${{ runner.os }}-php-${{ matrix.php-version }}-ps-${{ matrix.prestashop-version }}-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-php-${{ matrix.php-version }}-
-    
-    - name: Install dependencies
-      run: composer install --prefer-dist --no-progress
-    
-    - name: Check PHP syntax
-      run: find . -name "*.php" -not -path "./vendor/*" -exec php -l {} \;
-    
-    - name: Run PHPUnit tests
-      run: |
-        mkdir -p coverage
-        vendor/bin/phpunit --configuration tests/phpunit.xml --coverage-clover coverage/clover.xml
-    
-    - name: Run PHPStan analysis
-      if: matrix.php-version == '8.1' && matrix.prestashop-version == '8.1'
-      run: |
-        chmod +x tests/phpstan.sh
-        ./tests/phpstan.sh ${{ matrix.prestashop-version }}
-    
-    - name: Check coding standards
-      if: matrix.php-version == '8.1'
-      run: vendor/bin/phpcs
-    
-    - name: Run PrestaShop module validator
-      if: matrix.php-version == '8.1' && matrix.prestashop-version == '8.1'
-      run: |
-        docker run --rm -v $PWD:/data prestashop/module-validator:latest \
-          php /validator/vendor/bin/prestashop-module-validator \
-          --report=json /data
-    
-    - name: Upload coverage to Codecov
-      if: matrix.php-version == '8.1' && matrix.prestashop-version == '8.1'
-      uses: codecov/codecov-action@v4
-      with:
-        file: coverage/clover.xml
-        flags: unittests
-        name: codecov-umbrella
-        token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  build-package:
-    needs: test
+      - name: Cache vendor folder
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: php-${{ hashFiles('composer.lock') }}
+
+      - name: Cache composer folder
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: php-composer-cache
+
+      - name: Install dependencies
+        run: composer install
+
+      - name: Execute PHPStan on PrestaShop (Tag ${{ matrix.presta-versions }})
+        run: ./tests/phpstan.sh ${{ matrix.presta-versions }}
+
+  # PHPUnit tests
+  phpunit:
+    name: PHPUnit
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
-    
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.1'
-        tools: composer:v2
-    
-    - name: Install dependencies (production only)
-      run: composer install --no-dev --optimize-autoloader
-    
-    - name: Create release package
-      run: |
-        mkdir -p dist
-        zip -r "dist/pskyc-${GITHUB_SHA::7}.zip" . \
-          -x "*.git*" "node_modules/*" "tests/*" "coverage/*" "*.md" "dist/*" \
-             "composer.json" "composer.lock" "phpunit.xml*" "phpcs.xml*" \
-             ".github/*" ".gitignore" "*.sh"
-    
-    - name: Upload build artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: pskyc-build-${{ github.sha }}
-        path: dist/
-        retention-days: 30
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: xdebug
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache vendor folder
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: php-${{ hashFiles('composer.lock') }}
+
+      - name: Cache composer folder
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: php-composer-cache
+
+      - name: Install dependencies
+        run: composer install
+
+      - name: Run PHPUnit tests
+        run: |
+          mkdir -p coverage
+          vendor/bin/phpunit --configuration tests/phpunit.xml --coverage-clover coverage/clover.xml
