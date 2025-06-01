@@ -221,7 +221,7 @@ class Document
      *
      * @return self
      */
-    public function setSide(?string $side): self
+    public function setSide(string $side = null): self
     {
         $this->side = $side;
 
@@ -480,7 +480,7 @@ class Document
      *
      * @return self
      */
-    public function setAdminNote(?string $note): self
+    public function setAdminNote(string $note = null): self
     {
         $this->adminNote = $note;
 

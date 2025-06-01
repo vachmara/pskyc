@@ -133,7 +133,7 @@ class DocumentRepository
      *
      * @return bool True if update was successful, false otherwise
      */
-    public function updateStatus(int $documentId, string $status, ?string $reviewNote, ?int $employeeId): bool
+    public function updateStatus(int $documentId, string $status, string $reviewNote = null, int $employeeId = null): bool
     {
         $qb = $this->connection->createQueryBuilder();
         $qb->update(_DB_PREFIX_ . 'kyc_document')
@@ -274,7 +274,7 @@ class DocumentRepository
      *
      * @return bool True if update was successful, false otherwise
      */
-    public function updateStatusAndNote(int $documentId, string $status, ?string $note): bool
+    public function updateStatusAndNote(int $documentId, string $status, string $note = null): bool
     {
         $qb = $this->connection->createQueryBuilder();
         $qb->update(_DB_PREFIX_ . 'kyc_document')

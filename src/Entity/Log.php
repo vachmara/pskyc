@@ -258,7 +258,7 @@ class Log
      *
      * @return self
      */
-    public function setIpAddress(?string $ip): self
+    public function setIpAddress(string $ip = null): self
     {
         $this->ipAddress = $ip;
 

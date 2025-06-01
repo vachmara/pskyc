@@ -83,7 +83,7 @@ class DocumentService
      *
      * @return array Result array with success status and document ID or error message
      */
-    public function uploadDocument(int $verificationId, array $fileData, string $documentType, ?string $side): array
+    public function uploadDocument(int $verificationId, array $fileData, string $documentType, string $side = null): array
     {
         try {
             // Validate file
@@ -437,7 +437,7 @@ class DocumentService
      *
      * @return array Validation result with 'valid' boolean and 'message' string
      */
-    private function validateDocumentSideRequirement(int $verificationId, string $documentType, ?string $side): array
+    private function validateDocumentSideRequirement(int $verificationId, string $documentType, string $side = null): array
     {
         // For two-sided documents, side must be specified
         if ($side === null) {
