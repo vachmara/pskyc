@@ -1,6 +1,10 @@
 /**
  * MIT License
  * Copyright (c) 2025 Valentin Chmara
+ *
+ * @author Valentin Chmara
+ * @copyright Valentin Chmara
+ * @license MIT
  */
 
 
