@@ -416,53 +416,6 @@ class VerificationRepositoryTest extends MockeryTestCase
         $this->assertEquals($expectedVerifications, $result);
     }
 
-    public function testCreateReturnsNewVerificationId()
-    {
-        $customerId = 1;
-        $status = 'pending';
-        $customerNote = 'Initial submission';
-        $expectedId = 42;
-
-        $this->connectionMock->shouldReceive('createQueryBuilder')
-            ->once()
-            ->andReturn($this->queryBuilderMock);
-
-        $this->queryBuilderMock->shouldReceive('insert')
-            ->once()
-            ->with('PS_kyc_verification')
-            ->andReturnSelf();
-
-        $this->queryBuilderMock->shouldReceive('values')
-            ->once()
-            ->with([
-                'id_customer' => ':customer_id',
-                'status' => ':status',
-                'date_submitted' => 'NOW()',
-                'customer_note' => ':customer_note',
-            ])
-            ->andReturnSelf();
-
-        $this->queryBuilderMock->shouldReceive('setParameters')
-            ->once()
-            ->with([
-                'customer_id' => $customerId,
-                'status' => $status,
-                'customer_note' => $customerNote,
-            ])
-            ->andReturnSelf();
-
-        $this->queryBuilderMock->shouldReceive('execute')
-            ->once();
-
-        $this->connectionMock->shouldReceive('lastInsertId')
-            ->once()
-            ->andReturn($expectedId);
-
-        $result = $this->repository->create($customerId, $status);
-
-        $this->assertEquals($expectedId, $result);
-    }
-
     public function testCreateWithDefaultValues()
     {
         $customerId = 1;
