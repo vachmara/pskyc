@@ -59,7 +59,7 @@ class VerificationService
         DocumentRepository $documentRepository,
         LogRepository $logRepository,
         NotificationService $notificationService,
-        CustomerRepository $customerRepository
+        CustomerRepository $customerRepository,
     ) {
         $this->verificationRepository = $verificationRepository;
         $this->documentRepository = $documentRepository;

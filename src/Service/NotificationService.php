@@ -7,7 +7,6 @@
 
 namespace PrestaShop\Module\Pskyc\Service;
 
-use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
@@ -359,7 +358,7 @@ class NotificationService
         array $templateVars,
         string $recipientEmail,
         ?string $recipientName,
-        $langId
+        $langId,
     ): bool {
         try {
             if (empty($recipientEmail)) {

@@ -299,6 +299,7 @@ class VerificationRepository
         }
 
         $result = $qb->execute();
+
         return is_int($result) ? $result > 0 : false;
     }
 
@@ -322,6 +323,7 @@ class VerificationRepository
             ]);
 
         $result = $qb->execute();
+
         return is_int($result) ? $result > 0 : false;
     }
 
@@ -346,6 +348,7 @@ class VerificationRepository
             ]);
 
         $result = $qb->execute();
+
         return is_int($result) ? $result > 0 : false;
     }
 
@@ -364,6 +367,7 @@ class VerificationRepository
             ->setParameter('id', $id);
 
         $result = $qb->execute();
+
         return is_int($result) ? $result > 0 : false;
     }
 

@@ -55,7 +55,7 @@ class LogRepository
         string $action,
         string $message,
         string $ipAddress,
-        string $userAgent
+        string $userAgent,
     ): ?int {
         $qb = $this->connection->createQueryBuilder();
         $qb->insert(_DB_PREFIX_ . 'kyc_log')

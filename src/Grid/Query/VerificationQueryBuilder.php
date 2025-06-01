@@ -38,7 +38,7 @@ class VerificationQueryBuilder extends AbstractDoctrineQueryBuilder
         Connection $connection,
         string $dbPrefix,
         DoctrineSearchCriteriaApplicatorInterface $searchCriteriaApplicator,
-        ?DoctrineFilterApplicatorInterface $filterApplicator = null
+        ?DoctrineFilterApplicatorInterface $filterApplicator = null,
     ) {
         parent::__construct($connection, $dbPrefix);
         $this->searchCriteriaApplicator = $searchCriteriaApplicator;

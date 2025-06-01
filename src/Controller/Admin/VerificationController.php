@@ -43,7 +43,7 @@ class VerificationController extends FrameworkBundleAdminController
      * @return Response Rendered verification grid page
      */
     public function indexAction(
-        VerificationFilters $filters
+        VerificationFilters $filters,
     ): Response {
         /** @var GridFactoryInterface $verificationGridFactory */
         $verificationGridFactory = $this->get('prestashop.module.pskyc.grid.factory.verifications');
@@ -103,7 +103,7 @@ class VerificationController extends FrameworkBundleAdminController
      * @return Response Rendered verification detail page
      */
     public function viewAction(
-        int $verificationId
+        int $verificationId,
     ): Response {
         /** @var VerificationRepository $verificationRepository */
         $verificationRepository = $this->get('PrestaShop\Module\Pskyc\Repository\VerificationRepository');

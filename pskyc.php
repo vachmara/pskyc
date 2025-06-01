@@ -171,7 +171,7 @@ class Pskyc extends Module
             if ($router !== false) {
                 $verificationUrl = $router->generate('ps_pskyc_verification_index');
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Fallback to admin link if router fails
             $verificationUrl = $this->context->link->getAdminLink('AdminModules') . '&configure=pskyc';
         }

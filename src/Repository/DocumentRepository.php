@@ -185,6 +185,7 @@ class DocumentRepository
             ->setParameter('verification_id', $verificationId);
 
         $result = $qb->execute();
+
         return is_int($result) ? $result >= 0 : false;
     }
 
