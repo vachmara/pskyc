@@ -1,10 +1,10 @@
 <?php
+
 namespace Tests\PsKyc\Repository;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
-use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use PrestaShop\Module\Pskyc\Repository\VerificationRepository;
 
@@ -24,10 +24,10 @@ class VerificationRepositoryTest extends MockeryTestCase
 
     protected function setUp(): void
     {
-        $this->connectionMock = Mockery::mock(Connection::class);
-        $this->queryBuilderMock = Mockery::mock(QueryBuilder::class);
-        $this->resultMock = Mockery::mock(Result::class);
-        
+        $this->connectionMock = \Mockery::mock(Connection::class);
+        $this->queryBuilderMock = \Mockery::mock(QueryBuilder::class);
+        $this->resultMock = \Mockery::mock(Result::class);
+
         $this->repository = new VerificationRepository($this->connectionMock);
     }
 
@@ -38,7 +38,7 @@ class VerificationRepositoryTest extends MockeryTestCase
             'id_kyc_verification' => $verificationId,
             'id_customer' => 1,
             'status' => 'pending',
-            'date_submitted' => '2025-01-01 10:00:00'
+            'date_submitted' => '2025-01-01 10:00:00',
         ];
 
         $this->mockQueryBuilderSelect()
@@ -91,13 +91,13 @@ class VerificationRepositoryTest extends MockeryTestCase
             [
                 'id_kyc_verification' => 1,
                 'id_customer' => 1,
-                'status' => 'pending'
+                'status' => 'pending',
             ],
             [
                 'id_kyc_verification' => 2,
                 'id_customer' => 2,
-                'status' => 'approved'
-            ]
+                'status' => 'approved',
+            ],
         ];
 
         $this->mockQueryBuilderSelect()
@@ -132,7 +132,7 @@ class VerificationRepositoryTest extends MockeryTestCase
             'status' => 'approved',
             'customer_id' => 1,
             'date_from' => '2025-01-01',
-            'date_to' => '2025-01-31'
+            'date_to' => '2025-01-31',
         ];
         $limit = 10;
         $offset = 5;
@@ -141,8 +141,8 @@ class VerificationRepositoryTest extends MockeryTestCase
             [
                 'id_kyc_verification' => 1,
                 'id_customer' => 1,
-                'status' => 'approved'
-            ]
+                'status' => 'approved',
+            ],
         ];
 
         $this->mockQueryBuilderSelect()
@@ -216,7 +216,7 @@ class VerificationRepositoryTest extends MockeryTestCase
         $expectedCounts = [
             'pending' => 5,
             'approved' => 3,
-            'rejected' => 2
+            'rejected' => 2,
         ];
 
         $this->mockQueryBuilderSelect('status, COUNT(*) as count')
@@ -266,7 +266,7 @@ class VerificationRepositoryTest extends MockeryTestCase
             'status' => 'approved',
             'customer_id' => 1,
             'date_from' => '2025-01-01',
-            'date_to' => '2025-01-31'
+            'date_to' => '2025-01-31',
         ];
         $expectedCount = 3;
 
@@ -301,7 +301,7 @@ class VerificationRepositoryTest extends MockeryTestCase
             'id_kyc_verification' => 2,
             'id_customer' => $customerId,
             'status' => 'pending',
-            'date_submitted' => '2025-01-02 10:00:00'
+            'date_submitted' => '2025-01-02 10:00:00',
         ];
 
         $this->mockQueryBuilderSelect()
@@ -375,13 +375,13 @@ class VerificationRepositoryTest extends MockeryTestCase
             [
                 'id_kyc_verification' => 2,
                 'id_customer' => $customerId,
-                'status' => 'pending'
+                'status' => 'pending',
             ],
             [
                 'id_kyc_verification' => 1,
                 'id_customer' => $customerId,
-                'status' => 'approved'
-            ]
+                'status' => 'approved',
+            ],
         ];
 
         $this->mockQueryBuilderSelect()
@@ -429,7 +429,7 @@ class VerificationRepositoryTest extends MockeryTestCase
                 'id_customer' => ':customer_id',
                 'status' => ':status',
                 'date_submitted' => 'NOW()',
-                'customer_note' => ':customer_note'
+                'customer_note' => ':customer_note',
             ])
             ->andReturnSelf();
 
@@ -500,13 +500,13 @@ class VerificationRepositoryTest extends MockeryTestCase
             [
                 'id_kyc_verification' => 1,
                 'id_customer' => $customerId,
-                'status' => 'pending'
+                'status' => 'pending',
             ],
             [
                 'id_kyc_verification' => 2,
                 'id_customer' => $customerId,
-                'status' => 'approved'
-            ]
+                'status' => 'approved',
+            ],
         ];
 
         $this->mockQueryBuilderSelect()
@@ -551,7 +551,7 @@ class VerificationRepositoryTest extends MockeryTestCase
         $verificationId = 1;
         $expectedVerification = [
             'id_kyc_verification' => $verificationId,
-            'status' => 'pending'
+            'status' => 'pending',
         ];
 
         $this->mockQueryBuilderSelect()
@@ -909,8 +909,8 @@ class VerificationRepositoryTest extends MockeryTestCase
                 'action' => 'created',
                 'customer_email' => 'test@example.com',
                 'employee_firstname' => 'John',
-                'employee_lastname' => 'Doe'
-            ]
+                'employee_lastname' => 'Doe',
+            ],
         ];
 
         $this->connectionMock->shouldReceive('createQueryBuilder')
@@ -932,7 +932,7 @@ class VerificationRepositoryTest extends MockeryTestCase
                 'v.status as verification_status',
                 'c.email as customer_email',
                 'e.firstname as employee_firstname',
-                'e.lastname as employee_lastname'
+                'e.lastname as employee_lastname',
             ])
             ->andReturnSelf();
 
@@ -981,8 +981,8 @@ class VerificationRepositoryTest extends MockeryTestCase
             [
                 'id_kyc_verification' => 1,
                 'status' => 'approved',
-                'date_expiry' => '2025-06-07 23:59:59'
-            ]
+                'date_expiry' => '2025-06-07 23:59:59',
+            ],
         ];
 
         $this->mockQueryBuilderSelect()
@@ -1037,8 +1037,8 @@ class VerificationRepositoryTest extends MockeryTestCase
             [
                 'id_kyc_verification' => 1,
                 'status' => 'approved',
-                'date_expiry' => '2024-12-31 23:59:59'
-            ]
+                'date_expiry' => '2024-12-31 23:59:59',
+            ],
         ];
 
         $this->mockQueryBuilderSelect()

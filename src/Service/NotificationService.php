@@ -2,14 +2,12 @@
 
 namespace PrestaShop\Module\Pskyc\Service;
 
-use Context;
-use Configuration;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Templating\EngineInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class NotificationService
- * 
+ *
  * Handles email notifications for KYC verification status changes using PrestaShop 8's modern email theme system
  * Sends automated emails to customers and administrators
  */
@@ -21,7 +19,7 @@ class NotificationService
     private $translator;
 
     /**
-     * @var Context
+     * @var \Context
      */
     private $context;
 
@@ -32,25 +30,26 @@ class NotificationService
 
     /**
      * NotificationService constructor
-     * 
+     *
      * @param TranslatorInterface $translator Translator service for internationalization
      * @param EngineInterface $templating Templating engine for email rendering
      */
-    public function __construct(TranslatorInterface $translator, EngineInterface $templating = null)
+    public function __construct(TranslatorInterface $translator, ?EngineInterface $templating = null)
     {
         $this->translator = $translator;
-        $this->context = Context::getContext();
+        $this->context = \Context::getContext();
         $this->templating = $templating;
     }
 
     /**
      * Send verification status change notification to customer
-     * 
+     *
      * Notifies the customer when their KYC verification status changes
-     * 
+     *
      * @param array $verification Verification record from database
      * @param array $customer Customer record from database
      * @param string|null $previousStatus Previous verification status (if applicable)
+     *
      * @return bool True if email was sent successfully, false otherwise
      */
     public function sendStatusChangeNotification(array $verification, array $customer, ?string $previousStatus = null): bool
@@ -65,12 +64,12 @@ class NotificationService
                 'date_validated' => $verification['date_validated'] ?? null,
                 'date_expiry' => $verification['date_expiry'] ?? null,
                 'admin_note' => $verification['admin_note'] ?? '',
-                'shop_name' => Configuration::get('PS_SHOP_NAME'),
-                'shop_url' => $this->context->shop->getBaseURL(true)
+                'shop_name' => \Configuration::get('PS_SHOP_NAME'),
+                'shop_url' => $this->context->shop->getBaseURL(true),
             ];
 
             $subject = $this->getEmailSubjectForStatus($verification['status']);
-            $customerLang = $customer['id_lang'] ?? Configuration::get('PS_LANG_DEFAULT');
+            $customerLang = $customer['id_lang'] ?? \Configuration::get('PS_LANG_DEFAULT');
 
             return $this->sendThemeEmail(
                 'verification_status',
@@ -80,21 +79,22 @@ class NotificationService
                 $customer['firstname'] . ' ' . $customer['lastname'],
                 $customerLang
             );
-
         } catch (\Exception $e) {
             \PrestaShopLogger::addLog('KYC notification error: ' . $e->getMessage(), 3, null, 'Pskyc');
+
             return false;
         }
     }
 
     /**
      * Send document upload confirmation to customer
-     * 
+     *
      * Confirms that documents have been received and are being reviewed
-     * 
+     *
      * @param array $verification Verification record from database
      * @param array $customer Customer record from database
      * @param array $documents Array of uploaded document records
+     *
      * @return bool True if email was sent successfully, false otherwise
      */
     public function sendDocumentUploadConfirmation(array $verification, array $customer, array $documents): bool
@@ -106,8 +106,8 @@ class NotificationService
                 'document_count' => count($documents),
                 'documents' => $documents,
                 'date_submitted' => $verification['date_submitted'],
-                'shop_name' => Configuration::get('PS_SHOP_NAME'),
-                'shop_url' => $this->context->shop->getBaseURL(true)
+                'shop_name' => \Configuration::get('PS_SHOP_NAME'),
+                'shop_url' => $this->context->shop->getBaseURL(true),
             ];
 
             $subject = $this->translator->trans(
@@ -116,7 +116,7 @@ class NotificationService
                 'Modules.Pskyc.Shop'
             );
 
-            $customerLang = $customer['id_lang'] ?? Configuration::get('PS_LANG_DEFAULT');
+            $customerLang = $customer['id_lang'] ?? \Configuration::get('PS_LANG_DEFAULT');
 
             return $this->sendThemeEmail(
                 'document_upload_confirmation',
@@ -126,20 +126,21 @@ class NotificationService
                 $customer['firstname'] . ' ' . $customer['lastname'],
                 $customerLang
             );
-
         } catch (\Exception $e) {
             \PrestaShopLogger::addLog('KYC upload confirmation error: ' . $e->getMessage(), 3, null, 'Pskyc');
+
             return false;
         }
     }
 
     /**
      * Send admin notification for new verification request
-     * 
+     *
      * Notifies administrators when a new KYC verification is submitted
-     * 
+     *
      * @param array $verification Verification record from database
      * @param array $customer Customer record from database
+     *
      * @return bool True if email was sent successfully, false otherwise
      */
     public function sendAdminNotification(array $verification, array $customer): bool
@@ -157,7 +158,7 @@ class NotificationService
                 'verification_id' => $verification['id_kyc_verification'],
                 'date_submitted' => $verification['date_submitted'],
                 'admin_url' => $this->context->link->getAdminLink('AdminModules') . '&configure=pskyc',
-                'shop_name' => Configuration::get('PS_SHOP_NAME')
+                'shop_name' => \Configuration::get('PS_SHOP_NAME'),
             ];
 
             $subject = $this->translator->trans(
@@ -174,27 +175,28 @@ class NotificationService
                     $templateVars,
                     $adminEmail['email'],
                     $adminEmail['name'],
-                    Configuration::get('PS_LANG_DEFAULT')
+                    \Configuration::get('PS_LANG_DEFAULT')
                 );
                 $success = $success && $result;
             }
 
             return $success;
-
         } catch (\Exception $e) {
             \PrestaShopLogger::addLog('KYC admin notification error: ' . $e->getMessage(), 3, null, 'Pskyc');
+
             return false;
         }
     }
 
     /**
      * Send expiry warning notification to customer
-     * 
+     *
      * Warns customers that their documents will expire soon
-     * 
+     *
      * @param array $verification Verification record from database
      * @param array $customer Customer record from database
      * @param int $daysUntilExpiry Number of days until expiry
+     *
      * @return bool True if email was sent successfully, false otherwise
      */
     public function sendExpiryWarning(array $verification, array $customer, int $daysUntilExpiry): bool
@@ -205,8 +207,8 @@ class NotificationService
                 'verification_id' => $verification['id_kyc_verification'],
                 'days_until_expiry' => $daysUntilExpiry,
                 'expiry_date' => $verification['date_expiry'],
-                'shop_name' => Configuration::get('PS_SHOP_NAME'),
-                'shop_url' => $this->context->shop->getBaseURL(true)
+                'shop_name' => \Configuration::get('PS_SHOP_NAME'),
+                'shop_url' => $this->context->shop->getBaseURL(true),
             ];
 
             $subject = $this->translator->trans(
@@ -215,7 +217,7 @@ class NotificationService
                 'Modules.Pskyc.Shop'
             );
 
-            $customerLang = $customer['id_lang'] ?? Configuration::get('PS_LANG_DEFAULT');
+            $customerLang = $customer['id_lang'] ?? \Configuration::get('PS_LANG_DEFAULT');
 
             return $this->sendThemeEmail(
                 'verification_expiry_warning',
@@ -225,20 +227,21 @@ class NotificationService
                 $customer['firstname'] . ' ' . $customer['lastname'],
                 $customerLang
             );
-
         } catch (\Exception $e) {
             \PrestaShopLogger::addLog('KYC expiry warning error: ' . $e->getMessage(), 3, null, 'Pskyc');
+
             return false;
         }
     }
 
     /**
      * Send bulk notifications to multiple recipients
-     * 
+     *
      * @param array $recipients Array of recipients with email and name
      * @param string $template Email template name
      * @param string $subject Email subject
      * @param array $templateVars Template variables
+     *
      * @return array Results with success count and failed emails
      */
     public function sendBulkNotification(array $recipients, string $template, string $subject, array $templateVars): array
@@ -246,7 +249,7 @@ class NotificationService
         $results = [
             'success_count' => 0,
             'failed_emails' => [],
-            'total_sent' => count($recipients)
+            'total_sent' => count($recipients),
         ];
 
         foreach ($recipients as $recipient) {
@@ -257,11 +260,11 @@ class NotificationService
                 $templateVars,
                 $recipient['email'],
                 $recipientName,
-                Configuration::get('PS_LANG_DEFAULT')
+                \Configuration::get('PS_LANG_DEFAULT')
             );
 
             if ($success) {
-                $results['success_count']++;
+                ++$results['success_count'];
             } else {
                 $results['failed_emails'][] = $recipient['email'];
             }
@@ -272,8 +275,9 @@ class NotificationService
 
     /**
      * Get appropriate email subject based on verification status
-     * 
+     *
      * @param string $status Verification status
+     *
      * @return string Translated email subject
      */
     private function getEmailSubjectForStatus(string $status): string
@@ -309,7 +313,7 @@ class NotificationService
 
     /**
      * Get admin emails from database
-     * 
+     *
      * @return array Array of admin email addresses and names
      */
     private function getAdminEmails(): array
@@ -329,12 +333,12 @@ class NotificationService
             return array_map(function ($admin) {
                 return [
                     'email' => $admin['email'],
-                    'name' => $admin['name']
+                    'name' => $admin['name'],
                 ];
             }, $adminEmails);
-
         } catch (\Exception $e) {
             \PrestaShopLogger::addLog('Error getting admin emails: ' . $e->getMessage(), 3, null, 'Pskyc');
+
             return [];
         }
     }
@@ -348,6 +352,7 @@ class NotificationService
      * @param string $recipientEmail Recipient email address
      * @param string $recipientName Recipient name
      * @param int $langId Language ID
+     *
      * @return bool True if email was sent successfully
      */
     private function sendThemeEmail(
@@ -356,7 +361,7 @@ class NotificationService
         array $templateVars,
         string $recipientEmail,
         ?string $recipientName,
-        int $langId
+        int $langId,
     ): bool {
         try {
             if (empty($recipientEmail)) {
@@ -381,9 +386,9 @@ class NotificationService
                 null, // bcc
                 null  // reply_to
             );
-
         } catch (\Exception $e) {
             \PrestaShopLogger::addLog('Theme email error: ' . $e->getMessage(), 3, null, 'Pskyc');
+
             return false;
         }
     }
@@ -397,6 +402,7 @@ class NotificationService
      * @param string $recipientEmail Recipient email address
      * @param string $recipientName Recipient name
      * @param int $langId Language ID
+     *
      * @return bool True if email was sent successfully
      */
     private function sendModernThemeEmail(
@@ -405,10 +411,8 @@ class NotificationService
         array $templateVars,
         string $recipientEmail,
         string $recipientName,
-        int $langId
+        int $langId,
     ): bool {
-
-
         if (empty($recipientEmail)) {
             return false;
         }
@@ -428,7 +432,5 @@ class NotificationService
             $recipientName,
             $langId
         );
-
-
     }
 }

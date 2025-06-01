@@ -1,0 +1,26 @@
+includes:
+	- %currentWorkingDirectory%/vendor/prestashop/php-dev-tools/phpstan/ps-module-extension.neon
+
+parameters:
+  paths:
+    # From PHPStan 0.12, paths to check are relative to the neon file
+    - ../../pskyc.php
+    - ../../controllers/
+    - ../../src/
+  
+  reportUnmatchedIgnoredErrors: false
+  level: 5
+  
+  # Memory limit for analysis
+  memoryLimit: 1G
+  
+  # PrestaShop 8 specific ignores
+  ignoreErrors:
+    - '#Call to an undefined method.*::trans\(\)#'
+    - '#Access to an undefined property.*::\$context#'
+    - '#Call to an undefined method.*::get\(\)#'
+    - '#Parameter \#1 \$hookParams of method.*::hookActionListMailThemes\(\) expects array, mixed given#'
+    
+  # Bootstrap for better context
+  bootstrapFiles:
+    - ../../tests/bootstrap.php

@@ -2,7 +2,7 @@
 
 /**
  * File System Interface for Dependency Injection
- * 
+ *
  * Allows us to inject different file system implementations
  * (real file system vs virtual file system for testing)
  */

@@ -2,10 +2,10 @@
 
 namespace PrestaShop\Module\Pskyc\Controller\Admin;
 
+use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
@@ -31,6 +31,7 @@ class DocumentController extends FrameworkBundleAdminController
      * @param int $documentId The document ID to download
      * @param int $preview Whether to display inline (1) or as attachment (0)
      * @param Request $request HTTP request object
+     *
      * @return Response|JsonResponse Document file response or JSON error
      */
     public function downloadAction(int $documentId, int $preview = 0, Request $request)
@@ -41,7 +42,7 @@ class DocumentController extends FrameworkBundleAdminController
         if (!$document) {
             return new JsonResponse([
                 'error' => 'Document not found',
-                'documentId' => $documentId
+                'documentId' => $documentId,
             ], 404);
         }
 
@@ -52,7 +53,7 @@ class DocumentController extends FrameworkBundleAdminController
         if (!file_exists($filePath)) {
             return new JsonResponse([
                 'error' => 'File not found',
-                'filename' => $storedFilename
+                'filename' => $storedFilename,
             ], 404);
         }
 
@@ -92,6 +93,7 @@ class DocumentController extends FrameworkBundleAdminController
      * @param int $verificationId The verification ID containing the documents
      * @param Request $request HTTP request containing document updates
      * @param CsrfTokenManagerInterface $csrfTokenManager CSRF token manager for security
+     *
      * @return Response Redirect response with success/error message
      */
     public function updateStatusAction(int $verificationId, Request $request, CsrfTokenManagerInterface $csrfTokenManager)
@@ -100,6 +102,7 @@ class DocumentController extends FrameworkBundleAdminController
         $token = $request->request->get('_token');
         if (!$csrfTokenManager->isTokenValid(new \Symfony\Component\Security\Csrf\CsrfToken('pskyc_document_update', $token))) {
             $this->addFlash('error', $this->trans('Invalid CSRF token.', 'Modules.Pskyc.Admin'));
+
             return $this->redirectToRoute('ps_pskyc_verification_view', ['verificationId' => $verificationId]);
         }
 
@@ -107,7 +110,7 @@ class DocumentController extends FrameworkBundleAdminController
         foreach ($documentsData as $docId => $data) {
             $status = $data['status'] ?? 'pending';
             $note = $data['admin_note'] ?? null;
-            $documentRepository->updateStatusAndNote((int)$docId, $status, $note);
+            $documentRepository->updateStatusAndNote((int) $docId, $status, $note);
         }
 
         // Recalculate verification status
@@ -115,6 +118,7 @@ class DocumentController extends FrameworkBundleAdminController
         $this->recalculateVerificationStatus($verificationService, $verificationId);
 
         $this->addFlash('success', $this->trans('Document statuses and notes updated.', 'Modules.Pskyc.Admin'));
+
         return $this->redirectToRoute('ps_pskyc_verification_view', ['verificationId' => $verificationId]);
     }
 
@@ -123,6 +127,7 @@ class DocumentController extends FrameworkBundleAdminController
      *
      * @param mixed $verificationService The verification service instance
      * @param int $verificationId The verification ID to recalculate
+     *
      * @return void
      */
     private function recalculateVerificationStatus($verificationService, int $verificationId): void

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MIT License
  * Copyright (c) 2025 Valentin Chmara
@@ -13,7 +14,7 @@ use PrestaShop\PrestaShop\Core\Search\Filters;
 
 /**
  * Filters for KYC verification grid
- * 
+ *
  * Handles search criteria and pagination for verification listings
  */
 class VerificationFilters extends Filters

@@ -1,11 +1,11 @@
 <?php
+
 namespace Tests\PsKyc\Repository;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
-use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
-use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use PrestaShop\Module\Pskyc\Repository\LogRepository;
 
@@ -28,19 +28,19 @@ class LogRepositoryTest extends MockeryTestCase
 
     protected function setUp(): void
     {
-        $this->connectionMock = Mockery::mock(Connection::class);
-        $this->queryBuilderMock = Mockery::mock(QueryBuilder::class);
-        $this->resultMock = Mockery::mock(Result::class);
-        $this->expressionBuilderMock = Mockery::mock(ExpressionBuilder::class);
-        
+        $this->connectionMock = \Mockery::mock(Connection::class);
+        $this->queryBuilderMock = \Mockery::mock(QueryBuilder::class);
+        $this->resultMock = \Mockery::mock(Result::class);
+        $this->expressionBuilderMock = \Mockery::mock(ExpressionBuilder::class);
+
         $this->repository = new LogRepository($this->connectionMock);
     }
 
     public function testConstructorSetsConnection()
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = \Mockery::mock(Connection::class);
         $repository = new LogRepository($connection);
-        
+
         $this->assertInstanceOf(LogRepository::class, $repository);
     }
 
@@ -74,7 +74,7 @@ class LogRepositoryTest extends MockeryTestCase
                 'message' => ':message',
                 'ip_address' => ':ip_address',
                 'user_agent' => ':user_agent',
-                'date_add' => 'NOW()'
+                'date_add' => 'NOW()',
             ])
             ->andReturnSelf();
 
@@ -87,7 +87,7 @@ class LogRepositoryTest extends MockeryTestCase
                 'action' => $action,
                 'message' => $message,
                 'ip_address' => $ipAddress,
-                'user_agent' => $userAgent
+                'user_agent' => $userAgent,
             ])
             ->andReturnSelf();
 
@@ -166,7 +166,7 @@ class LogRepositoryTest extends MockeryTestCase
             'action' => 'verification_approved',
             'message' => 'Verification approved by admin',
             'ip_address' => '10.0.0.1',
-            'user_agent' => 'Chrome/96.0'
+            'user_agent' => 'Chrome/96.0',
         ];
 
         $this->connectionMock->shouldReceive('createQueryBuilder')
@@ -208,7 +208,7 @@ class LogRepositoryTest extends MockeryTestCase
             'action' => 'document_upload',
             'details' => 'ID document uploaded',
             'ip_address' => '127.0.0.1',
-            'user_agent' => 'Safari/14.1'
+            'user_agent' => 'Safari/14.1',
         ];
 
         $this->connectionMock->shouldReceive('createQueryBuilder')
@@ -251,7 +251,7 @@ class LogRepositoryTest extends MockeryTestCase
                 'action' => 'documents_uploaded',
                 'message' => 'Documents uploaded',
                 'date_add' => '2025-01-01 10:00:00',
-                'ip_address_readable' => '192.168.1.1'
+                'ip_address_readable' => '192.168.1.1',
             ],
             [
                 'id_kyc_log' => 2,
@@ -259,8 +259,8 @@ class LogRepositoryTest extends MockeryTestCase
                 'action' => 'status_changed',
                 'message' => 'Status changed to pending',
                 'date_add' => '2025-01-01 11:00:00',
-                'ip_address_readable' => '192.168.1.2'
-            ]
+                'ip_address_readable' => '192.168.1.2',
+            ],
         ];
 
         $this->connectionMock->shouldReceive('createQueryBuilder')
@@ -385,8 +385,8 @@ class LogRepositoryTest extends MockeryTestCase
                 'action' => 'profile_updated',
                 'message' => 'Profile information updated',
                 'date_add' => '2025-01-02 14:00:00',
-                'ip_address_readable' => '192.168.1.3'
-            ]
+                'ip_address_readable' => '192.168.1.3',
+            ],
         ];
 
         $this->connectionMock->shouldReceive('createQueryBuilder')
@@ -447,8 +447,8 @@ class LogRepositoryTest extends MockeryTestCase
                 'action' => 'verification_reviewed',
                 'message' => 'Verification reviewed and approved',
                 'date_add' => '2025-01-03 09:00:00',
-                'ip_address_readable' => '10.0.0.5'
-            ]
+                'ip_address_readable' => '10.0.0.5',
+            ],
         ];
 
         $this->connectionMock->shouldReceive('createQueryBuilder')
@@ -504,7 +504,7 @@ class LogRepositoryTest extends MockeryTestCase
         $expectedStats = [
             ['action' => 'documents_uploaded', 'count' => '15'],
             ['action' => 'status_changed', 'count' => '10'],
-            ['action' => 'verification_approved', 'count' => '5']
+            ['action' => 'verification_approved', 'count' => '5'],
         ];
 
         $this->connectionMock->shouldReceive('createQueryBuilder')
@@ -550,7 +550,7 @@ class LogRepositoryTest extends MockeryTestCase
         $verificationId = 1;
         $expectedStats = [
             ['action' => 'documents_uploaded', 'count' => '3'],
-            ['action' => 'status_changed', 'count' => '2']
+            ['action' => 'status_changed', 'count' => '2'],
         ];
 
         $this->connectionMock->shouldReceive('createQueryBuilder')

@@ -1,9 +1,10 @@
 <?php
+
 namespace Tests\PsKyc\Mock;
 
 /**
  * Virtual File System Implementation
- * 
+ *
  * Implementation of FileSystemInterface using vfsStream for testing
  */
 class VirtualFileSystemAdapter implements \FileSystemInterface
@@ -49,6 +50,7 @@ class VirtualFileSystemAdapter implements \FileSystemInterface
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $mimeType = finfo_file($finfo, $path);
         finfo_close($finfo);
+
         return $mimeType ?: 'application/octet-stream';
     }
 

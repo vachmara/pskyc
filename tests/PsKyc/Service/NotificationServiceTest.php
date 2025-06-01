@@ -1,11 +1,11 @@
 <?php
+
 namespace Tests\PsKyc\Service;
 
-use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use PrestaShop\Module\Pskyc\Service\NotificationService;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Templating\EngineInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class NotificationServiceTest extends MockeryTestCase
 {
@@ -21,15 +21,15 @@ class NotificationServiceTest extends MockeryTestCase
     protected function setUp(): void
     {
         // Set up mocks for PrestaShop classes using proper mock proxy system
-        $contextMock = Mockery::mock();
-        $configMock = Mockery::mock();
-        $loggerMock = Mockery::mock();
-        $dbMock = Mockery::mock();
-        $mailMock = Mockery::mock();
+        $contextMock = \Mockery::mock();
+        $configMock = \Mockery::mock();
+        $loggerMock = \Mockery::mock();
+        $dbMock = \Mockery::mock();
+        $mailMock = \Mockery::mock();
 
         // Create shop and link mocks
-        $shopMock = Mockery::mock();
-        $linkMock = Mockery::mock();
+        $shopMock = \Mockery::mock();
+        $linkMock = \Mockery::mock();
 
         // Set up the context mock with shop and link properties
         $contextMock->shop = $shopMock;
@@ -57,15 +57,15 @@ class NotificationServiceTest extends MockeryTestCase
             ->with(true)
             ->andReturn('https://example.com/')
             ->byDefault();
-        
+
         $linkMock->shouldReceive('getAdminLink')
             ->with('AdminModules')
             ->andReturn('https://example.com/admin/modules')
             ->byDefault();
 
         // Set up service dependencies
-        $this->translatorMock = Mockery::mock(TranslatorInterface::class);
-        $this->templatingMock = Mockery::mock(EngineInterface::class);
+        $this->translatorMock = \Mockery::mock(TranslatorInterface::class);
+        $this->templatingMock = \Mockery::mock(EngineInterface::class);
 
         // Configure default translator behavior
         $this->translatorMock->shouldReceive('trans')
@@ -95,14 +95,14 @@ class NotificationServiceTest extends MockeryTestCase
             'date_submitted' => '2025-01-01 10:00:00',
             'date_validated' => '2025-01-02 10:00:00',
             'date_expiry' => '2025-12-31 23:59:59',
-            'admin_note' => 'Test note'
+            'admin_note' => 'Test note',
         ];
 
         $customer = [
             'firstname' => 'John',
             'lastname' => 'Doe',
             'email' => 'john.doe@example.com',
-            'id_lang' => 1
+            'id_lang' => 1,
         ];
 
         $this->setupContextExpectations();
@@ -118,14 +118,14 @@ class NotificationServiceTest extends MockeryTestCase
         $verification = [
             'id_kyc_verification' => 1,
             'status' => 'approved',
-            'date_submitted' => '2025-01-01 10:00:00'
+            'date_submitted' => '2025-01-01 10:00:00',
         ];
 
         $customer = [
             'firstname' => 'John',
             'lastname' => 'Doe',
             'email' => 'john.doe@example.com',
-            'id_lang' => 1
+            'id_lang' => 1,
         ];
 
         $this->setupContextExpectations();
@@ -141,14 +141,14 @@ class NotificationServiceTest extends MockeryTestCase
         $verification = [
             'id_kyc_verification' => 1,
             'status' => 'approved',
-            'date_submitted' => '2025-01-01 10:00:00'
+            'date_submitted' => '2025-01-01 10:00:00',
         ];
 
         $customer = [
             'firstname' => 'John',
             'lastname' => 'Doe',
             'email' => 'john.doe@example.com',
-            'id_lang' => 1
+            'id_lang' => 1,
         ];
 
         // Reset mock expectations and make Configuration throw exception
@@ -158,7 +158,7 @@ class NotificationServiceTest extends MockeryTestCase
 
         \PrestaShopLogger::shouldReceive('addLog')
             ->once()
-            ->with(Mockery::pattern('/KYC notification error:/'), 3, null, 'Pskyc');
+            ->with(\Mockery::pattern('/KYC notification error:/'), 3, null, 'Pskyc');
 
         $result = $this->service->sendStatusChangeNotification($verification, $customer);
 
@@ -169,19 +169,19 @@ class NotificationServiceTest extends MockeryTestCase
     {
         $verification = [
             'id_kyc_verification' => 1,
-            'date_submitted' => '2025-01-01 10:00:00'
+            'date_submitted' => '2025-01-01 10:00:00',
         ];
 
         $customer = [
             'firstname' => 'John',
             'lastname' => 'Doe',
             'email' => 'john.doe@example.com',
-            'id_lang' => 1
+            'id_lang' => 1,
         ];
 
         $documents = [
             ['id' => 1, 'filename' => 'doc1.pdf'],
-            ['id' => 2, 'filename' => 'doc2.pdf']
+            ['id' => 2, 'filename' => 'doc2.pdf'],
         ];
 
         $this->setupContextExpectations();
@@ -196,14 +196,14 @@ class NotificationServiceTest extends MockeryTestCase
     {
         $verification = [
             'id_kyc_verification' => 1,
-            'date_submitted' => '2025-01-01 10:00:00'
+            'date_submitted' => '2025-01-01 10:00:00',
         ];
 
         $customer = [
             'firstname' => 'John',
             'lastname' => 'Doe',
             'email' => 'john.doe@example.com',
-            'id_lang' => 1
+            'id_lang' => 1,
         ];
 
         $documents = [];
@@ -215,7 +215,7 @@ class NotificationServiceTest extends MockeryTestCase
 
         \PrestaShopLogger::shouldReceive('addLog')
             ->once()
-            ->with(Mockery::pattern('/KYC upload confirmation error:/'), 3, null, 'Pskyc');
+            ->with(\Mockery::pattern('/KYC upload confirmation error:/'), 3, null, 'Pskyc');
 
         $result = $this->service->sendDocumentUploadConfirmation($verification, $customer, $documents);
 
@@ -226,14 +226,14 @@ class NotificationServiceTest extends MockeryTestCase
     {
         $verification = [
             'id_kyc_verification' => 1,
-            'date_submitted' => '2025-01-01 10:00:00'
+            'date_submitted' => '2025-01-01 10:00:00',
         ];
 
         $customer = [
             'firstname' => 'John',
             'lastname' => 'Doe',
             'email' => 'john.doe@example.com',
-            'id_customer' => 1
+            'id_customer' => 1,
         ];
 
         $this->setupContextExpectations();
@@ -249,14 +249,14 @@ class NotificationServiceTest extends MockeryTestCase
     {
         $verification = [
             'id_kyc_verification' => 1,
-            'date_submitted' => '2025-01-01 10:00:00'
+            'date_submitted' => '2025-01-01 10:00:00',
         ];
 
         $customer = [
             'firstname' => 'John',
             'lastname' => 'Doe',
             'email' => 'john.doe@example.com',
-            'id_customer' => 1
+            'id_customer' => 1,
         ];
 
         $this->setupContextExpectations();
@@ -277,19 +277,19 @@ class NotificationServiceTest extends MockeryTestCase
     {
         $verification = [
             'id_kyc_verification' => 1,
-            'date_submitted' => '2025-01-01 10:00:00'
+            'date_submitted' => '2025-01-01 10:00:00',
         ];
 
         $customer = [
             'firstname' => 'John',
             'lastname' => 'Doe',
             'email' => 'john.doe@example.com',
-            'id_customer' => 1
+            'id_customer' => 1,
         ];
 
         // First, set up getAdminEmails to return valid admin emails
         $adminEmails = [
-            ['email' => 'admin@example.com', 'name' => 'Admin User']
+            ['email' => 'admin@example.com', 'name' => 'Admin User'],
         ];
 
         \Db::shouldReceive('getInstance')
@@ -306,7 +306,7 @@ class NotificationServiceTest extends MockeryTestCase
 
         \PrestaShopLogger::shouldReceive('addLog')
             ->once()
-            ->with(Mockery::pattern('/KYC admin notification error:/'), 3, null, 'Pskyc');
+            ->with(\Mockery::pattern('/KYC admin notification error:/'), 3, null, 'Pskyc');
 
         $result = $this->service->sendAdminNotification($verification, $customer);
 
@@ -317,14 +317,14 @@ class NotificationServiceTest extends MockeryTestCase
     {
         $verification = [
             'id_kyc_verification' => 1,
-            'date_expiry' => '2025-12-31 23:59:59'
+            'date_expiry' => '2025-12-31 23:59:59',
         ];
 
         $customer = [
             'firstname' => 'John',
             'lastname' => 'Doe',
             'email' => 'john.doe@example.com',
-            'id_lang' => 1
+            'id_lang' => 1,
         ];
 
         $this->setupContextExpectations();
@@ -339,14 +339,14 @@ class NotificationServiceTest extends MockeryTestCase
     {
         $verification = [
             'id_kyc_verification' => 1,
-            'date_expiry' => '2025-12-31 23:59:59'
+            'date_expiry' => '2025-12-31 23:59:59',
         ];
 
         $customer = [
             'firstname' => 'John',
             'lastname' => 'Doe',
             'email' => 'john.doe@example.com',
-            'id_lang' => 1
+            'id_lang' => 1,
         ];
 
         // Make Configuration throw exception
@@ -356,7 +356,7 @@ class NotificationServiceTest extends MockeryTestCase
 
         \PrestaShopLogger::shouldReceive('addLog')
             ->once()
-            ->with(Mockery::pattern('/KYC expiry warning error:/'), 3, null, 'Pskyc');
+            ->with(\Mockery::pattern('/KYC expiry warning error:/'), 3, null, 'Pskyc');
 
         $result = $this->service->sendExpiryWarning($verification, $customer, 30);
 
@@ -368,7 +368,7 @@ class NotificationServiceTest extends MockeryTestCase
         $recipients = [
             ['email' => 'user1@example.com', 'name' => 'User One'],
             ['email' => 'user2@example.com', 'name' => 'User Two'],
-            ['email' => 'user3@example.com']
+            ['email' => 'user3@example.com'],
         ];
 
         \Mail::shouldReceive('Send')
@@ -391,7 +391,7 @@ class NotificationServiceTest extends MockeryTestCase
     {
         $recipients = [
             ['email' => 'user1@example.com', 'name' => 'User One'],
-            ['email' => 'user2@example.com', 'name' => 'User Two']
+            ['email' => 'user2@example.com', 'name' => 'User Two'],
         ];
 
         \Mail::shouldReceive('Send')
@@ -479,7 +479,7 @@ class NotificationServiceTest extends MockeryTestCase
     {
         $adminEmails = [
             ['email' => 'admin1@example.com', 'name' => 'Admin One'],
-            ['email' => 'admin2@example.com', 'name' => 'Admin Two']
+            ['email' => 'admin2@example.com', 'name' => 'Admin Two'],
         ];
 
         \Db::shouldReceive('getInstance')
@@ -526,7 +526,7 @@ class NotificationServiceTest extends MockeryTestCase
 
         \PrestaShopLogger::shouldReceive('addLog')
             ->once()
-            ->with(Mockery::pattern('/Error getting admin emails:/'), 3, null, 'Pskyc');
+            ->with(\Mockery::pattern('/Error getting admin emails:/'), 3, null, 'Pskyc');
 
         $reflection = new \ReflectionClass($this->service);
         $method = $reflection->getMethod('getAdminEmails');
@@ -553,7 +553,7 @@ class NotificationServiceTest extends MockeryTestCase
             ['test' => 'data'],
             'test@example.com',
             'Test User',
-            1
+            1,
         ]);
 
         $this->assertTrue($result);
@@ -571,7 +571,7 @@ class NotificationServiceTest extends MockeryTestCase
             ['test' => 'data'],
             '',
             'Test User',
-            1
+            1,
         ]);
 
         $this->assertFalse($result);
@@ -585,7 +585,7 @@ class NotificationServiceTest extends MockeryTestCase
 
         \PrestaShopLogger::shouldReceive('addLog')
             ->once()
-            ->with(Mockery::pattern('/Theme email error:/'), 3, null, 'Pskyc');
+            ->with(\Mockery::pattern('/Theme email error:/'), 3, null, 'Pskyc');
 
         $reflection = new \ReflectionClass($this->service);
         $method = $reflection->getMethod('sendThemeEmail');
@@ -597,7 +597,7 @@ class NotificationServiceTest extends MockeryTestCase
             ['test' => 'data'],
             'test@example.com',
             'Test User',
-            1
+            1,
         ]);
 
         $this->assertFalse($result);
@@ -619,7 +619,7 @@ class NotificationServiceTest extends MockeryTestCase
             ['test' => 'data'],
             'test@example.com',
             'Test User',
-            1
+            1,
         ]);
 
         $this->assertTrue($result);
@@ -628,7 +628,7 @@ class NotificationServiceTest extends MockeryTestCase
     public function testSendModernThemeEmailWithoutTemplating()
     {
         $serviceWithoutTemplating = new NotificationService($this->translatorMock);
-        
+
         \Mail::shouldReceive('Send')
             ->once()
             ->andReturn(true);
@@ -643,7 +643,7 @@ class NotificationServiceTest extends MockeryTestCase
             ['test' => 'data'],
             'test@example.com',
             'Test User',
-            1
+            1,
         ]);
 
         $this->assertTrue($result);
@@ -661,7 +661,7 @@ class NotificationServiceTest extends MockeryTestCase
             ['test' => 'data'],
             '',
             'Test User',
-            1
+            1,
         ]);
 
         $this->assertFalse($result);
@@ -672,8 +672,8 @@ class NotificationServiceTest extends MockeryTestCase
      */
     private function setupContextExpectations()
     {
-        $shopMock = Mockery::mock();
-        $linkMock = Mockery::mock();
+        $shopMock = \Mockery::mock();
+        $linkMock = \Mockery::mock();
 
         \Context::shouldReceive('getContext')
             ->andReturnSelf();
@@ -693,7 +693,7 @@ class NotificationServiceTest extends MockeryTestCase
     private function setupAdminEmailsExpectations()
     {
         $adminEmails = [
-            ['email' => 'admin@example.com', 'name' => 'Admin User']
+            ['email' => 'admin@example.com', 'name' => 'Admin User'],
         ];
 
         \Db::shouldReceive('getInstance')

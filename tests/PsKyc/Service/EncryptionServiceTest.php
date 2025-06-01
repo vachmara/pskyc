@@ -1,7 +1,7 @@
 <?php
+
 namespace Tests\PsKyc\Service;
 
-use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use PrestaShop\Module\Pskyc\Service\EncryptionService;
 
@@ -19,7 +19,7 @@ class EncryptionServiceTest extends MockeryTestCase
     protected function setUp(): void
     {
         // Mock Configuration class using the existing mock proxy system
-        $configMock = Mockery::mock();
+        $configMock = \Mockery::mock();
         $configMock->shouldReceive('get')
             ->with('PSKYC_ENCRYPTION_KEY')
             ->andReturn($this->testKey)
@@ -28,7 +28,7 @@ class EncryptionServiceTest extends MockeryTestCase
         \Configuration::setStaticExpectations($configMock);
 
         $this->encryptionService = new EncryptionService();
-        
+
         // Generate a proper 16-byte IV
         $this->testIV = base64_encode(str_repeat('a', 16)); // 16 bytes of 'a'
     }
@@ -36,17 +36,17 @@ class EncryptionServiceTest extends MockeryTestCase
     public function testGenerateIV()
     {
         $iv = $this->encryptionService->generateIV();
-        
+
         $this->assertIsString($iv);
         $this->assertNotEmpty($iv);
-        
+
         // Check that it's valid base64
         $decoded = base64_decode($iv, true);
         $this->assertNotFalse($decoded);
-        
+
         // Check that decoded IV has correct length (16 bytes)
         $this->assertEquals(16, strlen($decoded));
-        
+
         // Test that multiple calls generate different IVs
         $iv2 = $this->encryptionService->generateIV();
         $this->assertNotEquals($iv, $iv2);
@@ -55,9 +55,9 @@ class EncryptionServiceTest extends MockeryTestCase
     public function testEncryptWithValidData()
     {
         $data = 'Hello, World!';
-        
+
         $encrypted = $this->encryptionService->encrypt($data, $this->testIV);
-        
+
         $this->assertIsString($encrypted);
         $this->assertNotEmpty($encrypted);
         $this->assertNotEquals($data, $encrypted);
@@ -66,13 +66,13 @@ class EncryptionServiceTest extends MockeryTestCase
     public function testDecryptWithValidData()
     {
         $data = 'Hello, World!';
-        
+
         // First encrypt the data
         $encrypted = $this->encryptionService->encrypt($data, $this->testIV);
-        
+
         // Then decrypt it
         $decrypted = $this->encryptionService->decrypt($encrypted, $this->testIV);
-        
+
         $this->assertEquals($data, $decrypted);
     }
 
@@ -90,8 +90,8 @@ class EncryptionServiceTest extends MockeryTestCase
             $iv = $this->encryptionService->generateIV();
             $encrypted = $this->encryptionService->encrypt($data, $iv);
             $decrypted = $this->encryptionService->decrypt($encrypted, $iv);
-            
-            $this->assertEquals($data, $decrypted, "Failed for data: " . substr($data, 0, 50));
+
+            $this->assertEquals($data, $decrypted, 'Failed for data: ' . substr($data, 0, 50));
         }
     }
 
@@ -99,10 +99,10 @@ class EncryptionServiceTest extends MockeryTestCase
     {
         $data = 'test data';
         $invalidIV = base64_encode('short'); // Too short IV
-        
+
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Invalid IV length. Expected 16 bytes.');
-        
+
         $this->encryptionService->encrypt($data, $invalidIV);
     }
 
@@ -110,10 +110,10 @@ class EncryptionServiceTest extends MockeryTestCase
     {
         $encryptedData = 'some encrypted data';
         $invalidIV = base64_encode('short'); // Too short IV
-        
+
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Invalid IV length. Expected 16 bytes.');
-        
+
         $this->encryptionService->decrypt($encryptedData, $invalidIV);
     }
 
@@ -121,17 +121,17 @@ class EncryptionServiceTest extends MockeryTestCase
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Encrypted data cannot be empty');
-        
+
         $this->encryptionService->decrypt('', $this->testIV);
     }
 
     public function testDecryptWithInvalidData()
     {
         $invalidEncryptedData = 'invalid base64 data that cannot be decrypted';
-        
+
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Failed to decrypt data');
-        
+
         $this->encryptionService->decrypt($invalidEncryptedData, $this->testIV);
     }
 
@@ -140,21 +140,21 @@ class EncryptionServiceTest extends MockeryTestCase
         $sourceFile = tempnam(sys_get_temp_dir(), 'test_source_');
         $destFile = tempnam(sys_get_temp_dir(), 'test_dest_');
         $testData = 'This is test file content';
-        
+
         file_put_contents($sourceFile, $testData);
-        
+
         $result = $this->encryptionService->encryptFile($sourceFile, $destFile);
-        
+
         $this->assertIsArray($result);
         $this->assertArrayHasKey('iv', $result);
         $this->assertArrayHasKey('sha256', $result);
         $this->assertEquals(hash('sha256', $testData), $result['sha256']);
         $this->assertTrue(file_exists($destFile));
-        
+
         // Verify the encrypted file content is different from original
         $encryptedContent = file_get_contents($destFile);
         $this->assertNotEquals($testData, $encryptedContent);
-        
+
         // Clean up
         unlink($sourceFile);
         unlink($destFile);
@@ -164,12 +164,12 @@ class EncryptionServiceTest extends MockeryTestCase
     {
         $nonExistentFile = '/path/that/does/not/exist.txt';
         $destFile = tempnam(sys_get_temp_dir(), 'test_dest_');
-        
+
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Source file does not exist');
-        
+
         $this->encryptionService->encryptFile($nonExistentFile, $destFile);
-        
+
         unlink($destFile);
     }
 
@@ -179,18 +179,18 @@ class EncryptionServiceTest extends MockeryTestCase
         // we'll use a simpler approach that still tests the error path
         $sourceFile = tempnam(sys_get_temp_dir(), 'test_source_');
         $destFile = tempnam(sys_get_temp_dir(), 'test_dest_');
-        
+
         // Create a file, then delete it but reference it to test the "file exists but can't read" path
         file_put_contents($sourceFile, 'test content');
-        
+
         // We'll create a mock that simulates the file_get_contents failure
-        $partialMock = Mockery::mock(EncryptionService::class)->makePartial();
+        $partialMock = \Mockery::mock(EncryptionService::class)->makePartial();
         $partialMock->shouldAllowMockingProtectedMethods();
-        
+
         // Since we can't easily mock file_get_contents directly, we'll simulate the scenario
         // by testing what happens when the file is locked by another process
         $this->markTestSkipped('File read failure simulation is platform-dependent and complex to test reliably');
-        
+
         // Clean up
         if (file_exists($sourceFile)) {
             unlink($sourceFile);
@@ -205,17 +205,17 @@ class EncryptionServiceTest extends MockeryTestCase
         $sourceFile = tempnam(sys_get_temp_dir(), 'test_source_');
         $encryptedFile = tempnam(sys_get_temp_dir(), 'test_encrypted_');
         $testData = 'This is test file content for decryption';
-        
+
         file_put_contents($sourceFile, $testData);
-        
+
         // First encrypt the file
         $encryptResult = $this->encryptionService->encryptFile($sourceFile, $encryptedFile);
-        
+
         // Then decrypt it
         $decryptedData = $this->encryptionService->decryptFile($encryptedFile, $encryptResult['iv']);
-        
+
         $this->assertEquals($testData, $decryptedData);
-        
+
         // Clean up
         unlink($sourceFile);
         unlink($encryptedFile);
@@ -224,10 +224,10 @@ class EncryptionServiceTest extends MockeryTestCase
     public function testDecryptFileNotExists()
     {
         $nonExistentFile = '/path/that/does/not/exist.txt';
-        
+
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Encrypted file does not exist');
-        
+
         $this->encryptionService->decryptFile($nonExistentFile, $this->testIV);
     }
 
@@ -235,13 +235,13 @@ class EncryptionServiceTest extends MockeryTestCase
     {
         // Similar to encrypt file, this is platform-dependent and complex to simulate reliably
         $encryptedFile = tempnam(sys_get_temp_dir(), 'test_encrypted_');
-        
+
         file_put_contents($encryptedFile, 'encrypted content');
-        
+
         // Since reliable file read failure simulation is complex across platforms,
         // we'll skip this test and focus on the other coverage
         $this->markTestSkipped('File read failure simulation is platform-dependent and complex to test reliably');
-        
+
         if (file_exists($encryptedFile)) {
             unlink($encryptedFile);
         }
@@ -251,9 +251,9 @@ class EncryptionServiceTest extends MockeryTestCase
     {
         $data = 'Test data for integrity check';
         $expectedHash = hash('sha256', $data);
-        
+
         $result = $this->encryptionService->verifyIntegrity($data, $expectedHash);
-        
+
         $this->assertTrue($result);
     }
 
@@ -261,9 +261,9 @@ class EncryptionServiceTest extends MockeryTestCase
     {
         $data = 'Test data for integrity check';
         $wrongHash = hash('sha256', 'Different data');
-        
+
         $result = $this->encryptionService->verifyIntegrity($data, $wrongHash);
-        
+
         $this->assertFalse($result);
     }
 
@@ -271,11 +271,11 @@ class EncryptionServiceTest extends MockeryTestCase
     {
         $testFile = tempnam(sys_get_temp_dir(), 'test_secure_delete_');
         file_put_contents($testFile, 'This file will be securely deleted');
-        
+
         $this->assertTrue(file_exists($testFile));
-        
+
         $result = $this->encryptionService->secureDelete($testFile);
-        
+
         $this->assertTrue($result);
         $this->assertFalse(file_exists($testFile));
     }
@@ -283,9 +283,9 @@ class EncryptionServiceTest extends MockeryTestCase
     public function testSecureDeleteFileNotExists()
     {
         $nonExistentFile = '/path/that/does/not/exist.txt';
-        
+
         $result = $this->encryptionService->secureDelete($nonExistentFile);
-        
+
         $this->assertTrue($result); // Should return true for non-existent files
     }
 
@@ -294,7 +294,7 @@ class EncryptionServiceTest extends MockeryTestCase
         // Create a file and immediately make it inaccessible by changing permissions
         $testFile = tempnam(sys_get_temp_dir(), 'test_secure_delete_');
         file_put_contents($testFile, 'test content');
-        
+
         // On Windows, we can't easily test filesize() failure, so we'll create a different scenario
         // We'll test with a file that exists but filesize might fail on
         if (PHP_OS_FAMILY === 'Windows') {
@@ -303,11 +303,11 @@ class EncryptionServiceTest extends MockeryTestCase
         } else {
             // On Unix systems, we could chmod the file
             chmod($testFile, 0000);
-            
+
             $result = $this->encryptionService->secureDelete($testFile);
-            
+
             $this->assertFalse($result);
-            
+
             // Restore permissions and clean up
             chmod($testFile, 0644);
             unlink($testFile);
@@ -317,24 +317,24 @@ class EncryptionServiceTest extends MockeryTestCase
     public function testGetEncryptionKeyGeneratesNewKeyWhenEmpty()
     {
         // Reset Configuration mock to return empty key first, then handle updateValue
-        $configMock = Mockery::mock();
+        $configMock = \Mockery::mock();
         $configMock->shouldReceive('get')
             ->with('PSKYC_ENCRYPTION_KEY')
             ->once()
             ->andReturn('');
         $configMock->shouldReceive('updateValue')
-            ->with('PSKYC_ENCRYPTION_KEY', Mockery::type('string'))
+            ->with('PSKYC_ENCRYPTION_KEY', \Mockery::type('string'))
             ->once()
             ->andReturn(true);
 
         \Configuration::setStaticExpectations($configMock);
 
         $encryptionService = new EncryptionService();
-        
+
         // This should trigger key generation
         $data = 'test';
         $iv = $encryptionService->generateIV();
-        
+
         // Should not throw exception and should work
         $encrypted = $encryptionService->encrypt($data, $iv);
         $this->assertIsString($encrypted);
@@ -345,10 +345,10 @@ class EncryptionServiceTest extends MockeryTestCase
         // The setUp already mocks Configuration to return a test key
         $data = 'test data';
         $iv = $this->encryptionService->generateIV();
-        
+
         $encrypted = $this->encryptionService->encrypt($data, $iv);
         $decrypted = $this->encryptionService->decrypt($encrypted, $iv);
-        
+
         $this->assertEquals($data, $decrypted);
     }
 
@@ -357,17 +357,17 @@ class EncryptionServiceTest extends MockeryTestCase
         $data = 'Same data, different IVs';
         $iv1 = $this->encryptionService->generateIV();
         $iv2 = $this->encryptionService->generateIV();
-        
+
         $encrypted1 = $this->encryptionService->encrypt($data, $iv1);
         $encrypted2 = $this->encryptionService->encrypt($data, $iv2);
-        
+
         // Same data with different IVs should produce different ciphertext
         $this->assertNotEquals($encrypted1, $encrypted2);
-        
+
         // But both should decrypt to the same original data
         $decrypted1 = $this->encryptionService->decrypt($encrypted1, $iv1);
         $decrypted2 = $this->encryptionService->decrypt($encrypted2, $iv2);
-        
+
         $this->assertEquals($data, $decrypted1);
         $this->assertEquals($data, $decrypted2);
     }
@@ -377,13 +377,13 @@ class EncryptionServiceTest extends MockeryTestCase
         $data = 'test data';
         $iv1 = $this->encryptionService->generateIV();
         $iv2 = $this->encryptionService->generateIV();
-        
+
         $encrypted = $this->encryptionService->encrypt($data, $iv1);
-        
+
         // Trying to decrypt with wrong IV should fail
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Failed to decrypt data');
-        
+
         $this->encryptionService->decrypt($encrypted, $iv2);
     }
 
@@ -391,20 +391,20 @@ class EncryptionServiceTest extends MockeryTestCase
     {
         $sourceFile = tempnam(sys_get_temp_dir(), 'test_large_');
         $encryptedFile = tempnam(sys_get_temp_dir(), 'test_large_encrypted_');
-        
+
         // Create a larger test file (100KB to avoid memory issues)
         $largeData = str_repeat('A', 100 * 1024);
         file_put_contents($sourceFile, $largeData);
-        
+
         $encryptResult = $this->encryptionService->encryptFile($sourceFile, $encryptedFile);
         $decryptedData = $this->encryptionService->decryptFile($encryptedFile, $encryptResult['iv']);
-        
+
         $this->assertEquals($largeData, $decryptedData);
         $this->assertEquals(hash('sha256', $largeData), $encryptResult['sha256']);
-        
+
         // Verify integrity
         $this->assertTrue($this->encryptionService->verifyIntegrity($decryptedData, $encryptResult['sha256']));
-        
+
         // Clean up
         unlink($sourceFile);
         unlink($encryptedFile);
@@ -413,14 +413,14 @@ class EncryptionServiceTest extends MockeryTestCase
     public function testBinaryDataEncryptionDecryption()
     {
         $binaryData = '';
-        for ($i = 0; $i < 256; $i++) {
+        for ($i = 0; $i < 256; ++$i) {
             $binaryData .= chr($i);
         }
-        
+
         $iv = $this->encryptionService->generateIV();
         $encrypted = $this->encryptionService->encrypt($binaryData, $iv);
         $decrypted = $this->encryptionService->decrypt($encrypted, $iv);
-        
+
         $this->assertEquals($binaryData, $decrypted);
         $this->assertEquals(strlen($binaryData), strlen($decrypted));
     }
@@ -453,14 +453,14 @@ class EncryptionServiceTest extends MockeryTestCase
         // Test that the encryption key is properly retrieved and converted from hex
         $data = 'test data for key verification';
         $iv = $this->encryptionService->generateIV();
-        
+
         // Encrypt some data
         $encrypted = $this->encryptionService->encrypt($data, $iv);
-        
+
         // Create a new service instance to verify key consistency
         $newService = new EncryptionService();
         $decrypted = $newService->decrypt($encrypted, $iv);
-        
+
         $this->assertEquals($data, $decrypted);
     }
 
@@ -469,10 +469,10 @@ class EncryptionServiceTest extends MockeryTestCase
         // Test encryption and decryption of empty string specifically
         $data = '';
         $iv = $this->encryptionService->generateIV();
-        
+
         $encrypted = $this->encryptionService->encrypt($data, $iv);
         $decrypted = $this->encryptionService->decrypt($encrypted, $iv);
-        
+
         $this->assertEquals($data, $decrypted);
         $this->assertEquals('', $decrypted);
     }
@@ -481,21 +481,21 @@ class EncryptionServiceTest extends MockeryTestCase
     {
         $sourceFile = tempnam(sys_get_temp_dir(), 'test_empty_');
         $destFile = tempnam(sys_get_temp_dir(), 'test_dest_');
-        
+
         // Create an empty file
         file_put_contents($sourceFile, '');
-        
+
         $result = $this->encryptionService->encryptFile($sourceFile, $destFile);
-        
+
         $this->assertIsArray($result);
         $this->assertArrayHasKey('iv', $result);
         $this->assertArrayHasKey('sha256', $result);
         $this->assertEquals(hash('sha256', ''), $result['sha256']);
-        
+
         // Verify we can decrypt the empty file
         $decrypted = $this->encryptionService->decryptFile($destFile, $result['iv']);
         $this->assertEquals('', $decrypted);
-        
+
         // Clean up
         unlink($sourceFile);
         unlink($destFile);
@@ -505,10 +505,10 @@ class EncryptionServiceTest extends MockeryTestCase
     {
         $data = '';
         $hash = hash('sha256', $data);
-        
+
         $result = $this->encryptionService->verifyIntegrity($data, $hash);
         $this->assertTrue($result);
-        
+
         // Test with wrong hash for empty data
         $wrongHash = hash('sha256', 'not empty');
         $result = $this->encryptionService->verifyIntegrity($data, $wrongHash);
@@ -518,13 +518,13 @@ class EncryptionServiceTest extends MockeryTestCase
     public function testSecureDeleteWithZeroByteFile()
     {
         $testFile = tempnam(sys_get_temp_dir(), 'test_zero_byte_');
-        
+
         // Create a zero-byte file
         file_put_contents($testFile, '');
         $this->assertEquals(0, filesize($testFile));
-        
+
         $result = $this->encryptionService->secureDelete($testFile);
-        
+
         // Zero-byte files should be deleted successfully
         // Note: openssl_random_pseudo_bytes(0) causes an error, but the file should still be deleted
         $this->assertTrue($result);
@@ -535,17 +535,17 @@ class EncryptionServiceTest extends MockeryTestCase
     {
         // Test that constants are accessible and have expected values
         // We can't directly access private constants, but we can verify their effects
-        
+
         // Test that IV length is enforced (16 bytes)
         $validIV = base64_encode(str_repeat('a', 16));
         $invalidIV = base64_encode(str_repeat('a', 15)); // 15 bytes
-        
+
         $data = 'test';
-        
+
         // Valid IV should work
         $encrypted = $this->encryptionService->encrypt($data, $validIV);
         $this->assertIsString($encrypted);
-        
+
         // Invalid IV should fail
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Invalid IV length. Expected 16 bytes.');
@@ -555,11 +555,11 @@ class EncryptionServiceTest extends MockeryTestCase
     public function testGenerateIVProducesValidBase64()
     {
         $iv = $this->encryptionService->generateIV();
-        
+
         // Test that it's valid base64
         $decoded = base64_decode($iv, true);
         $this->assertNotFalse($decoded, 'Generated IV should be valid base64');
-        
+
         // Test that re-encoding produces the same result
         $reencoded = base64_encode($decoded);
         $this->assertEquals($iv, $reencoded, 'IV should be properly base64 encoded');
@@ -569,14 +569,14 @@ class EncryptionServiceTest extends MockeryTestCase
     {
         $ivs = [];
         $iterations = 10;
-        
+
         // Generate multiple IVs and ensure they're all unique
-        for ($i = 0; $i < $iterations; $i++) {
+        for ($i = 0; $i < $iterations; ++$i) {
             $iv = $this->encryptionService->generateIV();
             $this->assertNotContains($iv, $ivs, 'Each generated IV should be unique');
             $ivs[] = $iv;
         }
-        
+
         $this->assertCount($iterations, array_unique($ivs), 'All IVs should be unique');
     }
 
@@ -592,7 +592,7 @@ class EncryptionServiceTest extends MockeryTestCase
                 rmdir($file);
             }
         }
-        
+
         parent::tearDown();
     }
 }

@@ -1,46 +1,47 @@
 <?php
+
 namespace PrestaShop\Module\Pskyc\Checkout;
 
-use AbstractCheckoutStepCore;
-use Context;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class KycStep
- * 
+ *
  * Simple checkout step that redirects to KYC verification page
  * Only appears when KYC verification is required for cart products
  */
-class KycStep extends AbstractCheckoutStepCore
+class KycStep extends \AbstractCheckoutStepCore
 {
     /**
      * @var string
      */
     private $kycUrl = '';
 
-    public function __construct(Context $context, TranslatorInterface $translator)
+    public function __construct(\Context $context, TranslatorInterface $translator)
     {
         parent::__construct($context, $translator);
-        
+
         $this->setTitle($this->getTranslator()->trans('Identity Verification Required', [], 'Modules.Pskyc.Shop'));
         $this->setTemplate('module:pskyc/views/templates/front/checkout/kyc-step.tpl');
     }
 
     /**
      * Set KYC URL
-     * 
+     *
      * @param string $url
+     *
      * @return $this
      */
     public function setKycUrl($url)
     {
         $this->kycUrl = $url;
+
         return $this;
     }
 
     /**
      * Get KYC URL
-     * 
+     *
      * @return string
      */
     public function getKycUrl()
@@ -50,8 +51,9 @@ class KycStep extends AbstractCheckoutStepCore
 
     /**
      * Handle step request - this step doesn't process forms
-     * 
+     *
      * @param array $requestParams
+     *
      * @return $this
      */
     public function handleRequest(array $requestParams = [])
@@ -62,8 +64,9 @@ class KycStep extends AbstractCheckoutStepCore
 
     /**
      * Render the step
-     * 
+     *
      * @param array $extraParams
+     *
      * @return string
      */
     public function render(array $extraParams = [])
@@ -81,7 +84,7 @@ class KycStep extends AbstractCheckoutStepCore
 
     /**
      * Get step identifier
-     * 
+     *
      * @return string
      */
     public function getIdentifier()

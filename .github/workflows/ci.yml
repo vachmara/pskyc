@@ -1,63 +1,116 @@
 name: CI Tests
 
 on:
-  # push:
-  #   branches: [ main, develop ]
-  # pull_request:
-  #   branches: [ main, develop ]
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
   workflow_dispatch:
+
 jobs:
   test:
     runs-on: ubuntu-latest
     
     strategy:
       matrix:
-        php-version: ['7.4', '8.0', '8.1', '8.2']
+        include:
+          # PrestaShop 8.0 compatibility
+          - php-version: '8.1'
+            prestashop-version: '8.0'
+          - php-version: '8.1'
+            prestashop-version: '8.1'
+          - php-version: '8.2'
+            prestashop-version: '8.1'
+          - php-version: '8.3'
+            prestashop-version: '8.1'
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ matrix.php-version }}
-        extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, dom, filter, gd, iconv, json, mbstring, pdo
+        extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, dom, filter, gd, json, pdo, zip, curl
         coverage: xdebug
+        tools: composer:v2
+    
+    - name: Validate composer.json
+      run: composer validate --strict
     
     - name: Cache Composer packages
-      id: composer-cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: vendor
-        key: ${{ runner.os }}-php-${{ matrix.php-version }}-${{ hashFiles('**/composer.lock') }}
+        key: ${{ runner.os }}-php-${{ matrix.php-version }}-ps-${{ matrix.prestashop-version }}-${{ hashFiles('**/composer.lock') }}
         restore-keys: |
           ${{ runner.os }}-php-${{ matrix.php-version }}-
     
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress
     
-    - name: Run unit tests
-      run: vendor/bin/phpunit --testsuite Unit
+    - name: Check PHP syntax
+      run: find . -name "*.php" -not -path "./vendor/*" -exec php -l {} \;
     
-    - name: Run integration tests
-      run: vendor/bin/phpunit --testsuite Integration
+    - name: Run PHPUnit tests
+      run: |
+        mkdir -p coverage
+        vendor/bin/phpunit --configuration tests/phpunit.xml --coverage-clover coverage/clover.xml
     
-    - name: Generate coverage report
+    - name: Run PHPStan analysis
+      if: matrix.php-version == '8.1' && matrix.prestashop-version == '8.1'
+      run: |
+        chmod +x tests/phpstan.sh
+        ./tests/phpstan.sh ${{ matrix.prestashop-version }}
+    
+    - name: Check coding standards
       if: matrix.php-version == '8.1'
-      run: vendor/bin/phpunit --coverage-clover coverage/clover.xml
+      run: vendor/bin/phpcs
+    
+    - name: Run PrestaShop module validator
+      if: matrix.php-version == '8.1' && matrix.prestashop-version == '8.1'
+      run: |
+        docker run --rm -v $PWD:/data prestashop/module-validator:latest \
+          php /validator/vendor/bin/prestashop-module-validator \
+          --report=json /data
     
     - name: Upload coverage to Codecov
-      if: matrix.php-version == '8.1'
-      uses: codecov/codecov-action@v3
+      if: matrix.php-version == '8.1' && matrix.prestashop-version == '8.1'
+      uses: codecov/codecov-action@v4
       with:
         file: coverage/clover.xml
         flags: unittests
         name: codecov-umbrella
+        token: ${{ secrets.CODECOV_TOKEN }}
+
+  build-package:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
     
-    - name: Run PHPStan
-      if: matrix.php-version == '8.1'
-      run: vendor/bin/phpstan analyse src/ --level=5
+    steps:
+    - uses: actions/checkout@v4
     
-    - name: Check coding standards
-      if: matrix.php-version == '8.1'
-      run: vendor/bin/phpcs --standard=PSR12 src/
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'
+        tools: composer:v2
+    
+    - name: Install dependencies (production only)
+      run: composer install --no-dev --optimize-autoloader
+    
+    - name: Create release package
+      run: |
+        mkdir -p dist
+        zip -r "dist/pskyc-${GITHUB_SHA::7}.zip" . \
+          -x "*.git*" "node_modules/*" "tests/*" "coverage/*" "*.md" "dist/*" \
+             "composer.json" "composer.lock" "phpunit.xml*" "phpcs.xml*" \
+             ".github/*" ".gitignore" "*.sh"
+    
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: pskyc-build-${{ github.sha }}
+        path: dist/
+        retention-days: 30

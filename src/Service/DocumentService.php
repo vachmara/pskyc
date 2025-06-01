@@ -1,15 +1,13 @@
 <?php
+
 namespace PrestaShop\Module\Pskyc\Service;
 
 use PrestaShop\Module\Pskyc\Repository\DocumentRepository;
 use PrestaShop\Module\Pskyc\Repository\VerificationRepository;
-use PrestaShop\Module\Pskyc\Service\EncryptionService;
 
-use PrestaShopLogger;
-use Configuration;
 /**
  * Class DocumentService
- * 
+ *
  * Business logic service for handling KYC document operations
  * Manages document upload, encryption, validation, and retrieval
  */
@@ -41,12 +39,12 @@ class DocumentService
     private const ALLOWED_MIME_TYPES = [
         'image/jpeg',
         'image/png',
-        'application/pdf'
+        'application/pdf',
     ];
 
     /**
      * DocumentService constructor
-     * 
+     *
      * @param DocumentRepository $documentRepository Repository for document data operations
      * @param VerificationRepository $verificationRepository Repository for verification data operations
      * @param EncryptionService $encryptionService Service for file encryption/decryption
@@ -54,7 +52,7 @@ class DocumentService
     public function __construct(
         DocumentRepository $documentRepository,
         VerificationRepository $verificationRepository,
-        EncryptionService $encryptionService
+        EncryptionService $encryptionService,
     ) {
         $this->documentRepository = $documentRepository;
         $this->encryptionService = $encryptionService;
@@ -63,13 +61,14 @@ class DocumentService
 
     /**
      * Upload and process a document
-     * 
+     *
      * Validates, encrypts, and stores a document file with metadata
-     * 
+     *
      * @param int $verificationId The verification ID to associate the document with
      * @param array $fileData Uploaded file data from $_FILES
      * @param string $documentType Type of document (e.g., 'passport', 'utility_bill')
      * @param string|null $side Side of the document ('front' or 'back'), or null for single-sided documents
+     *
      * @return array Result array with success status and document ID or error message
      */
     public function uploadDocument(int $verificationId, array $fileData, string $documentType, ?string $side = null): array
@@ -80,7 +79,7 @@ class DocumentService
             if (!$validationResult['valid']) {
                 return [
                     'success' => false,
-                    'message' => $validationResult['message']
+                    'message' => $validationResult['message'],
                 ];
             }
 
@@ -89,7 +88,7 @@ class DocumentService
             if (!$verification) {
                 return [
                     'success' => false,
-                    'message' => 'Invalid verification ID'
+                    'message' => 'Invalid verification ID',
                 ];
             }
 
@@ -99,11 +98,10 @@ class DocumentService
                 if (!$validationResult['valid']) {
                     return [
                         'success' => false,
-                        'message' => $validationResult['message']
+                        'message' => $validationResult['message'],
                     ];
                 }
             }
-
 
             // Encrypt and save file (use a temp name, will rename after DB insert)
             $extension = $this->getFileExtension($fileData['name']);
@@ -123,7 +121,7 @@ class DocumentService
                 'sha256' => $encryptionResult['sha256'],
                 'iv' => $encryptionResult['iv'],
                 'encrypted' => 1,
-                'expires_at' => $this->calculateExpiryDate()
+                'expires_at' => $this->calculateExpiryDate(),
             ];
 
             $documentId = $this->documentRepository->create($documentData);
@@ -143,25 +141,26 @@ class DocumentService
                 'success' => true,
                 'document_id' => $documentId,
                 'filename' => $storedFilename,
-                'side' => $side
+                'side' => $side,
             ];
-
         } catch (\Exception $e) {
-            PrestaShopLogger::addLog('Document upload error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            \PrestaShopLogger::addLog('Document upload error: ' . $e->getMessage(), 3, null, 'Pskyc');
+
             return [
                 'success' => false,
-                'message' => 'Failed to upload document'
+                'message' => 'Failed to upload document',
             ];
         }
     }
 
     /**
      * Retrieve and decrypt a document
-     * 
+     *
      * Fetches a document from storage, decrypts it, and returns the content
-     * 
+     *
      * @param int $documentId The document ID to retrieve
      * @param bool $verifyIntegrity Whether to verify file integrity (default: true)
+     *
      * @return array Result array with success status and file data or error message
      */
     public function getDocument(int $documentId, bool $verifyIntegrity = true): array
@@ -171,7 +170,7 @@ class DocumentService
             if (!$document) {
                 return [
                     'success' => false,
-                    'message' => 'Document not found'
+                    'message' => 'Document not found',
                 ];
             }
 
@@ -179,7 +178,7 @@ class DocumentService
             if (!file_exists($filePath)) {
                 return [
                     'success' => false,
-                    'message' => 'Document file not found on disk'
+                    'message' => 'Document file not found on disk',
                 ];
             }
 
@@ -188,7 +187,7 @@ class DocumentService
             if ($verifyIntegrity && !$this->encryptionService->verifyIntegrity($decryptedData, $document['sha256'])) {
                 return [
                     'success' => false,
-                    'message' => 'Document integrity verification failed'
+                    'message' => 'Document integrity verification failed',
                 ];
             }
 
@@ -197,24 +196,25 @@ class DocumentService
                 'data' => $decryptedData,
                 'filename' => $document['filename'],
                 'mime' => $document['mime'],
-                'size' => $document['filesize']
+                'size' => $document['filesize'],
             ];
-
         } catch (\Exception $e) {
-            PrestaShopLogger::addLog('Document retrieval error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            \PrestaShopLogger::addLog('Document retrieval error: ' . $e->getMessage(), 3, null, 'Pskyc');
+
             return [
                 'success' => false,
-                'message' => 'Failed to retrieve document'
+                'message' => 'Failed to retrieve document',
             ];
         }
     }
 
     /**
      * Delete a document and its file
-     * 
+     *
      * Removes the document record and securely deletes the encrypted file
-     * 
+     *
      * @param int $documentId The document ID to delete
+     *
      * @return bool True if deletion was successful, false otherwise
      */
     public function deleteDocument(int $documentId): bool
@@ -226,28 +226,28 @@ class DocumentService
             }
 
             $filePath = $this->getUploadDirectory() . '/' . $this->generateStoredFilename($document);
-            
+
             // Delete from database first
             $dbDeleted = $this->documentRepository->delete($documentId);
-            
+
             // Then securely delete the file
             if (file_exists($filePath)) {
                 $this->encryptionService->secureDelete($filePath);
             }
 
             return $dbDeleted;
-
         } catch (\Exception $e) {
-            PrestaShopLogger::addLog('Document deletion error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            \PrestaShopLogger::addLog('Document deletion error: ' . $e->getMessage(), 3, null, 'Pskyc');
+
             return false;
         }
     }
 
     /**
      * Clean up expired documents
-     * 
+     *
      * Finds and deletes documents that have passed their expiration date
-     * 
+     *
      * @return int Number of documents deleted
      */
     public function cleanupExpiredDocuments(): int
@@ -258,24 +258,25 @@ class DocumentService
 
             foreach ($expiredDocuments as $document) {
                 if ($this->deleteDocument($document['id_kyc_document'])) {
-                    $deletedCount++;
+                    ++$deletedCount;
                 }
             }
 
             return $deletedCount;
-
         } catch (\Exception $e) {
-            PrestaShopLogger::addLog('Expired document cleanup error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            \PrestaShopLogger::addLog('Expired document cleanup error: ' . $e->getMessage(), 3, null, 'Pskyc');
+
             return 0;
         }
     }
 
     /**
      * Validate uploaded file
-     * 
+     *
      * Checks file size, type, and upload errors
-     * 
+     *
      * @param array $fileData Uploaded file data from $_FILES
+     *
      * @return array Validation result with 'valid' boolean and 'message' string
      */
     private function validateUploadedFile(array $fileData): array
@@ -284,7 +285,7 @@ class DocumentService
         if ($fileData['error'] !== UPLOAD_ERR_OK) {
             return [
                 'valid' => false,
-                'message' => 'File upload failed'
+                'message' => 'File upload failed',
             ];
         }
 
@@ -292,7 +293,7 @@ class DocumentService
         if ($fileData['size'] > self::MAX_FILE_SIZE) {
             return [
                 'valid' => false,
-                'message' => 'File size exceeds 10MB limit'
+                'message' => 'File size exceeds 10MB limit',
             ];
         }
 
@@ -301,7 +302,7 @@ class DocumentService
         if (!in_array($mimeType, self::ALLOWED_MIME_TYPES)) {
             return [
                 'valid' => false,
-                'message' => 'File type not allowed. Only JPG, PNG, and PDF files are accepted'
+                'message' => 'File type not allowed. Only JPG, PNG, and PDF files are accepted',
             ];
         }
 
@@ -310,10 +311,11 @@ class DocumentService
 
     /**
      * Get file MIME type
-     * 
+     *
      * Determines the MIME type of a file using finfo
-     * 
+     *
      * @param string $filePath Path to the file
+     *
      * @return string The MIME type
      */
     protected function getMimeType(string $filePath): string
@@ -321,13 +323,15 @@ class DocumentService
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $mimeType = finfo_file($finfo, $filePath);
         finfo_close($finfo);
+
         return $mimeType ?: 'application/octet-stream';
     }
 
     /**
      * Get file extension from filename
-     * 
+     *
      * @param string $filename The filename
+     *
      * @return string The file extension (without dot)
      */
     protected function getFileExtension(string $filename): string
@@ -337,9 +341,9 @@ class DocumentService
 
     /**
      * Get upload directory path
-     * 
+     *
      * Returns the directory where encrypted documents are stored
-     * 
+     *
      * @return string The upload directory path
      */
     protected function getUploadDirectory(): string
@@ -349,10 +353,11 @@ class DocumentService
 
     /**
      * Generate stored filename
-     * 
+     *
      * Creates the filename used to store the document on disk
-     * 
+     *
      * @param array $document Document record from database
+     *
      * @return string The generated filename
      */
     protected function generateStoredFilename(array $document): string
@@ -362,21 +367,23 @@ class DocumentService
 
     /**
      * Calculate expiry date for documents
-     * 
+     *
      * Returns the date when documents should be automatically deleted
-     * 
+     *
      * @return string Expiry date in MySQL datetime format
      */
     private function calculateExpiryDate(): string
     {
-        $retentionDays = (int) Configuration::get('PSKYC_RETENTION_DAYS', 365);
+        $retentionDays = (int) \Configuration::get('PSKYC_RETENTION_DAYS', 365);
+
         return date('Y-m-d H:i:s', strtotime('+' . $retentionDays . ' days'));
     }
 
     /**
      * Check if a document type requires both front and back sides
-     * 
+     *
      * @param string $documentType The document type to check
+     *
      * @return bool True if the document requires both sides
      */
     public function requiresBothSides(string $documentType): bool
@@ -385,7 +392,7 @@ class DocumentService
             'drivers_license',
             'national_id',
             'residence_permit',
-            'id_card'
+            'id_card',
         ];
 
         return in_array($documentType, $twoSidedDocuments);
@@ -393,8 +400,9 @@ class DocumentService
 
     /**
      * Get the required sides for a document type
-     * 
+     *
      * @param string $documentType The document type
+     *
      * @return array Array of required sides
      */
     public function getRequiredSides(string $documentType): array
@@ -408,12 +416,13 @@ class DocumentService
 
     /**
      * Validate document side requirement
-     * 
+     *
      * Checks if the required sides are properly specified and not duplicated
-     * 
+     *
      * @param int $verificationId The verification ID
      * @param string $documentType The document type
      * @param string|null $side The side being uploaded
+     *
      * @return array Validation result with 'valid' boolean and 'message' string
      */
     private function validateDocumentSideRequirement(int $verificationId, string $documentType, ?string $side): array
@@ -422,7 +431,7 @@ class DocumentService
         if ($side === null) {
             return [
                 'valid' => false,
-                'message' => 'Document side (front/back) must be specified for ' . $documentType
+                'message' => 'Document side (front/back) must be specified for ' . $documentType,
             ];
         }
 
@@ -430,7 +439,7 @@ class DocumentService
         if (!in_array($side, ['front', 'back'])) {
             return [
                 'valid' => false,
-                'message' => 'Invalid document side. Must be "front" or "back"'
+                'message' => 'Invalid document side. Must be "front" or "back"',
             ];
         }
 
@@ -440,7 +449,7 @@ class DocumentService
             if ($doc['side'] === $side) {
                 return [
                     'valid' => false,
-                    'message' => 'The ' . $side . ' side of this document has already been uploaded'
+                    'message' => 'The ' . $side . ' side of this document has already been uploaded',
                 ];
             }
         }
@@ -450,10 +459,11 @@ class DocumentService
 
     /**
      * Check if verification has complete documents
-     * 
+     *
      * Validates that all required document types and sides have been uploaded
-     * 
+     *
      * @param int $verificationId The verification ID to check
+     *
      * @return array Result with 'complete' boolean and details about missing documents
      */
     public function checkDocumentCompleteness(int $verificationId): array
@@ -478,7 +488,7 @@ class DocumentService
                 // This would need to be configured based on your requirements
                 // For now, we'll check that at least one identity and one address document exists
                 $hasDocument = false;
-                
+
                 foreach ($documentsByType as $type => $docs) {
                     if ($this->getDocumentCategory($type) === $category) {
                         // Check if all required sides are present for two-sided documents
@@ -503,23 +513,24 @@ class DocumentService
             return [
                 'complete' => empty($missing),
                 'missing_categories' => $missing,
-                'documents_by_type' => $documentsByType
+                'documents_by_type' => $documentsByType,
             ];
-
         } catch (\Exception $e) {
-            PrestaShopLogger::addLog('Document completeness check error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            \PrestaShopLogger::addLog('Document completeness check error: ' . $e->getMessage(), 3, null, 'Pskyc');
+
             return [
                 'complete' => false,
                 'missing_categories' => ['unknown'],
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ];
         }
     }
 
     /**
      * Get the category for a document type
-     * 
+     *
      * @param string $documentType The document type
+     *
      * @return string The category ('identity' or 'address')
      */
     private function getDocumentCategory(string $documentType): string
@@ -541,6 +552,7 @@ class DocumentService
      *
      * @param int $documentId The document ID to replace
      * @param array $file The new uploaded file (from $_FILES)
+     *
      * @return array Result array with success status and message
      */
     public function replaceDocument(int $documentId, array $file): array
@@ -562,7 +574,7 @@ class DocumentService
                 'mime' => $this->getMimeType($file['tmp_name']),
                 'date_uploaded' => date('Y-m-d H:i:s'),
                 'status' => 'pending',
-                'admin_note' => null
+                'admin_note' => null,
             ];
             $this->documentRepository->updateDocumentFields($documentId, $updateData);
             // Encrypt and save new file with correct name
@@ -573,21 +585,24 @@ class DocumentService
             $this->documentRepository->updateDocumentFields($documentId, [
                 'sha256' => $encryptionResult['sha256'],
                 'iv' => $encryptionResult['iv'],
-                'encrypted' => 1
+                'encrypted' => 1,
             ]);
             // Also update the parent verification status to pending
             $this->verificationRepository->updateStatus($document['id_kyc_verification'], 'pending');
+
             return ['success' => true];
         } catch (\Exception $e) {
-            PrestaShopLogger::addLog('Document re-upload error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            \PrestaShopLogger::addLog('Document re-upload error: ' . $e->getMessage(), 3, null, 'Pskyc');
+
             return ['success' => false, 'message' => 'Failed to replace document'];
         }
     }
 
     /**
      * Delete all documents for a verification
-     * 
+     *
      * @param int $verificationId The verification ID to delete documents for
+     *
      * @return int Number of documents deleted
      */
     public function deleteByVerificationId(int $verificationId): int
@@ -598,14 +613,14 @@ class DocumentService
 
             foreach ($documents as $doc) {
                 if ($this->deleteDocument($doc['id_kyc_document'])) {
-                    $deletedCount++;
+                    ++$deletedCount;
                 }
             }
 
             return $deletedCount;
-
         } catch (\Exception $e) {
-            PrestaShopLogger::addLog('Document deletion by verification error: ' . $e->getMessage(), 3, null, 'Pskyc');
+            \PrestaShopLogger::addLog('Document deletion by verification error: ' . $e->getMessage(), 3, null, 'Pskyc');
+
             return 0;
         }
     }

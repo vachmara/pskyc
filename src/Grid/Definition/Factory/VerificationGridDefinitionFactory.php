@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MIT License
  * Copyright (c) 2025 Valentin Chmara
@@ -17,8 +18,8 @@ use PrestaShop\PrestaShop\Core\Grid\Definition\Factory\AbstractGridDefinitionFac
 use PrestaShop\PrestaShop\Core\Grid\Filter\Filter;
 use PrestaShop\PrestaShop\Core\Grid\Filter\FilterCollection;
 use PrestaShopBundle\Form\Admin\Type\SearchAndResetType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class VerificationGridDefinitionFactory extends AbstractGridDefinitionFactory
 {
@@ -178,7 +179,7 @@ class VerificationGridDefinitionFactory extends AbstractGridDefinitionFactory
 
     /**
      * Get row actions for the grid
-     * 
+     *
      * @return RowActionCollection
      */
     private function getRowActions(): RowActionCollection

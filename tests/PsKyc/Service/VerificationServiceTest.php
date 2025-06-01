@@ -1,17 +1,15 @@
 <?php
+
 namespace Tests\PsKyc\Service;
 
-use PrestaShop\Module\Pskyc\Service\VerificationService;
-use PrestaShop\Module\Pskyc\Repository\VerificationRepository;
+use Mockery\Adapter\Phpunit\MockeryTestCase;
+use PrestaShop\Module\Pskyc\Repository\CustomerRepository;
 use PrestaShop\Module\Pskyc\Repository\DocumentRepository;
 use PrestaShop\Module\Pskyc\Repository\LogRepository;
-use PrestaShop\Module\Pskyc\Repository\CustomerRepository;
+use PrestaShop\Module\Pskyc\Repository\VerificationRepository;
 use PrestaShop\Module\Pskyc\Service\DocumentService;
 use PrestaShop\Module\Pskyc\Service\NotificationService;
-use Mockery;
-use Mockery\Adapter\Phpunit\MockeryTestCase;
-use Configuration;
-use PrestaShopLogger;
+use PrestaShop\Module\Pskyc\Service\VerificationService;
 
 class VerificationServiceTest extends MockeryTestCase
 {
@@ -38,12 +36,12 @@ class VerificationServiceTest extends MockeryTestCase
 
     protected function setUp(): void
     {
-        $this->verificationRepositoryMock = Mockery::mock(VerificationRepository::class);
-        $this->documentRepositoryMock = Mockery::mock(DocumentRepository::class);
-        $this->logRepositoryMock = Mockery::mock(LogRepository::class);
-        $this->documentServiceMock = Mockery::mock(DocumentService::class);
-        $this->notificationServiceMock = Mockery::mock(NotificationService::class);
-        $this->customerRepositoryMock = Mockery::mock(CustomerRepository::class);
+        $this->verificationRepositoryMock = \Mockery::mock(VerificationRepository::class);
+        $this->documentRepositoryMock = \Mockery::mock(DocumentRepository::class);
+        $this->logRepositoryMock = \Mockery::mock(LogRepository::class);
+        $this->documentServiceMock = \Mockery::mock(DocumentService::class);
+        $this->notificationServiceMock = \Mockery::mock(NotificationService::class);
+        $this->customerRepositoryMock = \Mockery::mock(CustomerRepository::class);
 
         $this->service = new VerificationService(
             $this->verificationRepositoryMock,
@@ -55,8 +53,8 @@ class VerificationServiceTest extends MockeryTestCase
         );
 
         // Mock static classes
-        Configuration::setStaticExpectations(Mockery::mock());
-        PrestaShopLogger::setStaticExpectations(Mockery::mock());
+        \Configuration::setStaticExpectations(\Mockery::mock());
+        \PrestaShopLogger::setStaticExpectations(\Mockery::mock());
 
         // Mock server variables
         $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
@@ -162,7 +160,7 @@ class VerificationServiceTest extends MockeryTestCase
             ->once()
             ->andThrow(new \Exception('Database error'));
 
-        PrestaShopLogger::shouldReceive('addLog')
+        \PrestaShopLogger::shouldReceive('addLog')
             ->once()
             ->with('Verification creation error: Database error', 3, null, 'Pskyc');
 
@@ -179,7 +177,7 @@ class VerificationServiceTest extends MockeryTestCase
         $offset = 0;
         $verifications = [
             ['id_kyc_verification' => 1, 'date_expiry' => null, 'is_expired' => false],
-            ['id_kyc_verification' => 2, 'date_expiry' => '2025-12-31 23:59:59', 'is_expired' => false]
+            ['id_kyc_verification' => 2, 'date_expiry' => '2025-12-31 23:59:59', 'is_expired' => false],
         ];
         $totalCount = 25;
 
@@ -204,7 +202,7 @@ class VerificationServiceTest extends MockeryTestCase
     public function testGetVerificationsWithExpiredVerification()
     {
         $verifications = [
-            ['id_kyc_verification' => 1, 'date_expiry' => '2020-01-01 00:00:00']
+            ['id_kyc_verification' => 1, 'date_expiry' => '2020-01-01 00:00:00'],
         ];
 
         $this->verificationRepositoryMock->shouldReceive('findAll')
@@ -226,7 +224,7 @@ class VerificationServiceTest extends MockeryTestCase
             ->once()
             ->andThrow(new \Exception('Database error'));
 
-        PrestaShopLogger::shouldReceive('addLog')
+        \PrestaShopLogger::shouldReceive('addLog')
             ->once()
             ->with('Get verifications error: Database error', 3, null, 'Pskyc');
 
@@ -280,7 +278,7 @@ class VerificationServiceTest extends MockeryTestCase
             ->once()
             ->andThrow(new \Exception('Database error'));
 
-        PrestaShopLogger::shouldReceive('addLog')
+        \PrestaShopLogger::shouldReceive('addLog')
             ->once()
             ->with('Get verification error: Database error', 3, null, 'Pskyc');
 
@@ -326,7 +324,7 @@ class VerificationServiceTest extends MockeryTestCase
             ->once()
             ->andThrow(new \Exception('Database error'));
 
-        PrestaShopLogger::shouldReceive('addLog')
+        \PrestaShopLogger::shouldReceive('addLog')
             ->once()
             ->with('Get customer verifications error: Database error', 3, null, 'Pskyc');
 
@@ -354,7 +352,7 @@ class VerificationServiceTest extends MockeryTestCase
             ->once()
             ->andThrow(new \Exception('Database error'));
 
-        PrestaShopLogger::shouldReceive('addLog')
+        \PrestaShopLogger::shouldReceive('addLog')
             ->once()
             ->with('Get status counts error: Database error', 3, null, 'Pskyc');
 
@@ -368,7 +366,7 @@ class VerificationServiceTest extends MockeryTestCase
         $customerId = 1;
         $verifications = [
             ['id_kyc_verification' => 1, 'date_expiry' => null, 'is_expired' => false],
-            ['id_kyc_verification' => 2, 'date_expiry' => '2025-12-31 23:59:59', 'is_expired' => false]
+            ['id_kyc_verification' => 2, 'date_expiry' => '2025-12-31 23:59:59', 'is_expired' => false],
         ];
 
         $this->verificationRepositoryMock->shouldReceive('findAllByCustomerId')
@@ -405,7 +403,7 @@ class VerificationServiceTest extends MockeryTestCase
             ->once()
             ->andThrow(new \Exception('Database error'));
 
-        PrestaShopLogger::shouldReceive('addLog')
+        \PrestaShopLogger::shouldReceive('addLog')
             ->once()
             ->with('Get verifications by customer ID error: Database error', 3, null, 'Pskyc');
 
@@ -471,7 +469,7 @@ class VerificationServiceTest extends MockeryTestCase
             ->once()
             ->andThrow(new \Exception('Database error'));
 
-        PrestaShopLogger::shouldReceive('addLog')
+        \PrestaShopLogger::shouldReceive('addLog')
             ->once()
             ->with('Update admin note error: Database error', 3, null, 'Pskyc');
 
@@ -488,7 +486,7 @@ class VerificationServiceTest extends MockeryTestCase
         $verification = [
             'id_kyc_verification' => $verificationId,
             'id_customer' => 123,
-            'status' => 'pending'
+            'status' => 'pending',
         ];
         $customerData = ['id_customer' => 123, 'email' => 'test@example.com'];
 
@@ -518,14 +516,14 @@ class VerificationServiceTest extends MockeryTestCase
         $this->notificationServiceMock->shouldReceive('sendStatusChangeNotification')
             ->once();
 
-        Configuration::shouldReceive('get')
+        \Configuration::shouldReceive('get')
             ->once()
             ->with('PSKYC_RETENTION_DAYS')
             ->andReturn(365);
 
         $this->verificationRepositoryMock->shouldReceive('updateExpiryDate')
             ->once()
-            ->with($verificationId, Mockery::pattern('/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/'));
+            ->with($verificationId, \Mockery::pattern('/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/'));
 
         $result = $this->service->updateStatus($verificationId, $newStatus, $note);
 
@@ -554,7 +552,7 @@ class VerificationServiceTest extends MockeryTestCase
         $verification = [
             'id_kyc_verification' => $verificationId,
             'id_customer' => 123,
-            'status' => 'pending'
+            'status' => 'pending',
         ];
 
         $this->verificationRepositoryMock->shouldReceive('findById')
@@ -579,7 +577,7 @@ class VerificationServiceTest extends MockeryTestCase
         $this->notificationServiceMock->shouldReceive('sendStatusChangeNotification')
             ->once();
 
-        Configuration::shouldReceive('get')
+        \Configuration::shouldReceive('get')
             ->once()
             ->with('PSKYC_RETENTION_DAYS')
             ->andReturn(0);
@@ -602,7 +600,7 @@ class VerificationServiceTest extends MockeryTestCase
             ->once()
             ->andThrow(new \Exception('Database error'));
 
-        PrestaShopLogger::shouldReceive('addLog')
+        \PrestaShopLogger::shouldReceive('addLog')
             ->once()
             ->with('Update status error: Database error', 3, null, 'Pskyc');
 
@@ -616,7 +614,7 @@ class VerificationServiceTest extends MockeryTestCase
         $customerId = 1;
         $verifications = [
             ['id_kyc_verification' => 1],
-            ['id_kyc_verification' => 2]
+            ['id_kyc_verification' => 2],
         ];
 
         $this->verificationRepositoryMock->shouldReceive('findAllByCustomerId')
@@ -660,7 +658,7 @@ class VerificationServiceTest extends MockeryTestCase
             ->once()
             ->andThrow(new \Exception('Database error'));
 
-        PrestaShopLogger::shouldReceive('addLog')
+        \PrestaShopLogger::shouldReceive('addLog')
             ->once()
             ->with('Delete verifications error: Database error', 3, null, 'Pskyc');
 
@@ -674,7 +672,7 @@ class VerificationServiceTest extends MockeryTestCase
         $customerId = 1;
         $verifications = [
             ['id_kyc_verification' => 1],
-            ['id_kyc_verification' => 2]
+            ['id_kyc_verification' => 2],
         ];
         $documents1 = [['id_document' => 1]];
         $documents2 = [['id_document' => 2]];
@@ -725,7 +723,7 @@ class VerificationServiceTest extends MockeryTestCase
             ->once()
             ->andThrow(new \Exception('Database error'));
 
-        PrestaShopLogger::shouldReceive('addLog')
+        \PrestaShopLogger::shouldReceive('addLog')
             ->once()
             ->with('Get GDPR data error: Database error', 3, null, 'Pskyc');
 
@@ -783,7 +781,7 @@ class VerificationServiceTest extends MockeryTestCase
             ->once()
             ->andThrow(new \Exception('Log error'));
 
-        PrestaShopLogger::shouldReceive('addLog')
+        \PrestaShopLogger::shouldReceive('addLog')
             ->once()
             ->with('Log action error: Log error', 3, null, 'Pskyc');
 

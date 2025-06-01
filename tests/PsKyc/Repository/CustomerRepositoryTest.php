@@ -1,11 +1,11 @@
 <?php
+
 namespace Tests\PsKyc\Repository;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
-use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
-use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use PrestaShop\Module\Pskyc\Repository\CustomerRepository;
 
@@ -28,11 +28,11 @@ class CustomerRepositoryTest extends MockeryTestCase
 
     protected function setUp(): void
     {
-        $this->connectionMock = Mockery::mock(Connection::class);
-        $this->queryBuilderMock = Mockery::mock(QueryBuilder::class);
-        $this->resultMock = Mockery::mock(Result::class);
-        $this->expressionBuilderMock = Mockery::mock(ExpressionBuilder::class);
-        
+        $this->connectionMock = \Mockery::mock(Connection::class);
+        $this->queryBuilderMock = \Mockery::mock(QueryBuilder::class);
+        $this->resultMock = \Mockery::mock(Result::class);
+        $this->expressionBuilderMock = \Mockery::mock(ExpressionBuilder::class);
+
         $this->repository = new CustomerRepository($this->connectionMock);
     }
 
@@ -44,7 +44,7 @@ class CustomerRepositoryTest extends MockeryTestCase
             'firstname' => 'John',
             'lastname' => 'Doe',
             'email' => 'john.doe@example.com',
-            'date_add' => '2025-01-01 10:00:00'
+            'date_add' => '2025-01-01 10:00:00',
         ];
 
         $this->connectionMock->shouldReceive('createQueryBuilder')
@@ -151,7 +151,7 @@ class CustomerRepositoryTest extends MockeryTestCase
             'firstname' => 'Jane',
             'lastname' => 'Smith',
             'email' => 'jane.smith@example.com',
-            'date_add' => '2025-01-15 14:30:00'
+            'date_add' => '2025-01-15 14:30:00',
         ];
 
         $this->connectionMock->shouldReceive('createQueryBuilder')
@@ -207,9 +207,9 @@ class CustomerRepositoryTest extends MockeryTestCase
 
     public function testConstructorSetsConnection()
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = \Mockery::mock(Connection::class);
         $repository = new CustomerRepository($connection);
-        
+
         // Test that the repository was created successfully
         $this->assertInstanceOf(CustomerRepository::class, $repository);
     }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MIT License
  * Copyright (c) 2025 Valentin Chmara
@@ -12,7 +13,7 @@ use PrestaShop\PrestaShop\Core\MailTemplate\ThemeInterface;
 
 /**
  * Class Pskyc
- * 
+ *
  * Main module class for KYC Secure Upload module
  * Handles document verification and encrypted storage for PrestaShop
  */
@@ -22,7 +23,7 @@ class Pskyc extends Module
 
     /**
      * Module constructor
-     * 
+     *
      * Initializes module properties and configuration
      */
     public function __construct()
@@ -33,7 +34,7 @@ class Pskyc extends Module
         $this->author = 'Valentin Chmara';
         $this->need_instance = 1;
 
-        /**
+        /*
          * Set $this->bootstrap to true if your module is compliant with bootstrap (PrestaShop 1.6)
          */
         $this->bootstrap = true;
@@ -48,7 +49,7 @@ class Pskyc extends Module
         $this->confirmUninstall = $warning;
         $this->confirmReset = $warning;
 
-        $this->ps_versions_compliancy = array('min' => '1.7.8', 'max' => _PS_VERSION_);
+        $this->ps_versions_compliancy = ['min' => '8.0.0', 'max' => _PS_VERSION_];
 
         // Define admin tabs following PrestaShop 8 official documentation
         $this->tabs = [
@@ -60,16 +61,16 @@ class Pskyc extends Module
                 'wording' => 'KYC Verifications',
                 'wording_domain' => 'Modules.Pskyc.Admin',
                 'parent_class_name' => 'AdminParentCustomer',
-            ]
+            ],
         ];
     }
 
     /**
      * Install the module
-     * 
+     *
      * Creates database tables, sets default configuration,
      * creates upload directory with .htaccess protection and registers hooks
-     * 
+     *
      * @return bool True if installation successful, false otherwise
      */
     public function install()
@@ -90,22 +91,22 @@ class Pskyc extends Module
             return false;
         }
 
-        return parent::install() &&
-            $this->registerHook('actionCheckoutRender') &&
-            $this->registerHook('displayAdminCustomers') &&
-            $this->registerHook('displayAdminOrder') &&
-            $this->registerHook('displayCustomerAccount') &&
-            $this->registerHook('registerGDPRConsent') &&
-            $this->registerHook('actionDeleteGDPRCustomer') &&
-            $this->registerHook('actionExportGDPRData') &&
-            $this->registerHook(ThemeCatalogInterface::LIST_MAIL_THEMES_HOOK);
+        return parent::install()
+            && $this->registerHook('actionCheckoutRender')
+            && $this->registerHook('displayAdminCustomers')
+            && $this->registerHook('displayAdminOrder')
+            && $this->registerHook('displayCustomerAccount')
+            && $this->registerHook('registerGDPRConsent')
+            && $this->registerHook('actionDeleteGDPRCustomer')
+            && $this->registerHook('actionExportGDPRData')
+            && $this->registerHook(ThemeCatalogInterface::LIST_MAIL_THEMES_HOOK);
     }
 
     /**
      * Uninstall the module
-     * 
+     *
      * Removes database tables, configuration values and uploaded files
-     * 
+     *
      * @return bool True if uninstallation successful, false otherwise
      */
     public function uninstall()
@@ -120,9 +121,9 @@ class Pskyc extends Module
 
     /**
      * Load the configuration form
-     * 
+     *
      * Handles form submission and displays the module configuration page
-     * 
+     *
      * @return string HTML content for the configuration page
      */
     public function getContent()
@@ -130,7 +131,7 @@ class Pskyc extends Module
         $output = '';
         $errors = [];
 
-        /**
+        /*
          * If values have been submitted in the form, process.
          */
         if (Tools::isSubmit('submitPskycModule')) {
@@ -144,7 +145,7 @@ class Pskyc extends Module
 
         // Check upload directory security status
         $securityStatus = $this->checkUploadDirectorySecurity();
-        
+
         // Display security warnings if any
         if ($securityStatus['status'] === 'warning') {
             foreach ($securityStatus['warnings'] as $warning) {
@@ -174,7 +175,7 @@ class Pskyc extends Module
 
     /**
      * Create the form that will be displayed in the configuration of your module
-     * 
+     *
      * @return string HTML form content
      */
     protected function renderForm()
@@ -193,18 +194,18 @@ class Pskyc extends Module
             . '&configure=' . $this->name . '&tab_module=' . $this->tab . '&module_name=' . $this->name;
         $helper->token = Tools::getAdminTokenLite('AdminModules');
 
-        $helper->tpl_vars = array(
+        $helper->tpl_vars = [
             'fields_value' => $this->getConfigFormValues(), /* Add values for your inputs */
             'languages' => $this->context->controller->getLanguages(),
             'id_language' => $this->context->language->id,
-        );
+        ];
 
-        return $helper->generateForm(array($this->getConfigForm()));
+        return $helper->generateForm([$this->getConfigForm()]);
     }
 
     /**
      * Create the structure of your form
-     * 
+     *
      * @return array Form configuration array
      */
     protected function getConfigForm()
@@ -225,7 +226,7 @@ class Pskyc extends Module
                         'suffix' => 'days',
                         'required' => true,
                         'cast' => 'intval',
-                        'class' => 'fixed-width-sm'
+                        'class' => 'fixed-width-sm',
                     ],
                     [
                         'type' => 'categories',
@@ -249,7 +250,7 @@ class Pskyc extends Module
                         'label' => $this->l('Admin notification emails'),
                         'desc' => $this->l('Comma-separated list of emails to notify for new KYC submissions. Example: admin@store.com, manager@store.com'),
                         'col' => 6,
-                        'placeholder' => 'admin@yourstore.com, manager@yourstore.com'
+                        'placeholder' => 'admin@yourstore.com, manager@yourstore.com',
                     ],
                     [
                         'type' => 'switch',
@@ -259,19 +260,19 @@ class Pskyc extends Module
                         'is_bool' => true,
                         'values' => [
                             ['id' => 'active_on', 'value' => 1, 'label' => $this->l('Enabled')],
-                            ['id' => 'active_off', 'value' => 0, 'label' => $this->l('Disabled')]
+                            ['id' => 'active_off', 'value' => 0, 'label' => $this->l('Disabled')],
                         ],
                     ],
                     [
                         'type' => 'html',
                         'name' => 'encryption_info',
                         'html_content' => '<div class="alert alert-info"><strong>' . $this->l('Security Note:') . '</strong> ' .
-                            $this->l('All uploaded documents are automatically encrypted using AES-256-CBC encryption. The encryption key is automatically generated and stored securely.') . '</div>'
-                    ]
+                            $this->l('All uploaded documents are automatically encrypted using AES-256-CBC encryption. The encryption key is automatically generated and stored securely.') . '</div>',
+                    ],
                 ],
                 'submit' => [
                     'title' => $this->l('Save Configuration'),
-                    'class' => 'btn btn-default pull-right'
+                    'class' => 'btn btn-default pull-right',
                 ],
             ],
         ];
@@ -279,7 +280,7 @@ class Pskyc extends Module
 
     /**
      * Get current configuration form values
-     * 
+     *
      * @return array Current configuration values
      */
     protected function getConfigFormValues()
@@ -294,9 +295,9 @@ class Pskyc extends Module
 
     /**
      * Save form data
-     * 
+     *
      * Processes and saves the configuration form values
-     * 
+     *
      * @return array Result with success status and any errors
      */
     protected function postProcess()
@@ -348,16 +349,16 @@ class Pskyc extends Module
 
         return [
             'success' => $success,
-            'errors' => $errors
+            'errors' => $errors,
         ];
     }
 
     /**
      * Generate encryption key
-     * 
+     *
      * Generates a new 256-bit encryption key in hexadecimal format
      * This method ensures the key is always compatible with EncryptionService
-     * 
+     *
      * @return void
      */
     private function generateEncryptionKey()
@@ -368,10 +369,10 @@ class Pskyc extends Module
 
     /**
      * Ensure encryption key exists and is valid
-     * 
+     *
      * Checks if encryption key exists and is valid hex format.
      * If not, generates a new one.
-     * 
+     *
      * @return void
      */
     private function ensureEncryptionKey()
@@ -386,9 +387,9 @@ class Pskyc extends Module
 
     /**
      * Hook executed in admin customers page
-     * 
+     *
      * Can display KYC status for each customer
-     * 
+     *
      * @return void
      */
     public function hookDisplayAdminCustomers()
@@ -412,9 +413,9 @@ class Pskyc extends Module
 
     /**
      * Hook executed in admin order page
-     * 
+     *
      * Can display KYC status for the order's customer
-     * 
+     *
      * @return void
      */
     public function hookDisplayAdminOrder()
@@ -424,9 +425,9 @@ class Pskyc extends Module
 
     /**
      * Display KYC verification link in customer account
-     * 
+     *
      * Hook executed in customer account page to show KYC verification box
-     * 
+     *
      * @return string HTML content for the KYC verification box
      */
     public function hookDisplayCustomerAccount()
@@ -464,37 +465,35 @@ class Pskyc extends Module
     }
 
     /**
-     * Add KYC layouts to a specific theme 
+     * Add KYC layouts to a specific theme
+     *
      * @param ThemeInterface $theme
      * @param string $themeName
+     *
      * @return void
      */
     private function addLayoutsToTheme(ThemeInterface $theme, string $themeName)
     {
         // Waiting this to be resolved in PrestaShop 9: https://github.com/PrestaShop/PrestaShop/issues/35214
-        $moduleLayoutsPath = "@Modules/" . $this->name . "/mails/layouts/{$themeName}/";
+        $moduleLayoutsPath = '@Modules/' . $this->name . "/mails/layouts/{$themeName}/";
 
         // Define our KYC layouts
         $layouts = [
             'verification_status' => [
                 'name' => 'verification_status',
                 'htmlTemplate' => $moduleLayoutsPath . 'verification_status.html.twig',
-
             ],
             'verification_expiry_warning' => [
                 'name' => 'verification_expiry_warning',
                 'htmlTemplate' => $moduleLayoutsPath . 'verification_expiry_warning.html.twig',
-
             ],
             'document_upload_confirmation' => [
                 'name' => 'document_upload_confirmation',
                 'htmlTemplate' => $moduleLayoutsPath . 'document_upload_confirmation.html.twig',
-
             ],
             'admin_new_verification' => [
                 'name' => 'admin_new_verification',
                 'htmlTemplate' => $moduleLayoutsPath . 'admin_new_verification.html.twig',
-
             ],
         ];
 
@@ -516,10 +515,11 @@ class Pskyc extends Module
 
     /**
      * Hook executed during checkout rendering
-     * 
+     *
      * Adds KYC step to checkout process if KYC verification is required
-     * 
+     *
      * @param array $params
+     *
      * @return void
      */
     public function hookActionCheckoutRender($params)
@@ -544,7 +544,7 @@ class Pskyc extends Module
         }
 
         // Get customer's verification status
-        /** @var PrestaShop\Module\Pskyc\Service\VerificationService $verificationService */
+        /** @var VerificationService $verificationService */
         $verificationService = $this->get('PrestaShop\\Module\\Pskyc\\Service\\VerificationService');
         $verification = $verificationService->getMostRecentVerification($context->customer->id);
 
@@ -554,7 +554,7 @@ class Pskyc extends Module
         }
 
         // Create KYC step
-        $kycStep = new \PrestaShop\Module\Pskyc\Checkout\KycStep(
+        $kycStep = new PrestaShop\Module\Pskyc\Checkout\KycStep(
             $context,
             $this->getTranslator()
         );
@@ -578,8 +578,9 @@ class Pskyc extends Module
 
     /**
      * Check if KYC is required for products in cart
-     * 
+     *
      * @param Cart $cart
+     *
      * @return bool
      */
     private function isKycRequiredForCart($cart)
@@ -604,7 +605,6 @@ class Pskyc extends Module
 
     /**
      * Hook to register GDPR consent
-     * 
      */
     public function hookRegisterGDPRConsent()
     {
@@ -615,8 +615,9 @@ class Pskyc extends Module
 
     /**
      * Hook to export GDPR data
-     * 
+     *
      * @param Customer $customer
+     *
      * @return string JSON encoded data
      */
     public function hookActionExportGDPRData($customer)
@@ -630,8 +631,9 @@ class Pskyc extends Module
 
     /**
      * Hook to delete GDPR customer data
-     * 
+     *
      * @param Customer $customer
+     *
      * @return void
      */
     public function hookActionDeleteGDPRCustomer($customer)
@@ -645,7 +647,7 @@ class Pskyc extends Module
 
     /**
      * Create secure upload directory with comprehensive security measures
-     * 
+     *
      * @return bool True if directory created successfully with proper security, false otherwise
      */
     private function createSecureUploadDirectory()
@@ -686,8 +688,9 @@ class Pskyc extends Module
 
     /**
      * Verify directory security settings
-     * 
+     *
      * @param string $uploadDir The upload directory path
+     *
      * @return bool True if directory is secure, false otherwise
      */
     private function verifyDirectorySecurity(string $uploadDir): bool
@@ -701,7 +704,7 @@ class Pskyc extends Module
         if (function_exists('fileperms') && DIRECTORY_SEPARATOR === '/') {
             $perms = fileperms($uploadDir);
             $octal = substr(sprintf('%o', $perms), -4);
-            
+
             // Check if permissions are too permissive (should be 0700 or similar)
             if (intval($octal) > 0755) {
                 // Try to fix permissions
@@ -716,23 +719,24 @@ class Pskyc extends Module
 
     /**
      * Create .htaccess file with proper security
-     * 
+     *
      * @param string $htaccessFile Path to .htaccess file
+     *
      * @return bool True if created successfully, false otherwise
      */
     private function createHtaccessFile(string $htaccessFile): bool
     {
         $templateFile = __DIR__ . '/secure_upload_htaccess_template.txt';
-        
+
         if (!file_exists($templateFile)) {
             return false;
         }
-        
+
         $htaccessContent = file_get_contents($templateFile);
         if ($htaccessContent === false) {
             return false;
         }
-        
+
         if (file_put_contents($htaccessFile, $htaccessContent) === false) {
             return false;
         }
@@ -747,18 +751,19 @@ class Pskyc extends Module
 
     /**
      * Create security index.php file to prevent directory listing
-     * 
+     *
      * @param string $indexFile Path to index.php file
+     *
      * @return bool True if created successfully, false otherwise
      */
     private function createSecurityIndexFile(string $indexFile): bool
     {
         $templateFile = __DIR__ . '/index.php';
-        
+
         if (!file_exists($templateFile)) {
             return false;
         }
-        
+
         $indexContent = file_get_contents($templateFile);
         if ($indexContent === false) {
             return false;
@@ -778,7 +783,7 @@ class Pskyc extends Module
 
     /**
      * Verify upload directory security on each configuration page load
-     * 
+     *
      * @return array Security status with warnings if any
      */
     private function checkUploadDirectorySecurity(): array
@@ -791,7 +796,7 @@ class Pskyc extends Module
         if (!is_dir($uploadDir)) {
             return [
                 'status' => 'error',
-                'warnings' => ['Upload directory does not exist']
+                'warnings' => ['Upload directory does not exist'],
             ];
         }
 
@@ -813,7 +818,7 @@ class Pskyc extends Module
         if (function_exists('fileperms') && DIRECTORY_SEPARATOR === '/') {
             $perms = fileperms($uploadDir);
             $octal = substr(sprintf('%o', $perms), -4);
-            
+
             if (intval($octal) > 0755) {
                 $warnings[] = 'Directory permissions may be too permissive (' . $octal . ')';
                 $status = 'warning';
@@ -828,7 +833,7 @@ class Pskyc extends Module
 
         return [
             'status' => $status,
-            'warnings' => $warnings
+            'warnings' => $warnings,
         ];
     }
 }

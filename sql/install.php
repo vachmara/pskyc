@@ -1,14 +1,14 @@
 <?php
+
 /**
  * MIT License
  * Copyright (c) 2025 Valentin Chmara
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-$sql = array();
+$sql = [];
 
 /* KYC VERIFICATION */
 $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'kyc_verification` (

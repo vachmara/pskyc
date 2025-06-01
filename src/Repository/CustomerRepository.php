@@ -1,11 +1,12 @@
 <?php
+
 namespace PrestaShop\Module\Pskyc\Repository;
 
 use Doctrine\DBAL\Connection;
 
 /**
  * Class CustomerRepository
- * 
+ *
  * Repository for managing customer data access
  * Provides methods for retrieving customer information needed for KYC operations
  */
@@ -32,6 +33,7 @@ class CustomerRepository
      * Retrieves customer information for KYC verification
      *
      * @param int $customerId Customer ID
+     *
      * @return array Customer data
      */
     public function getCustomerData(int $customerId): array
@@ -44,6 +46,7 @@ class CustomerRepository
             ->setParameter('customerId', $customerId);
 
         $result = $queryBuilder->execute();
+
         return $result->fetchAssociative() ?: [];
     }
 }

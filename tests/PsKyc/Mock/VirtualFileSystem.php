@@ -1,4 +1,5 @@
 <?php
+
 namespace Tests\PsKyc\Mock;
 
 use org\bovigo\vfs\vfsStream;
@@ -6,7 +7,7 @@ use org\bovigo\vfs\vfsStreamDirectory;
 
 /**
  * Virtual File System Helper for DocumentService Testing
- * 
+ *
  * Provides a clean abstraction over vfsStream for testing file operations
  * without touching the real file system.
  */
@@ -37,7 +38,7 @@ class VirtualFileSystem
     {
         $structure = [
             'secure_upload' => [],
-            'tmp' => []
+            'tmp' => [],
         ];
 
         $this->root = vfsStream::setup('pskyc', 0755, $structure);
@@ -66,11 +67,12 @@ class VirtualFileSystem
     public function createTestFile(string $filename, string $content, string $mimeType = 'image/jpeg'): string
     {
         $filePath = $this->getTmpDirectory() . '/' . $filename;
-        
+
         // Create content based on MIME type for realistic testing
         $fileContent = $this->generateFileContent($content, $mimeType);
-        
+
         file_put_contents($filePath, $fileContent);
+
         return $filePath;
     }
 
@@ -81,8 +83,9 @@ class VirtualFileSystem
     {
         $storedFilename = 'doc_' . $documentId . '_' . hash('md5', $filename);
         $filePath = $this->getUploadDirectory() . '/' . $storedFilename;
-        
+
         file_put_contents($filePath, $encryptedContent);
+
         return $filePath;
     }
 
@@ -110,6 +113,7 @@ class VirtualFileSystem
         if (file_exists($path)) {
             return unlink($path);
         }
+
         return false;
     }
 
@@ -130,18 +134,18 @@ class VirtualFileSystem
             case 'image/jpeg':
                 // JPEG file header
                 return "\xFF\xD8\xFF\xE0\x00\x10JFIF\x00\x01\x01\x01\x00H\x00H\x00\x00\xFF\xDB" . $baseContent;
-                
+
             case 'image/png':
                 // PNG file header
                 return "\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR" . $baseContent;
-                
+
             case 'application/pdf':
                 // PDF file header
                 return "%PDF-1.4\n" . $baseContent . "\n%%EOF";
-                
+
             case 'text/plain':
                 return $baseContent;
-                
+
             default:
                 return $baseContent;
         }
@@ -163,6 +167,7 @@ class VirtualFileSystem
         $filePath = $this->getTmpDirectory() . '/' . $filename;
         file_put_contents($filePath, $content);
         chmod($filePath, $permissions);
+
         return $filePath;
     }
 
@@ -173,6 +178,7 @@ class VirtualFileSystem
     {
         $dirPath = $this->rootPath . '/' . $dirname;
         mkdir($dirPath, $permissions, true);
+
         return $dirPath;
     }
 

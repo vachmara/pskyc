@@ -1,8 +1,9 @@
 <?php
-use Symfony\Component\Translation\Exception\InvalidArgumentException;
-use PrestaShop\Module\Pskyc\Service\VerificationService;
+
 use PrestaShop\Module\Pskyc\Service\DocumentService;
 use PrestaShop\Module\Pskyc\Service\NotificationService;
+use PrestaShop\Module\Pskyc\Service\VerificationService;
+use Symfony\Component\Translation\Exception\InvalidArgumentException;
 
 /**
  * Class PskycVerifyModuleFrontController
@@ -38,8 +39,9 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
      * Displays the verification form and handles form submissions
      * Redirects non-logged customers to home page
      *
-     * @throws PrestaShopException
      * @return void
+     *
+     * @throws PrestaShopException
      */
     public function initContent()
     {
@@ -111,6 +113,7 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
 
         if ($token !== $expectedToken) {
             $this->errors[] = $this->trans('Invalid security token.', [], 'Modules.Pskyc.Shop');
+
             return;
         }
 
@@ -141,6 +144,7 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
             foreach ($requiredFields as $field) {
                 if (!Tools::getValue($field)) {
                     $this->errors[] = $this->trans('Please fill in all required fields.', [], 'Modules.Pskyc.Shop');
+
                     return;
                 }
             }
@@ -154,10 +158,11 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
                 $idDocumentBack = $_FILES['id_document_back'] ?? null;
 
                 if (
-                    !$idDocumentFront || $idDocumentFront['error'] !== UPLOAD_ERR_OK ||
-                    !$idDocumentBack || $idDocumentBack['error'] !== UPLOAD_ERR_OK
+                    !$idDocumentFront || $idDocumentFront['error'] !== UPLOAD_ERR_OK
+                    || !$idDocumentBack || $idDocumentBack['error'] !== UPLOAD_ERR_OK
                 ) {
                     $this->errors[] = $this->trans('Please upload both front and back sides of your identity document.', [], 'Modules.Pskyc.Shop');
+
                     return;
                 }
                 if (!$this->validateUploadedFile($idDocumentFront) || !$this->validateUploadedFile($idDocumentBack)) {
@@ -168,6 +173,7 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
                 $idDocument = $_FILES['id_document'] ?? null;
                 if (!$idDocument || $idDocument['error'] !== UPLOAD_ERR_OK) {
                     $this->errors[] = $this->trans('Please upload your identity document.', [], 'Modules.Pskyc.Shop');
+
                     return;
                 }
                 if (!$this->validateUploadedFile($idDocument)) {
@@ -178,6 +184,7 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
             $addressDocument = $_FILES['address_document'] ?? null;
             if (!$addressDocument || $addressDocument['error'] !== UPLOAD_ERR_OK) {
                 $this->errors[] = $this->trans('Please upload your proof of address document.', [], 'Modules.Pskyc.Shop');
+
                 return;
             }
             if (!$this->validateUploadedFile($addressDocument)) {
@@ -201,6 +208,7 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
      *
      * @param array $idDocument Identity document file data (for single-sided documents or ['front'=>...,'back'=>...] for two-sided)
      * @param array $addressDocument Address document file data
+     *
      * @return void
      */
     private function processDocumentUploadWithServices($idDocument, $addressDocument)
@@ -209,15 +217,17 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
         $existingVerification = $this->verificationService->getMostRecentVerification($this->context->customer->id);
         if ($existingVerification && !empty($existingVerification['status']) && in_array($existingVerification['status'], ['pending', 'under_review'])) {
             $this->errors[] = $this->trans('You already have a verification request in progress.', [], 'Modules.Pskyc.Shop');
+
             return;
         }
 
         $verificationResult = $this->verificationService->createVerification($this->context->customer->id, [
-            'customer_note' => Tools::getValue('additional_notes')
+            'customer_note' => Tools::getValue('additional_notes'),
         ]);
 
         if (empty($verificationResult['success']) || empty($verificationResult['verification_id'])) {
             $this->errors[] = $this->trans('Failed to create verification request.', [], 'Modules.Pskyc.Shop');
+
             return;
         }
 
@@ -319,10 +329,11 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
      */
     protected function processReuploadDocument()
     {
-        $documentId = (int)Tools::getValue('document_id');
+        $documentId = (int) Tools::getValue('document_id');
         $file = $_FILES['reupload_file'] ?? null;
         if (!$documentId || !$file || $file['error'] !== UPLOAD_ERR_OK) {
             $this->errors[] = $this->trans('Please select a file to re-upload.', [], 'Modules.Pskyc.Shop');
+
             return;
         }
         if (!$this->validateUploadedFile($file)) {
@@ -343,23 +354,27 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
      * Checks file upload errors, size limits, and allowed MIME types
      *
      * @param array $file Uploaded file array from $_FILES
+     *
      * @return bool True if file is valid, false otherwise
      */
     protected function validateUploadedFile($file)
     {
         if (!is_array($file) || !isset($file['error'], $file['size'], $file['tmp_name'])) {
             $this->errors[] = $this->trans('Invalid file upload.', [], 'Modules.Pskyc.Shop');
+
             return false;
         }
 
         if ($file['error'] !== UPLOAD_ERR_OK) {
             $this->errors[] = $this->trans('File upload failed. Please try again.', [], 'Modules.Pskyc.Shop');
+
             return false;
         }
 
         $maxSize = 10 * 1024 * 1024; // 10MB
         if ($file['size'] > $maxSize) {
             $this->errors[] = $this->trans('File size must be less than 10MB.', [], 'Modules.Pskyc.Shop');
+
             return false;
         }
 
@@ -370,6 +385,7 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
 
         if (!in_array($mimeType, $allowedMimes)) {
             $this->errors[] = $this->trans('Only JPG, PNG, and PDF files are allowed.', [], 'Modules.Pskyc.Shop');
+
             return false;
         }
 
@@ -387,9 +403,11 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
     {
         try {
             $verifications = $this->verificationService->getMostRecentVerification($this->context->customer->id);
+
             return $verifications ?: null;
         } catch (Exception $e) {
             PrestaShopLogger::addLog('Get customer verification error: ' . $e->getMessage(), 3, null, 'Pskyc');
+
             return null;
         }
     }
@@ -400,6 +418,7 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
      * Retrieves customer information for notifications and processing
      *
      * @param int $customerId The customer ID
+     *
      * @return array|null Customer data or null if not found
      */
     private function getCustomerData(int $customerId): ?array
@@ -407,9 +426,11 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
         try {
             $customerRepository = $this->module->get('PrestaShop\Module\Pskyc\Repository\CustomerRepository');
             $customerData = $customerRepository->getCustomerData($customerId);
+
             return $customerData ?: null;
         } catch (Exception $e) {
             PrestaShopLogger::addLog('Get customer data error: ' . $e->getMessage(), 3, null, 'Pskyc');
+
             return null;
         }
     }

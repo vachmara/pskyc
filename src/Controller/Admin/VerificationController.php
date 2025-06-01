@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MIT License
  * Copyright (c) 2025 Valentin Chmara
@@ -22,7 +23,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * KYC Verification Admin Controller
- * 
+ *
  * Manages KYC verification records in the PrestaShop back office.
  * Provides grid listing, search, view, and status management functionality.
  */
@@ -38,10 +39,11 @@ class VerificationController extends FrameworkBundleAdminController
      * )
      *
      * @param VerificationFilters $filters Grid filters for pagination and search
+     *
      * @return Response Rendered verification grid page
      */
     public function indexAction(
-        VerificationFilters $filters
+        VerificationFilters $filters,
     ): Response {
         /** @var GridFactoryInterface $verificationGridFactory */
         $verificationGridFactory = $this->get('prestashop.module.pskyc.grid.factory.verifications');
@@ -67,11 +69,12 @@ class VerificationController extends FrameworkBundleAdminController
      * )
      *
      * @param Request $request HTTP request containing search filters
+     *
      * @return RedirectResponse Redirect to index with applied filters
      */
     public function searchAction(Request $request): RedirectResponse
     {
-          /** @var GridDefinitionFactoryInterface $verificationGridDefinitionFactory */
+        /** @var GridDefinitionFactoryInterface $verificationGridDefinitionFactory */
         $verificationGridDefinitionFactory = $this->get('prestashop.module.pskyc.grid.definition.factory.verifications');
 
         /** @var ResponseBuilder $responseBuilder */
@@ -96,10 +99,11 @@ class VerificationController extends FrameworkBundleAdminController
      * )
      *
      * @param int $verificationId The verification ID to view
+     *
      * @return Response Rendered verification detail page
      */
     public function viewAction(
-        int $verificationId
+        int $verificationId,
     ): Response {
         /** @var VerificationRepository $verificationRepository */
         $verificationRepository = $this->get('PrestaShop\Module\Pskyc\Repository\VerificationRepository');
@@ -151,6 +155,7 @@ class VerificationController extends FrameworkBundleAdminController
      *
      * @param int $verificationId The verification ID to update note for
      * @param Request $request HTTP request containing admin note
+     *
      * @return Response Redirect response with success message
      */
     public function updateNoteAction(int $verificationId, Request $request): Response
@@ -160,6 +165,7 @@ class VerificationController extends FrameworkBundleAdminController
         $verificationRepository->updateAdminNote($verificationId, $note);
 
         $this->addFlash('success', $this->trans('Note updated.', 'Modules.Pskyc.Admin'));
+
         return $this->redirectToRoute('ps_pskyc_verification_view', ['verificationId' => $verificationId]);
     }
 
@@ -183,6 +189,7 @@ class VerificationController extends FrameworkBundleAdminController
             $verifications = $verificationRepository->findAllForExport();
         } catch (\Exception $e) {
             $this->addFlash('error', $this->trans('Error retrieving verification logs.', 'Modules.Pskyc.Admin'));
+
             return $this->redirectToRoute('ps_pskyc_verification_index');
         }
 
@@ -203,7 +210,7 @@ class VerificationController extends FrameworkBundleAdminController
                 'IP Address',
                 'User Agent',
                 'Date Added',
-                'Date Updated'
+                'Date Updated',
             ]);
 
             // Add data rows
@@ -225,7 +232,7 @@ class VerificationController extends FrameworkBundleAdminController
                     $log['ip_address'] ?? '',
                     $log['user_agent'] ?? '',
                     $log['date_add'],
-                    $log['date_upd']
+                    $log['date_upd'],
                 ]);
             }
 
@@ -233,7 +240,7 @@ class VerificationController extends FrameworkBundleAdminController
         });
 
         $filename = sprintf('kyc_verification_logs_%s.csv', date('Y-m-d_H-i-s'));
-        
+
         $response->setStatusCode(200);
         $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
         $response->headers->set('Content-Disposition', sprintf('attachment; filename="%s"', $filename));
@@ -253,8 +260,8 @@ class VerificationController extends FrameworkBundleAdminController
                 'href' => $this->generateUrl('ps_pskyc_verification_export_logs'),
                 'desc' => $this->trans('Export Verification Logs', 'Modules.Pskyc.Admin'),
                 'icon' => 'cloud_download',
-                'class' => 'btn btn-outline-secondary'
-            ]
+                'class' => 'btn btn-outline-secondary',
+            ],
         ];
     }
 }

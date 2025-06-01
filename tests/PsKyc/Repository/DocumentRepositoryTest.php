@@ -1,10 +1,10 @@
 <?php
+
 namespace Tests\PsKyc\Repository;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
-use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use PrestaShop\Module\Pskyc\Repository\DocumentRepository;
 
@@ -24,10 +24,10 @@ class DocumentRepositoryTest extends MockeryTestCase
 
     protected function setUp(): void
     {
-        $this->connectionMock = Mockery::mock(Connection::class);
-        $this->queryBuilderMock = Mockery::mock(QueryBuilder::class);
-        $this->resultMock = Mockery::mock(Result::class);
-        
+        $this->connectionMock = \Mockery::mock(Connection::class);
+        $this->queryBuilderMock = \Mockery::mock(QueryBuilder::class);
+        $this->resultMock = \Mockery::mock(Result::class);
+
         $this->repository = new DocumentRepository($this->connectionMock);
     }
 
@@ -39,7 +39,7 @@ class DocumentRepositoryTest extends MockeryTestCase
             'type' => 'passport',
             'filename' => 'test.jpg',
             'status' => 'pending',
-            'date_uploaded' => '2025-01-01 10:00:00'
+            'date_uploaded' => '2025-01-01 10:00:00',
         ];
 
         $this->mockQueryBuilderSelect()
@@ -94,14 +94,14 @@ class DocumentRepositoryTest extends MockeryTestCase
                 'id_kyc_document' => 1,
                 'id_kyc_verification' => $verificationId,
                 'type' => 'passport',
-                'side' => 'front'
+                'side' => 'front',
             ],
             [
                 'id_kyc_document' => 2,
                 'id_kyc_verification' => $verificationId,
                 'type' => 'passport',
-                'side' => 'back'
-            ]
+                'side' => 'back',
+            ],
         ];
 
         $this->mockQueryBuilderSelect()
@@ -139,7 +139,7 @@ class DocumentRepositoryTest extends MockeryTestCase
             'sha256' => 'abc123',
             'iv' => 'def456',
             'encrypted' => 1,
-            'expires_at' => '2024-12-31 23:59:59'
+            'expires_at' => '2024-12-31 23:59:59',
         ];
         $expectedId = 42;
 
@@ -302,8 +302,8 @@ class DocumentRepositoryTest extends MockeryTestCase
         $expiredDocuments = [
             [
                 'id_kyc_document' => 1,
-                'expires_at' => '2023-12-31 23:59:59'
-            ]
+                'expires_at' => '2023-12-31 23:59:59',
+            ],
         ];
 
         $this->mockQueryBuilderSelect()
@@ -359,13 +359,13 @@ class DocumentRepositoryTest extends MockeryTestCase
             [
                 'id_kyc_document' => 1,
                 'type' => 'passport',
-                'side' => 'front'
+                'side' => 'front',
             ],
             [
                 'id_kyc_document' => 2,
                 'type' => 'passport',
-                'side' => 'back'
-            ]
+                'side' => 'back',
+            ],
         ];
 
         $this->mockQueryBuilderSelect()
@@ -454,7 +454,7 @@ class DocumentRepositoryTest extends MockeryTestCase
         $fields = [
             'status' => 'approved',
             'admin_note' => 'All good',
-            'reviewed_by' => 5
+            'reviewed_by' => 5,
         ];
 
         $this->connectionMock->shouldReceive('createQueryBuilder')

@@ -13,3 +13,5 @@ secure_upload/
 tests/coverage/
 tests/results/
 tests/temp/
+
+MIT.txt

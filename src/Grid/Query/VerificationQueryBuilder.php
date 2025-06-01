@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MIT License
  * Copyright (c) 2025 Valentin Chmara
@@ -18,7 +19,7 @@ use PrestaShop\PrestaShop\Core\Grid\Search\SearchCriteriaInterface;
 
 /**
  * Query builder for KYC verification grid
- * 
+ *
  * Builds SQL queries to retrieve verification data for the admin grid
  */
 class VerificationQueryBuilder extends AbstractDoctrineQueryBuilder
@@ -37,7 +38,7 @@ class VerificationQueryBuilder extends AbstractDoctrineQueryBuilder
         Connection $connection,
         string $dbPrefix,
         DoctrineSearchCriteriaApplicatorInterface $searchCriteriaApplicator,
-        DoctrineFilterApplicatorInterface $filterApplicator = null
+        ?DoctrineFilterApplicatorInterface $filterApplicator = null,
     ) {
         parent::__construct($connection, $dbPrefix);
         $this->searchCriteriaApplicator = $searchCriteriaApplicator;
@@ -50,10 +51,10 @@ class VerificationQueryBuilder extends AbstractDoctrineQueryBuilder
     public function getSearchQueryBuilder(SearchCriteriaInterface $searchCriteria): QueryBuilder
     {
         $qb = $this->getQueryBuilder($searchCriteria->getFilters());
-        
+
         // Debug logging
         error_log('KYC Grid Filters: ' . json_encode($searchCriteria->getFilters()));
-        
+
         $qb
             ->select('v.`id_kyc_verification`, v.`id_customer`, v.`status`')
             ->addSelect('v.`date_submitted`, v.`date_validated`, v.`admin_note`')

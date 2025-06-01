@@ -1,9 +1,12 @@
 <?php
+
 namespace PrestaShop\Module\Pskyc\Service;
+
 use Configuration;
+
 /**
  * Class EncryptionService
- * 
+ *
  * Handles file encryption and decryption for secure storage of KYC documents
  * Uses AES-256-CBC encryption with random initialization vectors
  */
@@ -21,21 +24,22 @@ class EncryptionService
 
     /**
      * Get encryption key from configuration or environment
-     * 
+     *
      * Retrieves the encryption key used for file encryption/decryption
      * The key should be stored securely and not in the database
-     * 
+     *
      * @return string The encryption key
+     *
      * @throws \RuntimeException If encryption key is not configured
      */
     private function getEncryptionKey(): string
     {
-        $key = Configuration::get('PSKYC_ENCRYPTION_KEY');
-        
+        $key = \Configuration::get('PSKYC_ENCRYPTION_KEY');
+
         if (empty($key)) {
             // Generate a new key if none exists
             $key = bin2hex(random_bytes(32)); // 256-bit key
-            Configuration::updateValue('PSKYC_ENCRYPTION_KEY', $key);
+            \Configuration::updateValue('PSKYC_ENCRYPTION_KEY', $key);
         }
 
         return hex2bin($key);
@@ -43,10 +47,10 @@ class EncryptionService
 
     /**
      * Generate a random initialization vector
-     * 
+     *
      * Creates a random IV for encryption to ensure each encrypted file
      * has unique ciphertext even with identical plaintext
-     * 
+     *
      * @return string Base64-encoded initialization vector
      */
     public function generateIV(): string
@@ -56,12 +60,14 @@ class EncryptionService
 
     /**
      * Encrypt file contents
-     * 
+     *
      * Encrypts the provided data using AES-256-CBC encryption
-     * 
+     *
      * @param string $data The data to encrypt
      * @param string $iv Base64-encoded initialization vector
+     *
      * @return string The encrypted data (base64-encoded)
+     *
      * @throws \RuntimeException If encryption fails
      */
     public function encrypt(string $data, string $iv): string
@@ -85,12 +91,14 @@ class EncryptionService
 
     /**
      * Decrypt file contents
-     * 
+     *
      * Decrypts previously encrypted data using the same algorithm and key
-     * 
+     *
      * @param string $encryptedData Base64-encoded encrypted data
      * @param string $iv Base64-encoded initialization vector used for encryption
+     *
      * @return string The decrypted data
+     *
      * @throws \RuntimeException If decryption fails
      */
     public function decrypt(string $encryptedData, string $iv): string
@@ -119,12 +127,14 @@ class EncryptionService
 
     /**
      * Encrypt file and save to disk
-     * 
+     *
      * Encrypts a file and saves it to the specified location
-     * 
+     *
      * @param string $sourceFilePath Path to the source file to encrypt
      * @param string $destinationPath Path where encrypted file should be saved
+     *
      * @return array Array containing 'iv' and 'sha256' of original file
+     *
      * @throws \RuntimeException If file operations fail
      */
     public function encryptFile(string $sourceFilePath, string $destinationPath): array
@@ -148,18 +158,20 @@ class EncryptionService
 
         return [
             'iv' => $iv,
-            'sha256' => $sha256
+            'sha256' => $sha256,
         ];
     }
 
     /**
      * Decrypt file from disk
-     * 
+     *
      * Reads an encrypted file from disk and decrypts it
-     * 
+     *
      * @param string $encryptedFilePath Path to the encrypted file
      * @param string $iv Base64-encoded initialization vector
+     *
      * @return string The decrypted file contents
+     *
      * @throws \RuntimeException If file operations or decryption fail
      */
     public function decryptFile(string $encryptedFilePath, string $iv): string
@@ -178,11 +190,12 @@ class EncryptionService
 
     /**
      * Verify file integrity
-     * 
+     *
      * Checks if a decrypted file matches its expected SHA256 hash
-     * 
+     *
      * @param string $data The decrypted file data
      * @param string $expectedSha256 The expected SHA256 hash
+     *
      * @return bool True if hashes match, false otherwise
      */
     public function verifyIntegrity(string $data, string $expectedSha256): bool
@@ -192,10 +205,11 @@ class EncryptionService
 
     /**
      * Securely delete file
-     * 
+     *
      * Overwrites file contents with random data before deletion
-     * 
+     *
      * @param string $filePath Path to the file to securely delete
+     *
      * @return bool True if file was successfully deleted, false otherwise
      */
     public function secureDelete(string $filePath): bool

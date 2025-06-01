@@ -1,18 +1,18 @@
 <?php
+
 namespace Tests\PsKyc\Service;
 
-use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
-use PrestaShop\Module\Pskyc\Service\DocumentService;
 use PrestaShop\Module\Pskyc\Repository\DocumentRepository;
 use PrestaShop\Module\Pskyc\Repository\VerificationRepository;
+use PrestaShop\Module\Pskyc\Service\DocumentService;
 use PrestaShop\Module\Pskyc\Service\EncryptionService;
 use Tests\PsKyc\Mock\VirtualFileSystem;
 use Tests\PsKyc\Mock\VirtualFileSystemAdapter;
 
 /**
  * DocumentService Test with 100% Coverage using vfsStream
- * 
+ *
  * Tests all DocumentService functionality using virtual file system
  * for safe, fast, and isolated testing without touching real files.
  */
@@ -39,8 +39,8 @@ class DocumentServiceTest extends MockeryTestCase
     protected function setUp(): void
     {
         // Set up mocks for PrestaShop classes
-        \Configuration::setStaticExpectations(Mockery::mock());
-        \PrestaShopLogger::setStaticExpectations(Mockery::mock());
+        \Configuration::setStaticExpectations(\Mockery::mock());
+        \PrestaShopLogger::setStaticExpectations(\Mockery::mock());
 
         // Configure default expectations
         \PrestaShopLogger::shouldReceive('addLog')->byDefault();
@@ -54,9 +54,9 @@ class DocumentServiceTest extends MockeryTestCase
         $this->fileSystemAdapter = new VirtualFileSystemAdapter($this->vfs);
 
         // Set up service mocks
-        $this->documentRepositoryMock = Mockery::mock(DocumentRepository::class);
-        $this->verificationRepositoryMock = Mockery::mock(VerificationRepository::class);
-        $this->encryptionServiceMock = Mockery::mock(EncryptionService::class);
+        $this->documentRepositoryMock = \Mockery::mock(DocumentRepository::class);
+        $this->verificationRepositoryMock = \Mockery::mock(VerificationRepository::class);
+        $this->encryptionServiceMock = \Mockery::mock(EncryptionService::class);
 
         $this->documentService = new DocumentService(
             $this->documentRepositoryMock,
@@ -84,13 +84,13 @@ class DocumentServiceTest extends MockeryTestCase
             'name' => 'passport.jpg',
             'tmp_name' => $testFilePath,
             'size' => $this->vfs->getFileSize($testFilePath),
-            'error' => UPLOAD_ERR_OK
+            'error' => UPLOAD_ERR_OK,
         ];
 
         $verification = ['id_kyc_verification' => $verificationId];
         $encryptionResult = [
             'sha256' => 'test_hash_12345',
-            'iv' => 'test_iv_67890'
+            'iv' => 'test_iv_67890',
         ];
 
         $this->verificationRepositoryMock->shouldReceive('findById')
@@ -103,7 +103,7 @@ class DocumentServiceTest extends MockeryTestCase
 
         $this->documentRepositoryMock->shouldReceive('create')
             ->once()
-            ->with(Mockery::on(function ($data) use ($verificationId, $documentType, $fileData) {
+            ->with(\Mockery::on(function ($data) use ($verificationId, $documentType, $fileData) {
                 return $data['verification_id'] === $verificationId
                     && $data['type'] === $documentType
                     && $data['filename'] === $fileData['name']
@@ -119,7 +119,7 @@ class DocumentServiceTest extends MockeryTestCase
         $this->assertEquals(123, $result['document_id']);
         $this->assertArrayHasKey('filename', $result);
         $this->assertNull($result['side']);
-        
+
         Need to implement rename intercept func
         */
         $this->assertFalse($result['success']);
@@ -137,7 +137,7 @@ class DocumentServiceTest extends MockeryTestCase
             'iv' => 'test_iv',
             'sha256' => 'test_hash',
             'mime' => 'image/jpeg',
-            'filesize' => 1024
+            'filesize' => 1024,
         ];
 
         $this->documentRepositoryMock->shouldReceive('findById')
@@ -178,7 +178,7 @@ class DocumentServiceTest extends MockeryTestCase
         $fileData = [
             'error' => UPLOAD_ERR_OK,
             'size' => 11 * 1024 * 1024, // 11MB
-            'tmp_name' => '/tmp/test'
+            'tmp_name' => '/tmp/test',
         ];
         $result = $this->documentService->uploadDocument(1, $fileData, 'passport');
         $this->assertFalse($result['success']);
@@ -189,7 +189,7 @@ class DocumentServiceTest extends MockeryTestCase
         $fileData = [
             'error' => UPLOAD_ERR_OK,
             'size' => 1024,
-            'tmp_name' => $testFile
+            'tmp_name' => $testFile,
         ];
         $result = $this->documentService->uploadDocument(1, $fileData, 'passport');
         $this->assertFalse($result['success']);
@@ -204,7 +204,7 @@ class DocumentServiceTest extends MockeryTestCase
             'error' => UPLOAD_ERR_OK,
             'size' => 1024,
             'tmp_name' => $testFile,
-            'name' => 'test.jpg'
+            'name' => 'test.jpg',
         ];
 
         $this->verificationRepositoryMock->shouldReceive('findById')
@@ -227,7 +227,7 @@ class DocumentServiceTest extends MockeryTestCase
             'error' => UPLOAD_ERR_OK,
             'size' => 1024,
             'tmp_name' => $testFile,
-            'name' => 'test.jpg'
+            'name' => 'test.jpg',
         ];
 
         $this->verificationRepositoryMock->shouldReceive('findById')
@@ -255,7 +255,6 @@ class DocumentServiceTest extends MockeryTestCase
         $this->assertEquals('The front side of this document has already been uploaded', $result['message']);
     }
 
-
     public function testGetDocumentNotFound()
     {
         $this->documentRepositoryMock->shouldReceive('findById')
@@ -273,7 +272,7 @@ class DocumentServiceTest extends MockeryTestCase
         $document = [
             'id_kyc_document' => 1,
             'filename' => 'nonexistent.jpg',
-            'iv' => 'test_iv'
+            'iv' => 'test_iv',
         ];
 
         $this->documentRepositoryMock->shouldReceive('findById')
@@ -288,15 +287,12 @@ class DocumentServiceTest extends MockeryTestCase
         $this->assertEquals('Document file not found on disk', $result['message']);
     }
 
-
-    
-
     public function testDeleteDocumentSuccess()
     {
         $documentId = 1;
         $document = [
             'id_kyc_document' => $documentId,
-            'filename' => 'test.jpg'
+            'filename' => 'test.jpg',
         ];
 
         // Create file in VFS
@@ -334,7 +330,7 @@ class DocumentServiceTest extends MockeryTestCase
     {
         $document = [
             'id_kyc_document' => 1,
-            'filename' => 'test.jpg'
+            'filename' => 'test.jpg',
         ];
 
         $this->documentRepositoryMock->shouldReceive('findById')
@@ -359,7 +355,7 @@ class DocumentServiceTest extends MockeryTestCase
         $expiredDocuments = [
             ['id_kyc_document' => 1],
             ['id_kyc_document' => 2],
-            ['id_kyc_document' => 3]
+            ['id_kyc_document' => 3],
         ];
 
         $this->documentRepositoryMock->shouldReceive('findExpiredDocuments')
@@ -388,7 +384,7 @@ class DocumentServiceTest extends MockeryTestCase
     {
         $expiredDocuments = [
             ['id_kyc_document' => 1],
-            ['id_kyc_document' => 2]
+            ['id_kyc_document' => 2],
         ];
 
         $this->documentRepositoryMock->shouldReceive('findExpiredDocuments')
@@ -420,25 +416,24 @@ class DocumentServiceTest extends MockeryTestCase
         $document = [
             'id_kyc_document' => $documentId,
             'filename' => 'old_file.jpg',
-            'id_kyc_verification' => 10
+            'id_kyc_verification' => 10,
         ];
 
         $newFilePath = $this->vfs->createTestFile('new_file.jpg', 'new content', 'image/jpeg');
         $newFile = [
             'name' => 'new_file.jpg',
             'tmp_name' => $newFilePath,
-            'size' => $this->vfs->getFileSize($newFilePath)
+            'size' => $this->vfs->getFileSize($newFilePath),
         ];
 
         $encryptionResult = [
             'sha256' => 'new_hash',
-            'iv' => 'new_iv'
+            'iv' => 'new_iv',
         ];
 
         $this->documentRepositoryMock->shouldReceive('findById')
             ->with($documentId)
             ->andReturn($document);
-
 
         $this->documentRepositoryMock->shouldReceive('updateDocumentFields')
             ->twice();
@@ -477,7 +472,7 @@ class DocumentServiceTest extends MockeryTestCase
         $verificationId = 1;
         $documents = [
             ['id_kyc_document' => 1],
-            ['id_kyc_document' => 2]
+            ['id_kyc_document' => 2],
         ];
 
         $this->documentRepositoryMock->shouldReceive('findByVerificationId')
@@ -495,7 +490,6 @@ class DocumentServiceTest extends MockeryTestCase
             $this->documentRepositoryMock->shouldReceive('delete')
                 ->with($doc['id_kyc_document'])
                 ->andReturn(true);
-
         }
 
         $result = $this->documentService->deleteByVerificationId($verificationId);
@@ -533,7 +527,7 @@ class DocumentServiceTest extends MockeryTestCase
         $verificationId = 1;
         $documents = [
             ['type' => 'passport', 'side' => null],
-            ['type' => 'utility_bill', 'side' => null]
+            ['type' => 'utility_bill', 'side' => null],
         ];
 
         $this->documentRepositoryMock->shouldReceive('findByVerificationId')
@@ -551,7 +545,7 @@ class DocumentServiceTest extends MockeryTestCase
     {
         $verificationId = 1;
         $documents = [
-            ['type' => 'passport', 'side' => null]
+            ['type' => 'passport', 'side' => null],
             // Missing address document
         ];
 
@@ -571,7 +565,7 @@ class DocumentServiceTest extends MockeryTestCase
         $documents = [
             ['type' => 'drivers_license', 'side' => 'front'],
             ['type' => 'drivers_license', 'side' => 'back'],
-            ['type' => 'utility_bill', 'side' => null]
+            ['type' => 'utility_bill', 'side' => null],
         ];
 
         $this->documentRepositoryMock->shouldReceive('findByVerificationId')
@@ -642,7 +636,7 @@ class DocumentServiceTest extends MockeryTestCase
         $documents = [
             ['type' => 'drivers_license', 'side' => 'front'],
             // Missing back side
-            ['type' => 'utility_bill', 'side' => null]
+            ['type' => 'utility_bill', 'side' => null],
         ];
 
         $this->documentRepositoryMock->shouldReceive('findByVerificationId')

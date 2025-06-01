@@ -1,14 +1,13 @@
 <?php
+
 namespace Tests\PsKyc\Repository;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
-use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
-use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use PrestaShop\Module\Pskyc\Repository\OrderRepository;
-use Exception;
 
 class OrderRepositoryTest extends MockeryTestCase
 {
@@ -29,19 +28,19 @@ class OrderRepositoryTest extends MockeryTestCase
 
     protected function setUp(): void
     {
-        $this->connectionMock = Mockery::mock(Connection::class);
-        $this->queryBuilderMock = Mockery::mock(QueryBuilder::class);
-        $this->resultMock = Mockery::mock(Result::class);
-        $this->expressionBuilderMock = Mockery::mock(ExpressionBuilder::class);
-        
+        $this->connectionMock = \Mockery::mock(Connection::class);
+        $this->queryBuilderMock = \Mockery::mock(QueryBuilder::class);
+        $this->resultMock = \Mockery::mock(Result::class);
+        $this->expressionBuilderMock = \Mockery::mock(ExpressionBuilder::class);
+
         $this->repository = new OrderRepository($this->connectionMock);
     }
 
     public function testConstructorSetsConnection()
     {
-        $connection = Mockery::mock(Connection::class);
+        $connection = \Mockery::mock(Connection::class);
         $repository = new OrderRepository($connection);
-        
+
         // Test that the repository was created successfully
         $this->assertInstanceOf(OrderRepository::class, $repository);
     }
@@ -52,7 +51,7 @@ class OrderRepositoryTest extends MockeryTestCase
         $expectedCategories = [
             ['id_category_default' => '3'],
             ['id_category_default' => '5'],
-            ['id_category_default' => '8']
+            ['id_category_default' => '8'],
         ];
 
         $this->connectionMock->shouldReceive('createQueryBuilder')
@@ -153,7 +152,7 @@ class OrderRepositoryTest extends MockeryTestCase
 
         $this->connectionMock->shouldReceive('createQueryBuilder')
             ->once()
-            ->andThrow(new Exception('Database error'));
+            ->andThrow(new \Exception('Database error'));
 
         $result = $this->repository->findProductsCartsCategoriesByCustomerId($customerId);
 
@@ -167,7 +166,7 @@ class OrderRepositoryTest extends MockeryTestCase
         $customerId = 42;
         $expectedCategories = [
             ['id_category_default' => '1'],
-            ['id_category_default' => '7']
+            ['id_category_default' => '7'],
         ];
 
         $this->connectionMock->shouldReceive('createQueryBuilder')
@@ -251,12 +250,10 @@ class OrderRepositoryTest extends MockeryTestCase
 
         $this->queryBuilderMock->shouldReceive('execute')
             ->once()
-            ->andThrow(new Exception('Execute failed'));
+            ->andThrow(new \Exception('Execute failed'));
 
         $result = $this->repository->findProductsCartsCategoriesByCustomerId($customerId);
 
         $this->assertEquals([], $result);
     }
-
-    
 }
