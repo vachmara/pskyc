@@ -23,6 +23,8 @@ echo "Run PHPStan using phpstan-${PS_VERSION}.neon file"
 docker run --rm --volumes-from temp-ps \
        -v $PWD:/var/www/html/modules/pskyc \
        -e _PS_ROOT_DIR_=/var/www/html \
-       --workdir=/var/www/html/modules/pskyc ghcr.io/phpstan/phpstan \
+       --workdir=/var/www/html/modules/pskyc \
+       --entrypoint=/var/www/html/modules/pskyc/vendor/bin/phpstan \
        analyse \
-       --configuration=/var/www/html/modules/pskyc/tests/phpstan/phpstan-$PS_VERSION.neon
+       --configuration=/var/www/html/modules/autoupgrade/tests/phpstan/phpstan-$PS_VERSION.neon \
+       "${@:2}"
