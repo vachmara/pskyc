@@ -72,7 +72,7 @@ class MaintenanceService
         DocumentRepository $documentRepository,
         CustomerRepository $customerRepository,
         LogRepository $logRepository,
-        ?string $uploadDir,
+        string $uploadDir = null,
     ) {
         $this->documentService = $documentService;
         $this->notificationService = $notificationService;
