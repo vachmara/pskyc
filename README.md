@@ -7,6 +7,24 @@ Open source, GDPR-compliant KYC document verification for PrestaShop.
 - Secure file storage with encryption
 - Product order blocking until KYC is validated
 
+## Requirements
+
+### PrestaShop Compatibility
+- **PrestaShop:** 8.0.0 - 8.99.99
+- **PHP:** 8.1 or higher
+
+### PHP Extensions
+This module uses standard PrestaShop-required PHP extensions:
+
+- **fileinfo** - For MIME type detection of uploaded documents
+- **openssl** - For AES-256-CBC document encryption
+- **curl** - For HTTP requests (standard PrestaShop requirement)
+- **gd** - For image processing (standard PrestaShop requirement)
+- **json** - For configuration data (standard PrestaShop requirement)
+- **mbstring** - For string handling (standard PrestaShop requirement)
+
+*All listed extensions are standard PrestaShop 8 requirements, so no additional server configuration is needed.*
+
 ## Features
 
 - [x] Secure KYC file uploads (ID, proof of address)
