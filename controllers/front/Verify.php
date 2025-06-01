@@ -4,6 +4,7 @@
  * MIT License
  * Copyright (c) 2025 Valentin Chmara
  */
+if (!defined('_PS_VERSION_')) { exit; }
 
 use PrestaShop\Module\Pskyc\Service\DocumentService;
 use PrestaShop\Module\Pskyc\Service\NotificationService;

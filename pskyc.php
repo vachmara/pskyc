@@ -4,7 +4,7 @@
  * MIT License
  * Copyright (c) 2025 Valentin Chmara
  */
-
+if (!defined('_PS_VERSION_')) { exit; }
 use PrestaShop\Module\Pskyc\Service\VerificationService;
 use PrestaShop\PrestaShop\Core\MailTemplate\Layout\Layout;
 use PrestaShop\PrestaShop\Core\MailTemplate\ThemeCatalogInterface;

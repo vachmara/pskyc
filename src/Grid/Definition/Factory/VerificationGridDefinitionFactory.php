@@ -5,9 +5,8 @@
  * Copyright (c) 2025 Valentin Chmara
  */
 
-declare(strict_types=1);
-
 namespace PrestaShop\Module\Pskyc\Grid\Definition\Factory;
+if (!defined('_PS_VERSION_')) { exit; }
 
 use PrestaShop\PrestaShop\Core\Grid\Action\Row\RowActionCollection;
 use PrestaShop\PrestaShop\Core\Grid\Action\Row\RowActionCollectionInterface;

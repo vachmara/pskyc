@@ -5,9 +5,8 @@
  * Copyright (c) 2025 Valentin Chmara
  */
 
-declare(strict_types=1);
-
 namespace PrestaShop\Module\Pskyc\Grid\Query;
+if (!defined('_PS_VERSION_')) { exit; }
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;

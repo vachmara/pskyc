@@ -6,7 +6,7 @@
  */
 
 namespace PrestaShop\Module\Pskyc\Service;
-
+if (!defined('_PS_VERSION_')) { exit; }
 use Configuration;
 
 /**

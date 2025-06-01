@@ -4,10 +4,8 @@
  * MIT License
  * Copyright (c) 2025 Valentin Chmara
  */
-
-declare(strict_types=1);
-
 namespace PrestaShop\Module\Pskyc\Grid\Filters;
+if (!defined('_PS_VERSION_')) { exit; }
 
 use PrestaShop\Module\Pskyc\Grid\Definition\Factory\VerificationGridDefinitionFactory;
 use PrestaShop\PrestaShop\Core\Search\Filters;

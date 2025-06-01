@@ -6,7 +6,7 @@
  */
 
 namespace PrestaShop\Module\Pskyc\Repository;
-
+if (!defined('_PS_VERSION_')) { exit; }
 use Doctrine\DBAL\Connection;
 use Exception;
 

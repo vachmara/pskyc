@@ -6,13 +6,9 @@
  */
 
 namespace PrestaShop\Module\Pskyc\Entity;
-
+if (!defined('_PS_VERSION_')) { exit; }
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
-
-if (!defined('_PS_VERSION_')) {
-    exit;
-}
 
 /**
  * Class Verification

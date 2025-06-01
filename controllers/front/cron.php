@@ -5,7 +5,7 @@
  * Copyright (c) 2025 Valentin Chmara
  */
 
-declare(strict_types=1);
+ if (!defined('_PS_VERSION_')) { exit; }
 
 /**
  * KYC Secure Upload Cron Controller

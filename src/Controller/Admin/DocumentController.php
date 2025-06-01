@@ -7,6 +7,7 @@
 
 namespace PrestaShop\Module\Pskyc\Controller\Admin;
 
+if (!defined('_PS_VERSION_')) { exit; }
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
