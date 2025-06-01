@@ -116,6 +116,12 @@ Email templates are located in:
 
 Available languages: `en`, `fr`
 
+### ⚠️ Known Issue: Email Template Generation
+
+There is a known bug in PrestaShop 8.1.2 preventing email template generation for custom modules through the admin interface. Email sending functionality works normally.
+
+**Details:** [PrestaShop Issue #35214](https://github.com/PrestaShop/PrestaShop/issues/35214)
+
 ## Contribution
 
 PRs welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
