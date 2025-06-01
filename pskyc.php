@@ -123,7 +123,7 @@ class Pskyc extends Module
 
         return parent::uninstall();
     }
-
+    
     /**
      * Load the configuration form
      *
@@ -176,6 +176,10 @@ class Pskyc extends Module
             $verificationUrl = $this->context->link->getAdminLink('AdminModules') . '&configure=pskyc';
         }
 
+        // Generate cron information
+        $cronToken = $this->getCronToken();
+        $cronUrl = $this->context->link->getModuleLink($this->name, 'cron', ['token' => $cronToken], true);
+
         // Assign template variables
         $this->context->smarty->assign([
             'module_dir' => $this->_path,
@@ -183,6 +187,8 @@ class Pskyc extends Module
             'errors' => $errors,
             'security_status' => $securityStatus,
             'verification_url' => $verificationUrl,
+            'cron_token' => $cronToken,
+            'cron_url' => $cronUrl,
         ]);
 
         $output .= $this->context->smarty->fetch($this->local_path . 'views/templates/admin/configure.tpl');
