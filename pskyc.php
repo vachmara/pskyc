@@ -123,7 +123,7 @@ class Pskyc extends Module
 
         return parent::uninstall();
     }
-    
+
     /**
      * Load the configuration form
      *

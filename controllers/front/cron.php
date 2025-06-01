@@ -20,7 +20,7 @@ class PskycCronModuleFrontController extends ModuleFrontController
     public $module;
 
     /**
-     * @var \PrestaShop\Module\Pskyc\Service\MaintenanceService
+     * @var PrestaShop\Module\Pskyc\Service\MaintenanceService
      */
     private $maintenanceService;
 
