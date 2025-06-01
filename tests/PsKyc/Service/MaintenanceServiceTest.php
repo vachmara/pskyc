@@ -109,7 +109,8 @@ class MaintenanceServiceTest extends MockeryTestCase
             $this->verificationRepositoryMock,
             $this->documentRepositoryMock,
             $this->customerRepositoryMock,
-            $this->logRepositoryMock
+            $this->logRepositoryMock,
+            null
         );
 
         $this->assertInstanceOf(MaintenanceService::class, $service);
@@ -980,7 +981,7 @@ class MaintenanceServiceTest extends MockeryTestCase
             ->andReturn([]);
 
         // Call without specifying warning days (should use config)
-        $result = $this->maintenanceService->sendExpiryWarnings();
+        $result = $this->maintenanceService->sendExpiryWarnings(null);
 
         $this->assertEquals(0, $result['warnings_sent']);
         $this->assertEmpty($result['errors']);
@@ -1003,7 +1004,7 @@ class MaintenanceServiceTest extends MockeryTestCase
             ->andReturn(12);
 
         // Call without specifying retention days (should use config)
-        $result = $this->maintenanceService->cleanupOldLogs();
+        $result = $this->maintenanceService->cleanupOldLogs(null);
 
         $this->assertEquals(12, $result['logs_deleted']);
         $this->assertEmpty($result['errors']);

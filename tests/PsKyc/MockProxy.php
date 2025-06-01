@@ -111,6 +111,22 @@ class Order extends MockProxy
 class PrestaShopLogger extends MockProxy
 {
     protected static $mock;
+
+    /**
+     * Log a message
+     *
+     * @param string $message
+     * @param int $level
+     */
+    public static function log($message, $level = 1)
+    {
+        if (static::$mock) {
+            static::$mock->log($message, $level);
+        } else {
+            // Default behavior if no mock is set
+            error_log("[$level] $message");
+        }
+    }
 }
 
 class Mail extends MockProxy

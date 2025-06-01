@@ -548,7 +548,7 @@ class LogRepositoryTest extends MockeryTestCase
             ->once()
             ->andReturn($expectedStats);
 
-        $result = $this->repository->getLogStats();
+        $result = $this->repository->getLogStats(null);
 
         $this->assertEquals($expectedStats, $result);
         $this->assertCount(3, $result);

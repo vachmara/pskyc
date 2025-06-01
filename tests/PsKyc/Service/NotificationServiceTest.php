@@ -169,7 +169,7 @@ class NotificationServiceTest extends MockeryTestCase
             ->once()
             ->with(\Mockery::pattern('/KYC notification error:/'), 3, null, 'Pskyc');
 
-        $result = $this->service->sendStatusChangeNotification($verification, $customer);
+        $result = $this->service->sendStatusChangeNotification($verification, $customer, 'pending');
 
         $this->assertFalse($result);
     }

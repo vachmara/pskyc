@@ -220,7 +220,7 @@ class DocumentRepositoryTest extends MockeryTestCase
             ->once()
             ->andReturn(1);
 
-        $result = $this->repository->updateStatus($documentId, $status);
+        $result = $this->repository->updateStatus($documentId, $status, null, null);
 
         $this->assertTrue($result);
     }
