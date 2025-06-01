@@ -497,7 +497,7 @@ class VerificationRepositoryTest extends MockeryTestCase
             ->once()
             ->andReturn($expectedId);
 
-        $result = $this->repository->create($customerId,  null,'pending');
+        $result = $this->repository->create($customerId, null, 'pending');
 
         $this->assertEquals($expectedId, $result);
     }
@@ -626,7 +626,7 @@ class VerificationRepositoryTest extends MockeryTestCase
             ->once()
             ->andReturn(1);
 
-        $result = $this->repository->updateStatus($verificationId, $status,     null);
+        $result = $this->repository->updateStatus($verificationId, $status, null);
 
         $this->assertTrue($result);
     }

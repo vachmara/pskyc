@@ -88,8 +88,6 @@ class VerificationServiceTest extends MockeryTestCase
         $this->assertInstanceOf(VerificationService::class, $service);
     }
 
-    
-
     public function testCreateVerificationWithActiveVerificationExists()
     {
         $customerId = 1;

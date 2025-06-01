@@ -100,7 +100,7 @@ class VerificationService
                 ];
             }
 
-            $verificationId = $this->verificationRepository->create($customerId,$options['customer_note'] ?? null , 'pending', );
+            $verificationId = $this->verificationRepository->create($customerId, $options['customer_note'] ?? null, 'pending');
 
             if ($verificationId) {
                 // Log the creation

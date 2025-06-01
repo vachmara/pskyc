@@ -179,7 +179,7 @@ class DocumentServiceTest extends MockeryTestCase
     {
         // Test file upload error
         $fileData = ['error' => UPLOAD_ERR_NO_FILE];
-        $result = $this->documentService->uploadDocument(1, $fileData, 'passport',null);
+        $result = $this->documentService->uploadDocument(1, $fileData, 'passport', null);
         $this->assertFalse($result['success']);
         $this->assertEquals('File upload failed', $result['message']);
 
