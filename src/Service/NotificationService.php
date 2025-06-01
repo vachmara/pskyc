@@ -354,8 +354,8 @@ class NotificationService
      * @param string $subject Email subject
      * @param array $templateVars Template variables
      * @param string $recipientEmail Recipient email address
-     * @param string $recipientName Recipient name
-     * @param string|int $langId Language ID
+     * @param string|null $recipientName Recipient name
+     * @param string|int|null $langId Language ID
      *
      * @return bool True if email was sent successfully
      */
@@ -365,7 +365,7 @@ class NotificationService
         array $templateVars,
         string $recipientEmail,
         ?string $recipientName = null,
-        $langId,
+        $langId = null,
     ): bool {
         try {
             if (empty($recipientEmail)) {
@@ -373,7 +373,7 @@ class NotificationService
             }
 
             // Ensure langId is an integer
-            $langId = (int) $langId;
+            $langId = (int) ($langId ?? \Configuration::get('PS_LANG_DEFAULT'));
             if ($langId <= 0) {
                 $langId = (int) \Configuration::get('PS_LANG_DEFAULT');
             }
