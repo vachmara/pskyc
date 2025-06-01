@@ -52,5 +52,5 @@ services:
       - '@PrestaShop\Module\Pskyc\Repository\VerificationRepository'
       - '@PrestaShop\Module\Pskyc\Repository\DocumentRepository'
       - '@PrestaShop\Module\Pskyc\Repository\LogRepository'
-      - '@PrestaShop\Module\Pskyc\Service\DocumentService'
       - '@PrestaShop\Module\Pskyc\Service\NotificationService'
+      - '@PrestaShop\Module\Pskyc\Repository\CustomerRepository'
