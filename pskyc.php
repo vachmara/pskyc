@@ -283,8 +283,7 @@ class Pskyc extends Module
                     [
                         'type' => 'html',
                         'name' => 'encryption_info',
-                        'html_content' => '<div class="alert alert-info"><strong>' . $this->l('Security Note:') . '</strong> ' .
-                            $this->l('All uploaded documents are automatically encrypted using AES-256-CBC encryption. The encryption key is automatically generated and stored securely.') . '</div>',
+                        'html_content' => $this->context->smarty->fetch($this->local_path . 'views/templates/admin/security_note.tpl'),
                     ],
                 ],
                 'submit' => [
@@ -727,7 +726,7 @@ class Pskyc extends Module
             $octal = substr(sprintf('%o', $perms), -4);
 
             // Check if permissions are too permissive (should be 0700 or similar)
-            if (intval($octal) > 0755) {
+            if ((int)$octal > 0755) {
                 // Try to fix permissions
                 if (!@chmod($uploadDir, 0700)) {
                     return false;
@@ -840,7 +839,7 @@ class Pskyc extends Module
             $perms = fileperms($uploadDir);
             $octal = substr(sprintf('%o', $perms), -4);
 
-            if (intval($octal) > 0755) {
+            if ((int)$octal > 0755) {
                 $warnings[] = 'Directory permissions may be too permissive (' . $octal . ')';
                 $status = 'warning';
             }
