@@ -607,6 +607,7 @@ class NotificationServiceTest extends MockeryTestCase
 
         $this->assertFalse($result);
     }
+
     /**
      * Helper method to set up Context expectations
      */
