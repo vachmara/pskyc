@@ -1,165 +1,28 @@
-# PrestaShop KYC Module Security Configuration
-# Compatible with Apache 2.2+ and 2.4+
+# Compatible .htaccess for older Apache versions
 
-# Prevent directory browsing
-Options -Indexes
+# Allow all image files (Apache 2.2/2.4 compatible)
+<Files "logo.png">
+    Order allow,deny
+    Allow from all
+    Satisfy any
+</Files>
 
-# Disable server signature
-ServerSignature Off
+<FilesMatch "\.(png|jpg|jpeg|gif|svg|ico|css|js)$">
+    Order allow,deny
+    Allow from all
+    Satisfy any
+</FilesMatch>
 
-# Security headers
-<IfModule mod_headers.c>
-    # Prevent clickjacking
-    Header always append X-Frame-Options SAMEORIGIN
-    
-    # Prevent MIME type sniffing
-    Header always set X-Content-Type-Options nosniff
-    
-    # Enable XSS protection
-    Header always set X-XSS-Protection "1; mode=block"
-    
-    # Strict transport security (if using HTTPS)
-    # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
-</IfModule>
-
-# Protect sensitive files and directories
+# Block sensitive files
 <Files "composer.json">
-    <RequireAll>
-        Require all denied
-    </RequireAll>
+    Order deny,allow
+    Deny from all
 </Files>
 
 <Files "composer.lock">
-    <RequireAll>
-        Require all denied
-    </RequireAll>
+    Order deny,allow
+    Deny from all
 </Files>
 
-<Files "*.md">
-    <RequireAll>
-        Require all denied
-    </RequireAll>
-</Files>
-
-<Files "*.txt">
-    <RequireAll>
-        Require all denied
-    </RequireAll>
-</Files>
-
-<Files "*.yml">
-    <RequireAll>
-        Require all denied
-    </RequireAll>
-</Files>
-
-<Files "*.yaml">
-    <RequireAll>
-        Require all denied
-    </RequireAll>
-</Files>
-
-<Files "docker-compose*.yml">
-    <RequireAll>
-        Require all denied
-    </RequireAll>
-</Files>
-
-# Protect configuration and sensitive directories
-<DirectoryMatch "^.*/(\.|config|sql|upgrade|tests|scripts|releases)/">
-    <RequireAll>
-        Require all denied
-    </RequireAll>
-</DirectoryMatch>
-
-# Protect vendor directory (Composer dependencies)
-<DirectoryMatch "^.*/vendor/">
-    <RequireAll>
-        Require all denied
-    </RequireAll>
-</DirectoryMatch>
-
-# Protect source code directory
-<DirectoryMatch "^.*/src/">
-    <RequireAll>
-        Require all denied
-    </RequireAll>
-</DirectoryMatch>
-
-# Block access to sensitive file types
-<FilesMatch "\.(log|sql|tpl|twig|ini|conf|cfg)$">
-    <RequireAll>
-        Require all denied
-    </RequireAll>
-</FilesMatch>
-
-# Block access to version control files
-<FilesMatch "^(\.git|\.svn|\.hg)">
-    <RequireAll>
-        Require all denied
-    </RequireAll>
-</FilesMatch>
-
-# Fallback for older Apache versions (2.2)
-<IfModule !mod_authz_core.c>
-    # Protect sensitive files
-    <Files "composer.json">
-        Order Deny,Allow
-        Deny from all
-    </Files>
-    
-    <Files "composer.lock">
-        Order Deny,Allow
-        Deny from all
-    </Files>
-    
-    <FilesMatch "\.(md|txt|yml|yaml|log|sql|tpl|twig|ini|conf|cfg)$">
-        Order Deny,Allow
-        Deny from all
-    </FilesMatch>
-    
-    # Protect directories
-    <DirectoryMatch "^.*/(\.|config|sql|upgrade|tests|scripts|releases|vendor|src)/">
-        Order Deny,Allow
-        Deny from all
-    </DirectoryMatch>
-</IfModule>
-
-# Prevent execution of PHP files in uploads directory
-<DirectoryMatch "^.*/secure_upload/">
-    <FilesMatch "\.php$">
-        <RequireAll>
-            Require all denied
-        </RequireAll>
-    </FilesMatch>
-</DirectoryMatch>
-
-# Fallback for older Apache versions
-<IfModule !mod_authz_core.c>
-    <DirectoryMatch "^.*/secure_upload/">
-        <FilesMatch "\.php$">
-            Order Deny,Allow
-            Deny from all
-        </FilesMatch>
-    </DirectoryMatch>
-</IfModule>
-
-# Gzip compression for better performance
-<IfModule mod_deflate.c>
-    <FilesMatch "\.(css|js|png|jpg|jpeg|gif|ico|svg)$">
-        SetOutputFilter DEFLATE
-    </FilesMatch>
-</IfModule>
-
-# Cache control for static assets
-<IfModule mod_expires.c>
-    ExpiresActive On
-    ExpiresByType text/css "access plus 1 month"
-    ExpiresByType application/javascript "access plus 1 month"
-    ExpiresByType image/png "access plus 1 month"
-    ExpiresByType image/jpg "access plus 1 month"
-    ExpiresByType image/jpeg "access plus 1 month"
-    ExpiresByType image/gif "access plus 1 month"
-    ExpiresByType image/ico "access plus 1 month"
-    ExpiresByType image/svg+xml "access plus 1 month"
-</IfModule>
+# Prevent directory browsing
+Options -Indexes
