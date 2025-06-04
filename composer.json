@@ -52,6 +52,12 @@
         ],
         "lint-check": [
             "php-cs-fixer fix --no-interaction --dry-run --diff"
+        ], 
+        "test": [
+            "@php ./vendor/bin/phpunit --configuration phpunit.xml.dist"
+        ],
+        "test:coverage": [
+            "@php ./vendor/bin/phpunit --configuration phpunit.xml.dist --coverage-html coverage"
         ]
     }
 }
