@@ -100,6 +100,10 @@ class PskycCronModuleFrontController extends ModuleFrontController
     private function initializeServices()
     {
         try {
+            if (!$this->module) {
+                $this->module = Module::getInstanceByName('pskyc');
+            }
+
             $this->maintenanceService = $this->module->get('PrestaShop\Module\Pskyc\Service\MaintenanceService');
         } catch (Exception $e) {
             PrestaShopLogger::addLog('Service initialization failed: ' . $e->getMessage(), 3, null, 'Pskyc');
