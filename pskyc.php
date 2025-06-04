@@ -77,6 +77,16 @@ class Pskyc extends Module
     }
 
     /**
+     * Tell PrestaShop that this module uses the new translation system (XLF files).
+     *
+     * @return bool
+     */
+    public function isUsingNewTranslationSystem(): bool
+    {
+        return true;
+    }
+
+    /**
      * Install the module
      *
      * Creates database tables, sets default configuration,

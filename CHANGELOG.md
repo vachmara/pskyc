@@ -10,10 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Logo image for the module
+- French translation for the module
 
 ### Fixed
 
 - .htaccess too complex and blocking logo.png
+- isUsingNewTranslationSystem method to use the correct translation system
 - KYC checkout step not shown for products with non-default categories
 
 

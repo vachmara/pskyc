@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin-dev" source-language="fr-FR" target-language="fr-FR" datatype="plaintext">
+    <body>
+      <trans-unit id="53a70f19490969a282cdeb595607f4d8">
+        <source>KYC Secure Upload Configuration</source>
+        <target>Configuration KYC Secure Upload</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="58a1ef2a5216fb4f7d5935dadd48add2">
+        <source>Welcome to KYC Secure Upload!</source>
+        <target>Bienvenue dans KYC Secure Upload !</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="e90e625f9886b7ef42c4c34eeabe9d6f">
+        <source>This module allows your customers to upload identity documents for verification. Configure the settings below to customize the behavior.</source>
+        <target>Ce module permet à vos clients de télécharger des documents d'identité pour vérification. Configurez les paramètres ci-dessous pour personnaliser le comportement.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="4d65112b8e029b397dff2dd5c190f46f">
+        <source>Settings updated successfully!</source>
+        <target>Paramètres mis à jour avec succès !</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="4fc01a3b24b501c5c9e5170ad81c8dcf">
+        <source>Module Information</source>
+        <target>Informations du module</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="b55afee3a3deb460e6149b486d8d9a49">
+        <source>Current Status</source>
+        <target>Statut actuel</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="9d290d3434589e33be3d2cad4f8323ec">
+        <source>Version:</source>
+        <target>Version :</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="c8ea60201962f6c68ed2d2f22fd6df3d">
+        <source>Upload Directory:</source>
+        <target>Répertoire de téléchargement :</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="8a7363b823dce00b3b1b7e62ca1d777d">
+        <source>Encryption:</source>
+        <target>Chiffrement :</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="78945de8de090e90045d299651a68a9b">
+        <source>Available</source>
+        <target>Disponible</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="67c19e107de33cab7ea9a9db8bc9ccd2">
+        <source>Not Available</source>
+        <target>Non disponible</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="57aee383485cf2d2836cdcfa681220d2">
+        <source>Quick Actions</source>
+        <target>Actions rapides</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="834f293875d0ad0b92be4b21d832fc59">
+        <source>View Verifications</source>
+        <target>Voir les vérifications</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
