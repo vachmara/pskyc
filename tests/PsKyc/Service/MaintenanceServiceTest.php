@@ -1174,7 +1174,6 @@ class MaintenanceServiceTest extends MockeryTestCase
     {
         $encryptionKey = 'test_encryption_key_12345';
         $expectedToken = 'abcdefghij';
-        $shopUrl = 'https://mystore.com';
         $action = 'daily_maintenance';
 
         // Mock Configuration::get() to return encryption key
@@ -1192,18 +1191,25 @@ class MaintenanceServiceTest extends MockeryTestCase
             ->once()
             ->with($encryptionKey . 'pskyc_cron_token')
             ->andReturn($expectedToken . 'extra_chars_to_be_truncated');
-
-        // Mock Tools::getShopDomainSsl() to return shop URL
-        $toolsMock->shouldReceive('getShopDomainSsl')
-            ->once()
-            ->with(true, true)
-            ->andReturn($shopUrl);
-
         \Tools::setStaticExpectations($toolsMock);
+
+        // Mock Context with Link
+        $linkMock = \Mockery::mock();
+        $languageMock = \Mockery::mock();
+        $languageMock->id = 1;
+        $contextMock = \Mockery::mock();
+        $contextMock->link = $linkMock;
+        $contextMock->language = $languageMock;
+        \Context::setStaticExpectations($contextMock);
+
+        $expectedUrl = 'https://mystore.com/fr/module/pskyc/cron?token=abcdefghij&action=daily_maintenance';
+        $linkMock->shouldReceive('getModuleLink')
+            ->once()
+            ->with('pskyc', 'cron', ['token' => $expectedToken, 'action' => $action], true, 1)
+            ->andReturn($expectedUrl);
 
         $result = $this->maintenanceService->generateCronUrl($action);
 
-        $expectedUrl = 'https://mystore.com/modules/pskyc/cron.php?token=abcdefghij&action=daily_maintenance';
         $this->assertEquals($expectedUrl, $result);
     }
 
@@ -1211,7 +1217,6 @@ class MaintenanceServiceTest extends MockeryTestCase
     {
         $encryptionKey = 'test_encryption_key_12345';
         $expectedToken = 'xyz1234567';
-        $shopUrl = 'https://example.com/shop';
         $action = 'cleanup_documents';
 
         // Mock Configuration::get() to return encryption key
@@ -1229,18 +1234,25 @@ class MaintenanceServiceTest extends MockeryTestCase
             ->once()
             ->with($encryptionKey . 'pskyc_cron_token')
             ->andReturn($expectedToken . 'more_chars');
-
-        // Mock Tools::getShopDomainSsl() to return shop URL
-        $toolsMock->shouldReceive('getShopDomainSsl')
-            ->once()
-            ->with(true, true)
-            ->andReturn($shopUrl);
-
         \Tools::setStaticExpectations($toolsMock);
+
+        // Mock Context with Link
+        $linkMock = \Mockery::mock();
+        $languageMock = \Mockery::mock();
+        $languageMock->id = 1;
+        $contextMock = \Mockery::mock();
+        $contextMock->link = $linkMock;
+        $contextMock->language = $languageMock;
+        \Context::setStaticExpectations($contextMock);
+
+        $expectedUrl = 'https://example.com/shop/fr/module/pskyc/cron?token=xyz1234567&action=cleanup_documents';
+        $linkMock->shouldReceive('getModuleLink')
+            ->once()
+            ->with('pskyc', 'cron', ['token' => $expectedToken, 'action' => $action], true, 1)
+            ->andReturn($expectedUrl);
 
         $result = $this->maintenanceService->generateCronUrl($action);
 
-        $expectedUrl = 'https://example.com/shop/modules/pskyc/cron.php?token=xyz1234567&action=cleanup_documents';
         $this->assertEquals($expectedUrl, $result);
     }
 
@@ -1248,7 +1260,6 @@ class MaintenanceServiceTest extends MockeryTestCase
     {
         $encryptionKey = 'test_key';
         $expectedToken = 'token12345';
-        $shopUrl = 'https://test.com/subfolder/';  // URL with trailing slash
         $action = 'daily_maintenance';
 
         // Mock Configuration::get() to return encryption key
@@ -1266,19 +1277,25 @@ class MaintenanceServiceTest extends MockeryTestCase
             ->once()
             ->with($encryptionKey . 'pskyc_cron_token')
             ->andReturn($expectedToken . 'suffix');
-
-        // Mock Tools::getShopDomainSsl() to return shop URL with trailing slash
-        $toolsMock->shouldReceive('getShopDomainSsl')
-            ->once()
-            ->with(true, true)
-            ->andReturn($shopUrl);
-
         \Tools::setStaticExpectations($toolsMock);
+
+        // Mock Context with Link
+        $linkMock = \Mockery::mock();
+        $languageMock = \Mockery::mock();
+        $languageMock->id = 1;
+        $contextMock = \Mockery::mock();
+        $contextMock->link = $linkMock;
+        $contextMock->language = $languageMock;
+        \Context::setStaticExpectations($contextMock);
+
+        $expectedUrl = 'https://test.com/subfolder/fr/module/pskyc/cron?token=token12345&action=daily_maintenance';
+        $linkMock->shouldReceive('getModuleLink')
+            ->once()
+            ->with('pskyc', 'cron', ['token' => $expectedToken, 'action' => $action], true, 1)
+            ->andReturn($expectedUrl);
 
         $result = $this->maintenanceService->generateCronUrl($action);
 
-        // The trailing slash should be removed by rtrim()
-        $expectedUrl = 'https://test.com/subfolder/modules/pskyc/cron.php?token=token12345&action=daily_maintenance';
         $this->assertEquals($expectedUrl, $result);
     }
 
@@ -1286,7 +1303,6 @@ class MaintenanceServiceTest extends MockeryTestCase
     {
         $encryptionKey = 'default_test_key';
         $expectedToken = 'default123';
-        $shopUrl = 'https://default.com';
 
         // Mock Configuration::get() to return encryption key
         $configurationMock = \Mockery::mock();
@@ -1303,19 +1319,26 @@ class MaintenanceServiceTest extends MockeryTestCase
             ->once()
             ->with($encryptionKey . 'pskyc_cron_token')
             ->andReturn($expectedToken . 'extra');
-
-        // Mock Tools::getShopDomainSsl() to return shop URL
-        $toolsMock->shouldReceive('getShopDomainSsl')
-            ->once()
-            ->with(true, true)
-            ->andReturn($shopUrl);
-
         \Tools::setStaticExpectations($toolsMock);
+
+        // Mock Context with Link
+        $linkMock = \Mockery::mock();
+        $languageMock = \Mockery::mock();
+        $languageMock->id = 1;
+        $contextMock = \Mockery::mock();
+        $contextMock->link = $linkMock;
+        $contextMock->language = $languageMock;
+        \Context::setStaticExpectations($contextMock);
+
+        $expectedUrl = 'https://default.com/fr/module/pskyc/cron?token=default123&action=daily_maintenance';
+        $linkMock->shouldReceive('getModuleLink')
+            ->once()
+            ->with('pskyc', 'cron', ['token' => $expectedToken, 'action' => 'daily_maintenance'], true, 1)
+            ->andReturn($expectedUrl);
 
         // Call without action parameter (should use default)
         $result = $this->maintenanceService->generateCronUrl();
 
-        $expectedUrl = 'https://default.com/modules/pskyc/cron.php?token=default123&action=daily_maintenance';
         $this->assertEquals($expectedUrl, $result);
     }
 
