@@ -450,14 +450,19 @@ class MaintenanceService
     public function generateCronUrl(string $action = 'daily_maintenance'): string
     {
         $token = $this->getCronToken();
-        $shopUrl = \Tools::getShopDomainSsl(true, true);
 
-        // Build the cron URL pointing to your module's cron endpoint
-        return sprintf(
-            '%s/modules/pskyc/cron.php?token=%s&action=%s',
-            rtrim($shopUrl, '/'),
-            $token,
-            urlencode($action)
+        $context = \Context::getContext();
+        $link = $context->link;
+
+        return $link->getModuleLink(
+            'pskyc',
+            'cron',
+            [
+                'token' => $token,
+                'action' => $action,
+            ],
+            true,
+            $context->language->id
         );
     }
 }
