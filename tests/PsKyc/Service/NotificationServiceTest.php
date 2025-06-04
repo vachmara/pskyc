@@ -612,6 +612,37 @@ class NotificationServiceTest extends MockeryTestCase
         $this->assertFalse($result);
     }
 
+    public function testFallbackTemplatesExist()
+    {
+        $rootPath = dirname(__DIR__, 3);
+        $mailsPath = $rootPath . '/mails/';
+
+        $templates = [
+            'verification_status',
+            'document_upload_confirmation',
+            'admin_new_verification',
+            'verification_expiry_warning',
+        ];
+
+        foreach (['en', 'fr'] as $lang) {
+            foreach ($templates as $template) {
+                $txt = $mailsPath . $lang . '/' . $template . '.txt';
+                $html = $mailsPath . $lang . '/' . $template . '.html';
+                $this->assertFileExists($txt, "Missing fallback text template $txt");
+                $this->assertFileExists($html, "Missing fallback html template $html");
+            }
+        }
+
+        $layoutBase = $mailsPath . 'layouts/';
+        foreach ($templates as $template) {
+            $this->assertFileExists($layoutBase . $template . '.html.twig');
+            foreach (['classic', 'modern'] as $theme) {
+                $layout = $layoutBase . $theme . '/' . $template . '.html.twig';
+                $this->assertFileExists($layout);
+            }
+        }
+    }
+
     /**
      * Helper method to set up Context expectations
      */
