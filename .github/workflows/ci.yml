@@ -102,3 +102,12 @@ jobs:
         run: |
           mkdir -p coverage
           vendor/bin/phpunit --configuration tests/phpunit.xml --coverage-clover coverage/clover.xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./coverage/clover.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
