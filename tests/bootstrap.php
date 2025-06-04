@@ -14,6 +14,7 @@ require_once __DIR__ . '/PsKyc/Mock/VirtualFileSystem.php';
 require_once __DIR__ . '/PsKyc/Mock/VirtualFileSystemAdapter.php';
 
 define('_PS_MODULE_DIR_', __DIR__ . '/../modules/pskyc/');
+define('_PS_THEME_DIR_', __DIR__ . '/../themes/default/');
 
 function pSQL($string, $htmlOK = false)
 {

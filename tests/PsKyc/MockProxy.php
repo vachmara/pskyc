@@ -91,6 +91,11 @@ class Shop extends MockProxy
 class Language extends MockProxy
 {
     protected static $mock;
+
+    public static function getIsoById($id)
+    {
+        return 'en';
+    }
 }
 
 class Customer extends MockProxy
