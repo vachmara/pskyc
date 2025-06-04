@@ -12,6 +12,8 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use PrestaShop\Module\Pskyc\Service\MaintenanceService;
+
 /**
  * KYC Secure Upload Cron Controller
  *
@@ -25,7 +27,7 @@ class PskycCronModuleFrontController extends ModuleFrontController
     public $module;
 
     /**
-     * @var PrestaShop\Module\Pskyc\Service\MaintenanceService
+     * @var MaintenanceService
      */
     private $maintenanceService;
 

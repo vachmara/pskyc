@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - French translation for the module
 - Display customer note back office
 - Display a redirection to the customer profile in the back office
+- Front controller cron tests 
 
 ### Fixed
 
@@ -20,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - isUsingNewTranslationSystem method to use the correct translation system
 - KYC checkout step not shown for products with non-default categories
 - fallback emails for KYC notifications / status (add html and text versions)
+- Cron endpoint for KYC document cleanup and expiration emails
 
 ## [1.0.0] - 2025-06-01
 
