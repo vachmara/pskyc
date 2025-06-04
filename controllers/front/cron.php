@@ -12,6 +12,8 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use PrestaShop\Module\Pskyc\Service\MaintenanceService;
+
 /**
  * KYC Secure Upload Cron Controller
  *
@@ -25,7 +27,7 @@ class PskycCronModuleFrontController extends ModuleFrontController
     public $module;
 
     /**
-     * @var PrestaShop\Module\Pskyc\Service\MaintenanceService
+     * @var MaintenanceService
      */
     private $maintenanceService;
 
@@ -100,10 +102,6 @@ class PskycCronModuleFrontController extends ModuleFrontController
     private function initializeServices()
     {
         try {
-            if (!$this->module) {
-                $this->module = Module::getInstanceByName('pskyc');
-            }
-
             $this->maintenanceService = $this->module->get('PrestaShop\Module\Pskyc\Service\MaintenanceService');
         } catch (Exception $e) {
             PrestaShopLogger::addLog('Service initialization failed: ' . $e->getMessage(), 3, null, 'Pskyc');
