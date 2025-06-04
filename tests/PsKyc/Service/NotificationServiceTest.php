@@ -626,8 +626,10 @@ class NotificationServiceTest extends MockeryTestCase
 
         foreach (['en', 'fr'] as $lang) {
             foreach ($templates as $template) {
-                $file = $mailsPath . $lang . '/' . $template . '.txt';
-                $this->assertFileExists($file, "Missing fallback text template $file");
+                $txt = $mailsPath . $lang . '/' . $template . '.txt';
+                $html = $mailsPath . $lang . '/' . $template . '.html';
+                $this->assertFileExists($txt, "Missing fallback text template $txt");
+                $this->assertFileExists($html, "Missing fallback html template $html");
             }
         }
 

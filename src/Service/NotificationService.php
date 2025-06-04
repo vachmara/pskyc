@@ -383,7 +383,7 @@ class NotificationService
             $modulePath = _PS_MODULE_DIR_ . 'pskyc/mails/';
 
             $useModulePath = !file_exists($themePath . $langIso . '/' . $template . '.txt')
-                && !file_exists($themePath . $langIso . '/' . $template . '.html');
+                || !file_exists($themePath . $langIso . '/' . $template . '.html');
 
             return \Mail::Send(
                 $langId,
