@@ -378,7 +378,13 @@ class NotificationService
                 $langId = (int) \Configuration::get('PS_LANG_DEFAULT');
             }
 
-            // Use PrestaShop's Mail::Send method
+            $langIso = \Language::getIsoById($langId);
+            $themePath = _PS_THEME_DIR_ . 'modules/pskyc/mails/';
+            $modulePath = _PS_MODULE_DIR_ . 'pskyc/mails/';
+
+            $useModulePath = !file_exists($themePath . $langIso . '/' . $template . '.txt')
+                || !file_exists($themePath . $langIso . '/' . $template . '.html');
+
             return \Mail::Send(
                 $langId,
                 $template,
@@ -386,15 +392,15 @@ class NotificationService
                 $templateVars,
                 $recipientEmail,
                 $recipientName,
-                null, // from email (use default)
-                null, // from name (use default)
-                null, // file attachment
-                null, // mode_smtp
-                _PS_MODULE_DIR_ . 'pskyc/mails/', // template_path
-                false, // die
-                null, // id_shop
-                null, // bcc
-                null  // reply_to
+                null,
+                null,
+                null,
+                null,
+                $useModulePath ? $modulePath : null,
+                false,
+                null,
+                null,
+                null
             );
         } catch (\Exception $e) {
             \PrestaShopLogger::addLog('Theme email error: ' . $e->getMessage(), 3, null, 'Pskyc');

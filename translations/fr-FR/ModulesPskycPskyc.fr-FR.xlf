@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin-dev" source-language="fr-FR" target-language="fr-FR" datatype="plaintext">
+    <body>
+      <trans-unit id="4d65112b8e029b397dff2dd5c190f46f">
+        <source>Settings updated successfully!</source>
+        <target>Paramètres mis à jour avec succès !</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="ee2d8d47277439dbb9c4db23b384d504">
+        <source>Security Warning: </source>
+        <target>Avertissement de sécurité : </target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="b9cf7982bb9390afb39ef0a9d0e875bf">
+        <source>Security Error: </source>
+        <target>Erreur de sécurité : </target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="4223bf2698ce30daa2a1afcdd5960649">
+        <source>Upload directory security: All security measures are properly configured.</source>
+        <target>Sécurité du répertoire de téléchargement : Toutes les mesures de sécurité sont correctement configurées.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="767a6a57bee38a1e521fad3f37723b87">
+        <source>KYC Settings</source>
+        <target>Paramètres KYC</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="e7a98332579e2d67bdb5ec6bba383d27">
+        <source>Document Retention (days)</source>
+        <target>Conservation des documents (jours)</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="8f50fa306a54e7b263fb0fb1452be71e">
+        <source>Documents older than this will be purged automatically. Set to 0 to disable automatic cleanup.</source>
+        <target>Les documents plus anciens seront supprimés automatiquement. Définir à 0 pour désactiver le nettoyage automatique.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="2ed8f5fa8f7061de0ea09d8041d219ee">
+        <source>Categories requiring KYC</source>
+        <target>Catégories nécessitant un KYC</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="cec54a81a748f003f7a67b8276af8710">
+        <source>Select product categories that require KYC verification before purchase. Leave empty to disable automatic order blocking.</source>
+        <target>Sélectionnez les catégories de produits qui nécessitent une vérification KYC avant l'achat. Laissez vide pour désactiver le blocage automatique des commandes.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="1f43b45f0e48ecbe2f087d601ef948b9">
+        <source>Admin notification emails</source>
+        <target>Admin notification emails</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="04ea915ee4289e8adadf6792ef08f321">
+        <source>Comma-separated list of emails to notify for new KYC submissions. Example: admin@store.com, manager@store.com</source>
+        <target>Liste d'adresses e-mail séparées par des virgules à notifier pour les nouvelles soumissions KYC. Exemple : admin@store.com, manager@store.com</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="3ff1f86ad9926394703fae2d4a08eedf">
+        <source>Auto notifications</source>
+        <target>Auto notifications</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="b99b46f4eff6c98f65753effdeeac05d">
+        <source>Send automatic email notifications to customers when their verification status changes.</source>
+        <target>Envoyer des notifications par e-mail automatiques aux clients lorsque leur statut de vérification change.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="00d23a76e43b46dae9ec7aa9dcbebb32">
+        <source>Enabled</source>
+        <target>Activé</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="b9f5c797ebbf55adccdd8539a65a0241">
+        <source>Disabled</source>
+        <target>Désactivé</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="08580e93520802cb11555ba3d1a7b842">
+        <source>Save Configuration</source>
+        <target>Enregistrer la configuration</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="307093ec691af3d74e7ca2db299a3148">
+        <source>Retention days must be 0 or positive.</source>
+        <target>Les jours de conservation doivent être 0 ou positifs.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="2dfc723af2b0568e7ddd5c467a8121ac">
+        <source>Invalid email address: %s</source>
+        <target>Adresse e-mail invalide : %s</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

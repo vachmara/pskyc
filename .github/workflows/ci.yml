@@ -1,6 +1,10 @@
 name: CI Tests
 
-on: [push, pull_request]
+on: 
+  pull_request:
+  push:
+    branches:
+      - dev
 
 jobs:
   # PHP syntax checking using official PrestaShop actions
