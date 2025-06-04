@@ -7,13 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2025-06-05
+
 ### Added
 
 - Logo image for the module
 - French translation for the module
 - Display customer note back office
 - Display a redirection to the customer profile in the back office
-- Front controller cron tests 
+- Front controller cron tests
+- Improve the README, codecov, and CI badges
 
 ### Fixed
 
@@ -58,5 +61,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ready for PrestaShop 8.0+ environments
 - Please report any issues on GitHub
 
-[Unreleased]: https://github.com/vachmara/pskyc/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/vachmara/pskyc/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/vachmara/pskyc/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/vachmara/pskyc/releases/tag/v1.0.0

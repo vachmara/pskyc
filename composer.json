@@ -1,15 +1,30 @@
 {
     "type": "prestashop-module",
-    "name": "prestashop/pskyc",
+    "name": "vachmara/pskyc",
     "description": "Open source, GDPR-compliant KYC document verification for PrestaShop 8.",
-    "license": "OSL-3.0",
+    "license": "MIT",
     "homepage": "https://github.com/vachmara/pskyc",
+    "keywords": [
+        "prestashop",
+        "module",
+        "kyc",
+        "verification",
+        "gdpr",
+        "security",
+        "documents"
+    ],
     "authors": [
         {
-            "name": "PrestaShop SA",
-            "email": "contact@prestashop.com"
+            "name": "Valentin Chmara",
+            "email": "valentin@supadev.fr",
+            "homepage": "https://github.com/vachmara"
         }
     ],
+    "support": {
+        "issues": "https://github.com/vachmara/pskyc/issues",
+        "source": "https://github.com/vachmara/pskyc",
+        "docs": "https://github.com/vachmara/pskyc#readme"
+    },
     "require": {
         "php": ">=8.1"
     },
@@ -52,7 +67,7 @@
         ],
         "lint-check": [
             "php-cs-fixer fix --no-interaction --dry-run --diff"
-        ], 
+        ],
         "test": [
             "@php ./vendor/bin/phpunit --configuration tests/phpunit.xml"
         ],

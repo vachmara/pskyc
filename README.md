@@ -1,5 +1,15 @@
 # KYC Secure Upload (PrestaShop Module)
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![PHP Version](https://img.shields.io/badge/PHP-8.1%2B-blue.svg)](https://www.php.net/)
+[![PrestaShop](https://img.shields.io/badge/PrestaShop-8.0%2B-orange.svg)](https://www.prestashop.com/)
+[![Packagist Version](https://img.shields.io/packagist/v/vachmara/pskyc.svg)](https://packagist.org/packages/vachmara/pskyc)
+[![Packagist Downloads](https://img.shields.io/packagist/dt/vachmara/pskyc.svg)](https://packagist.org/packages/vachmara/pskyc)
+[![CI Tests](https://github.com/vachmara/pskyc/workflows/CI%20Tests/badge.svg)](https://github.com/vachmara/pskyc/actions)
+[![codecov](https://codecov.io/gh/vachmara/pskyc/branch/dev/graph/badge.svg)](https://codecov.io/gh/vachmara/pskyc)
+[![Code Style](https://img.shields.io/badge/code%20style-PSR--12-blue.svg)](https://www.php-fig.org/psr/psr-12/)
+[![PHPStan](https://img.shields.io/badge/PHPStan-level%205-brightgreen.svg)](https://phpstan.org/)
+
 Open source, GDPR-compliant KYC document verification for PrestaShop.
 
 - Proof of identity (ID)
