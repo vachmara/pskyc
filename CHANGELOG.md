@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - .htaccess too complex and blocking logo.png
+- KYC checkout step not shown for products with non-default categories
 
 
 ## [1.0.0] - 2025-06-01
