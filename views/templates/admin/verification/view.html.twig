@@ -31,7 +31,7 @@
 							</h4>
 						</div>
 						<div class="card-body">
-							<table class="table table-striped">
+                                                        <table class="table table-striped">
 								<tr>
 									<td>
 										<strong>{{ 'Customer ID'|trans({}, 'Modules.Pskyc.Admin') }}:</strong>
@@ -51,7 +51,16 @@
 									<td>{{ verification.customer.firstname|default('-') }}
 										{{ verification.customer.lastname|default('-') }}</td>
 								</tr>
-							</table>
+                                                        </table>
+                                                        <a
+                                                                href="{{ path('admin_customers_view', {'customerId': verification.id_customer}) }}"
+                                                                class="btn btn-sm btn-outline-primary mt-2"
+                                                                target="_blank"
+                                                                rel="noopener"
+                                                        >
+                                                                <i class="material-icons">open_in_new</i>
+                                                                {{ 'View customer'|trans({}, 'Admin.Actions') }}
+                                                        </a>
 						</div>
 					</div>
 				</div>
