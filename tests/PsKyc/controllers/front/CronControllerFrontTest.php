@@ -6,10 +6,10 @@ use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 
 // Load the ModuleFrontController stub and the controller under test
-require_once __DIR__ . '/../Mock/ModuleFrontController.php';
-require_once dirname(__DIR__, 3) . '/controllers/front/cron.php';
+require_once dirname(__DIR__, 2) . '/Mock/ModuleFrontController.php';
+require_once dirname(__DIR__, 4) . '/controllers/front/cron.php';
 
-class CronControllerTest extends MockeryTestCase
+class CronControllerFrontTest extends MockeryTestCase
 {
     /** @var Mockery\MockInterface */
     private $maintenanceServiceMock;
@@ -73,6 +73,7 @@ class CronControllerTest extends MockeryTestCase
             ->andReturn('daily_maintenance');
 
         $controller = new \PskycCronModuleFrontController();
+        $controller->module = $this->moduleMock;
         set_error_handler(function () {});
         ob_start();
         $controller->postProcess();
@@ -98,6 +99,7 @@ class CronControllerTest extends MockeryTestCase
             ->andReturn('daily_maintenance');
 
         $controller = new \PskycCronModuleFrontController();
+        $controller->module = $this->moduleMock;
         set_error_handler(function () {});
         ob_start();
         $controller->postProcess();
@@ -119,6 +121,7 @@ class CronControllerTest extends MockeryTestCase
             ->with('Cron service initialization failed: MaintenanceService not available', 3, null, 'Pskyc');
 
         $controller = new \PskycCronModuleFrontController();
+        $controller->module = $this->moduleMock;
         set_error_handler(function () {});
         ob_start();
         $controller->postProcess();
@@ -144,6 +147,7 @@ class CronControllerTest extends MockeryTestCase
             ->andReturn('invalid');
 
         $controller = new \PskycCronModuleFrontController();
+        $controller->module = $this->moduleMock;
         set_error_handler(function () {});
         ob_start();
         $controller->postProcess();
