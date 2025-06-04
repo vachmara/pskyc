@@ -1,4 +1,4 @@
-Cher {prénom} {nom},
+Cher {firstname} {lastname},
 
 Le statut de votre vérification KYC a été mis à jour.
 

@@ -60,9 +60,13 @@ class NotificationService
     {
         try {
             $templateVars = [
+                'firstname' => $customer['firstname'],
+                'lastname' => $customer['lastname'],
                 'customer_name' => $customer['firstname'] . ' ' . $customer['lastname'],
                 'verification_id' => $verification['id_kyc_verification'],
                 'status' => $verification['status'],
+                'status_label' => $this->getStatusLabel($verification['status']),
+                'status_message' => $verification['admin_note'] ?? '',
                 'previous_status' => $previousStatus,
                 'date_submitted' => $verification['date_submitted'],
                 'date_validated' => $verification['date_validated'] ?? null,
@@ -105,11 +109,15 @@ class NotificationService
     {
         try {
             $templateVars = [
+                'firstname' => $customer['firstname'],
+                'lastname' => $customer['lastname'],
                 'customer_name' => $customer['firstname'] . ' ' . $customer['lastname'],
                 'verification_id' => $verification['id_kyc_verification'],
                 'document_count' => count($documents),
+                'upload_date' => $verification['date_submitted'],
                 'documents' => $documents,
                 'date_submitted' => $verification['date_submitted'],
+                'verification_status_url' => $this->context->shop->getBaseURL(true),
                 'shop_name' => \Configuration::get('PS_SHOP_NAME'),
                 'shop_url' => $this->context->shop->getBaseURL(true),
             ];
@@ -160,8 +168,10 @@ class NotificationService
                 'customer_email' => $customer['email'],
                 'customer_id' => $customer['id_customer'],
                 'verification_id' => $verification['id_kyc_verification'],
+                'document_count' => $verification['document_count'] ?? 0,
                 'date_submitted' => $verification['date_submitted'],
                 'admin_url' => $this->context->link->getAdminLink('AdminModules') . '&configure=pskyc',
+                'admin_verification_url' => $this->context->link->getAdminLink('AdminModules') . '&configure=pskyc&verification_id=' . $verification['id_kyc_verification'],
                 'shop_name' => \Configuration::get('PS_SHOP_NAME'),
             ];
 
@@ -207,10 +217,14 @@ class NotificationService
     {
         try {
             $templateVars = [
+                'firstname' => $customer['firstname'],
+                'lastname' => $customer['lastname'],
                 'customer_name' => $customer['firstname'] . ' ' . $customer['lastname'],
                 'verification_id' => $verification['id_kyc_verification'],
                 'days_until_expiry' => $daysUntilExpiry,
+                'days_remaining' => $daysUntilExpiry,
                 'expiry_date' => $verification['date_expiry'],
+                'renewal_url' => $this->context->shop->getBaseURL(true),
                 'shop_name' => \Configuration::get('PS_SHOP_NAME'),
                 'shop_url' => $this->context->shop->getBaseURL(true),
             ];
@@ -275,6 +289,31 @@ class NotificationService
         }
 
         return $results;
+    }
+
+    /**
+     * Get human-readable status label
+     *
+     * @param string $status Verification status
+     *
+     * @return string Translated status label
+     */
+    private function getStatusLabel(string $status): string
+    {
+        switch ($status) {
+            case 'approved':
+                return $this->translator->trans('Approved', [], 'Modules.Pskyc.Shop');
+            case 'rejected':
+                return $this->translator->trans('Rejected', [], 'Modules.Pskyc.Shop');
+            case 'pending':
+                return $this->translator->trans('Pending Review', [], 'Modules.Pskyc.Shop');
+            case 'expired':
+                return $this->translator->trans('Expired', [], 'Modules.Pskyc.Shop');
+            case 'requested_more_info':
+                return $this->translator->trans('More Information Required', [], 'Modules.Pskyc.Shop');
+            default:
+                return $this->translator->trans('Unknown', [], 'Modules.Pskyc.Shop');
+        }
     }
 
     /**
@@ -365,7 +404,7 @@ class NotificationService
         array $templateVars,
         string $recipientEmail,
         ?string $recipientName = null,
-        $langId = null,
+        $langId = null
     ): bool {
         try {
             if (empty($recipientEmail)) {
