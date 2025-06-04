@@ -142,3 +142,40 @@ class Mail extends MockProxy
 class PrestaShopException extends Exception
 {
 }
+
+class ModuleFrontController
+{
+    public $module;
+    public $context;
+    public $ajax = false;
+
+    public function __construct()
+    {
+        $this->context = Context::getContext();
+    }
+
+    protected function trans(string $string, array $params = [], ?string $domain = null)
+    {
+        return $string;
+    }
+
+    protected function ajaxRender(string $content)
+    {
+        echo $content;
+    }
+
+    public function getBreadcrumbLinks()
+    {
+        return ['links' => []];
+    }
+
+    protected function addMyAccountToBreadcrumb()
+    {
+        return [];
+    }
+
+    protected function setTemplate(string $template)
+    {
+        // no-op for tests
+    }
+}

@@ -4,10 +4,12 @@
     <include>
       <directory suffix=".php">../src/Repository</directory>
       <directory suffix=".php">../src/Service</directory>
+      <directory suffix=".php">../controllers/front</directory>
     </include>
     <exclude>
       <file>../src/Repository/index.php</file>
       <file>../src/Service/index.php</file>
+      <file>../controllers/front/index.php</file>
     </exclude>
   </coverage>
   <php>
