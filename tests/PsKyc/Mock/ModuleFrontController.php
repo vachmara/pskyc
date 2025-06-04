@@ -2,41 +2,41 @@
 
 class ModuleFrontController
 {
-  public $ajax = false;
-  public $module;
-  public $output = '';
+    public $ajax = false;
+    public $module;
+    public $output = '';
 
-  public function __construct()
-  {
-  }
+    public function __construct()
+    {
+    }
 
-  public function ajaxRender(string $content)
-  {
-    $this->output = $content;
-  }
+    public function ajaxRender(string $content)
+    {
+        $this->output = $content;
+    }
 
-  public function initContent()
-  {
-    // Empty implementation for testing
-  }
+    public function initContent()
+    {
+        // Empty implementation for testing
+    }
 
-  public function setTemplate($template)
-  {
-    // Empty implementation for testing
-  }
+    public function setTemplate($template)
+    {
+        // Empty implementation for testing
+    }
 
-  public function getBreadcrumbLinks()
-  {
-    return ['links' => []];
-  }
+    public function getBreadcrumbLinks()
+    {
+        return ['links' => []];
+    }
 
-  public function addMyAccountToBreadcrumb()
-  {
-    return ['title' => 'My Account', 'url' => '/my-account'];
-  }
+    public function addMyAccountToBreadcrumb()
+    {
+        return ['title' => 'My Account', 'url' => '/my-account'];
+    }
 
-  public function trans($message, $parameters = [], $domain = null)
-  {
-    return $message;
-  }
+    public function trans($message, $parameters = [], $domain = null)
+    {
+        return $message;
+    }
 }

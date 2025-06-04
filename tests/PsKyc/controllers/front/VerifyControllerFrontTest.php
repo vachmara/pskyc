@@ -43,7 +43,7 @@ class VerifyControllerFrontTest extends MockeryTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->verificationServiceMock = \Mockery::mock();
         $this->documentServiceMock = \Mockery::mock();
         $this->notificationServiceMock = \Mockery::mock();
@@ -98,7 +98,7 @@ class VerifyControllerFrontTest extends MockeryTestCase
         $this->loggerMock->shouldReceive('addLog')->byDefault();
         $this->smartyMock->shouldReceive('assign')->byDefault();
         $this->smartyMock->shouldReceive('setTemplate')->byDefault();
-        
+
         // Fix smarty tpl_vars structure
         $pageMock = \Mockery::mock();
         $pageMock->value = ['body_classes' => []];
@@ -108,7 +108,7 @@ class VerifyControllerFrontTest extends MockeryTestCase
         $this->toolsMock->shouldReceive('isSubmit')->byDefault()->andReturn(false);
         $this->toolsMock->shouldReceive('redirect')->byDefault();
         $this->toolsMock->shouldReceive('getValue')->byDefault()->andReturn('');
-        
+
         // Add missing Link methods
         $this->linkMock->shouldReceive('getModuleLink')->byDefault()->andReturn('test-url');
     }
@@ -116,7 +116,7 @@ class VerifyControllerFrontTest extends MockeryTestCase
     public function testInitContentRedirectsWhenCustomerNotLoggedIn()
     {
         $this->customerMock->id = 0;
-        
+
         $this->toolsMock->shouldReceive('redirect')
             ->once()
             ->with('index.php');
@@ -255,7 +255,7 @@ class VerifyControllerFrontTest extends MockeryTestCase
         $controller->module = $this->moduleMock;
         $controller->context = $this->contextMock;
         $controller->errors = [];
-        
+
         $controller->shouldReceive('trans')
             ->with('Invalid security token.', [], 'Modules.Pskyc.Shop')
             ->andReturn('Invalid security token.');
@@ -283,7 +283,7 @@ class VerifyControllerFrontTest extends MockeryTestCase
         $controller->module = $this->moduleMock;
         $controller->context = $this->contextMock;
         $controller->errors = [];
-        
+
         $controller->shouldReceive('trans')
             ->with('Invalid action.', [], 'Modules.Pskyc.Shop')
             ->andReturn('Invalid action.');
@@ -306,7 +306,7 @@ class VerifyControllerFrontTest extends MockeryTestCase
         $controller->module = $this->moduleMock;
         $controller->context = $this->contextMock;
         $controller->errors = [];
-        
+
         $controller->shouldReceive('trans')
             ->with('Please fill in all required fields.', [], 'Modules.Pskyc.Shop')
             ->andReturn('Please fill in all required fields.');
@@ -331,15 +331,15 @@ class VerifyControllerFrontTest extends MockeryTestCase
                 'type' => 'image/jpeg',
                 'tmp_name' => '/tmp/test',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 1024
+                'size' => 1024,
             ],
             'address_document' => [
                 'name' => 'bill.pdf',
                 'type' => 'application/pdf',
                 'tmp_name' => '/tmp/test2',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 2048
-            ]
+                'size' => 2048,
+            ],
         ];
 
         $this->documentServiceMock->shouldReceive('requiresBothSides')
@@ -419,22 +419,22 @@ class VerifyControllerFrontTest extends MockeryTestCase
                 'type' => 'image/jpeg',
                 'tmp_name' => '/tmp/test_front',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 1024
+                'size' => 1024,
             ],
             'id_document_back' => [
                 'name' => 'id_back.jpg',
                 'type' => 'image/jpeg',
                 'tmp_name' => '/tmp/test_back',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 1024
+                'size' => 1024,
             ],
             'address_document' => [
                 'name' => 'bill.pdf',
                 'type' => 'application/pdf',
                 'tmp_name' => '/tmp/test2',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 2048
-            ]
+                'size' => 2048,
+            ],
         ];
 
         $this->documentServiceMock->shouldReceive('requiresBothSides')
@@ -510,15 +510,15 @@ class VerifyControllerFrontTest extends MockeryTestCase
                 'type' => 'image/jpeg',
                 'tmp_name' => '/tmp/test_back',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 1024
+                'size' => 1024,
             ],
             'address_document' => [
                 'name' => 'bill.pdf',
                 'type' => 'application/pdf',
                 'tmp_name' => '/tmp/test2',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 2048
-            ]
+                'size' => 2048,
+            ],
         ];
 
         $this->documentServiceMock->shouldReceive('requiresBothSides')
@@ -560,8 +560,8 @@ class VerifyControllerFrontTest extends MockeryTestCase
                 'type' => 'image/jpeg',
                 'tmp_name' => '/tmp/test',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 1024
-            ]
+                'size' => 1024,
+            ],
         ];
 
         $this->documentServiceMock->shouldReceive('requiresBothSides')
@@ -605,15 +605,15 @@ class VerifyControllerFrontTest extends MockeryTestCase
                 'type' => 'image/jpeg',
                 'tmp_name' => '/tmp/test',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 1024
+                'size' => 1024,
             ],
             'address_document' => [
                 'name' => 'bill.pdf',
                 'type' => 'application/pdf',
                 'tmp_name' => '/tmp/test2',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 2048
-            ]
+                'size' => 2048,
+            ],
         ];
 
         $this->documentServiceMock->shouldReceive('requiresBothSides')
@@ -665,15 +665,15 @@ class VerifyControllerFrontTest extends MockeryTestCase
                 'type' => 'image/jpeg',
                 'tmp_name' => '/tmp/test',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 1024
+                'size' => 1024,
             ],
             'address_document' => [
                 'name' => 'bill.pdf',
                 'type' => 'application/pdf',
                 'tmp_name' => '/tmp/test2',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 2048
-            ]
+                'size' => 2048,
+            ],
         ];
 
         $this->documentServiceMock->shouldReceive('requiresBothSides')
@@ -727,8 +727,8 @@ class VerifyControllerFrontTest extends MockeryTestCase
                 'type' => 'image/jpeg',
                 'tmp_name' => '/tmp/new_test',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 1024
-            ]
+                'size' => 1024,
+            ],
         ];
 
         $this->toolsMock->shouldReceive('getValue')
@@ -777,8 +777,8 @@ class VerifyControllerFrontTest extends MockeryTestCase
                 'type' => 'image/jpeg',
                 'tmp_name' => '/tmp/new_test',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 1024
-            ]
+                'size' => 1024,
+            ],
         ];
 
         $this->toolsMock->shouldReceive('getValue')
@@ -822,7 +822,7 @@ class VerifyControllerFrontTest extends MockeryTestCase
             'size' => 1024,
             'tmp_name' => '/tmp/test',
             'name' => 'test.txt',
-            'type' => 'text/plain'
+            'type' => 'text/plain',
         ];
 
         // Mock finfo functions to return invalid MIME type
@@ -954,15 +954,15 @@ class VerifyControllerFrontTest extends MockeryTestCase
                 'type' => 'image/jpeg',
                 'tmp_name' => '/tmp/test',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 1024
+                'size' => 1024,
             ],
             'address_document' => [
                 'name' => 'bill.pdf',
                 'type' => 'application/pdf',
                 'tmp_name' => '/tmp/test2',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 2048
-            ]
+                'size' => 2048,
+            ],
         ];
 
         $this->documentServiceMock->shouldReceive('requiresBothSides')
@@ -1119,7 +1119,7 @@ class VerifyControllerFrontTest extends MockeryTestCase
         $controller = \Mockery::mock('PskycVerifyModuleFrontController')
             ->makePartial()
             ->shouldAllowMockingProtectedMethods();
-        
+
         $controller->module = $this->moduleMock;
         $controller->context = $this->contextMock;
 
@@ -1150,7 +1150,7 @@ class VerifyControllerFrontTest extends MockeryTestCase
         // Verify the basic structure exists
         $this->assertIsArray($result);
         $this->assertArrayHasKey('links', $result);
-        
+
         // Verify that the method calls we expect are made
         // The actual breadcrumb structure will depend on the parent implementation
         // but we can verify our method adds the KYC-specific breadcrumb
@@ -1169,8 +1169,8 @@ class VerifyControllerFrontTest extends MockeryTestCase
                 'type' => 'application/pdf',
                 'tmp_name' => '/tmp/test2',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 2048
-            ]
+                'size' => 2048,
+            ],
         ];
 
         $this->documentServiceMock->shouldReceive('requiresBothSides')
@@ -1212,15 +1212,15 @@ class VerifyControllerFrontTest extends MockeryTestCase
                 'type' => 'image/jpeg',
                 'tmp_name' => '/tmp/test',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 1024
+                'size' => 1024,
             ],
             'address_document' => [
                 'name' => 'bill.pdf',
                 'type' => 'application/pdf',
                 'tmp_name' => '/tmp/test2',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 2048
-            ]
+                'size' => 2048,
+            ],
         ];
 
         $this->documentServiceMock->shouldReceive('requiresBothSides')
@@ -1263,22 +1263,22 @@ class VerifyControllerFrontTest extends MockeryTestCase
                 'type' => 'image/jpeg',
                 'tmp_name' => '/tmp/test_front',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 1024
+                'size' => 1024,
             ],
             'id_document_back' => [
                 'name' => 'id_back.jpg',
                 'type' => 'image/jpeg',
                 'tmp_name' => '/tmp/test_back',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 1024
+                'size' => 1024,
             ],
             'address_document' => [
                 'name' => 'bill.pdf',
                 'type' => 'application/pdf',
                 'tmp_name' => '/tmp/test2',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 2048
-            ]
+                'size' => 2048,
+            ],
         ];
 
         $this->documentServiceMock->shouldReceive('requiresBothSides')
@@ -1321,15 +1321,15 @@ class VerifyControllerFrontTest extends MockeryTestCase
                 'type' => 'image/jpeg',
                 'tmp_name' => '/tmp/test',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 1024
+                'size' => 1024,
             ],
             'address_document' => [
                 'name' => 'bill.pdf',
                 'type' => 'application/pdf',
                 'tmp_name' => '/tmp/test2',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 2048
-            ]
+                'size' => 2048,
+            ],
         ];
 
         $this->documentServiceMock->shouldReceive('requiresBothSides')
@@ -1375,15 +1375,15 @@ class VerifyControllerFrontTest extends MockeryTestCase
                 'type' => 'image/jpeg',
                 'tmp_name' => '/tmp/test',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 1024
+                'size' => 1024,
             ],
             'address_document' => [
                 'name' => 'bill.pdf',
                 'type' => 'application/pdf',
                 'tmp_name' => '/tmp/test2',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 2048
-            ]
+                'size' => 2048,
+            ],
         ];
 
         $this->documentServiceMock->shouldReceive('requiresBothSides')
@@ -1432,15 +1432,15 @@ class VerifyControllerFrontTest extends MockeryTestCase
                 'type' => 'image/jpeg',
                 'tmp_name' => '/tmp/test',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 1024
+                'size' => 1024,
             ],
             'address_document' => [
                 'name' => 'bill.pdf',
                 'type' => 'application/pdf',
                 'tmp_name' => '/tmp/test2',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 2048
-            ]
+                'size' => 2048,
+            ],
         ];
 
         $this->documentServiceMock->shouldReceive('requiresBothSides')
@@ -1520,8 +1520,8 @@ class VerifyControllerFrontTest extends MockeryTestCase
                 'type' => 'image/jpeg',
                 'tmp_name' => '/tmp/new_test',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 1024
-            ]
+                'size' => 1024,
+            ],
         ];
 
         $this->toolsMock->shouldReceive('getValue')
@@ -1590,7 +1590,7 @@ class VerifyControllerFrontTest extends MockeryTestCase
         $file = [
             'error' => UPLOAD_ERR_PARTIAL, // Upload error
             'size' => 1024,
-            'tmp_name' => '/tmp/test'
+            'tmp_name' => '/tmp/test',
         ];
 
         $controller = \Mockery::mock('PskycVerifyModuleFrontController[trans]')
@@ -1619,7 +1619,7 @@ class VerifyControllerFrontTest extends MockeryTestCase
         $file = [
             'error' => UPLOAD_ERR_OK,
             'size' => 11 * 1024 * 1024, // 11MB - too big
-            'tmp_name' => '/tmp/test'
+            'tmp_name' => '/tmp/test',
         ];
 
         $controller = \Mockery::mock('PskycVerifyModuleFrontController[trans]')
@@ -1654,11 +1654,11 @@ class VerifyControllerFrontTest extends MockeryTestCase
         // Create a temporary PDF file
         $tempFile = tempnam(sys_get_temp_dir(), 'test');
         file_put_contents($tempFile, '%PDF-1.4'); // Simple PDF header
-        
+
         $file = [
             'error' => UPLOAD_ERR_OK,
             'size' => 1024,
-            'tmp_name' => $tempFile
+            'tmp_name' => $tempFile,
         ];
 
         $reflection = new \ReflectionClass($controller);
@@ -1681,8 +1681,8 @@ class VerifyControllerFrontTest extends MockeryTestCase
                 'type' => 'image/jpeg',
                 'tmp_name' => '/tmp/new_test',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 1024
-            ]
+                'size' => 1024,
+            ],
         ];
 
         $this->toolsMock->shouldReceive('getValue')
@@ -1725,15 +1725,15 @@ class VerifyControllerFrontTest extends MockeryTestCase
                 'type' => 'image/jpeg',
                 'tmp_name' => '/tmp/test',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 1024
+                'size' => 1024,
             ],
             'address_document' => [
                 'name' => 'bill.pdf',
                 'type' => 'application/pdf',
                 'tmp_name' => '/tmp/test2',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 2048
-            ]
+                'size' => 2048,
+            ],
         ];
 
         $this->documentServiceMock->shouldReceive('requiresBothSides')
@@ -1778,22 +1778,22 @@ class VerifyControllerFrontTest extends MockeryTestCase
                 'type' => 'image/jpeg',
                 'tmp_name' => '/tmp/test_front',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 1024
+                'size' => 1024,
             ],
             'id_document_back' => [
                 'name' => 'id_back.jpg',
                 'type' => 'image/jpeg',
                 'tmp_name' => '/tmp/test_back',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 1024
+                'size' => 1024,
             ],
             'address_document' => [
                 'name' => 'bill.pdf',
                 'type' => 'application/pdf',
                 'tmp_name' => '/tmp/test2',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 2048
-            ]
+                'size' => 2048,
+            ],
         ];
 
         $this->documentServiceMock->shouldReceive('requiresBothSides')
@@ -1853,22 +1853,22 @@ class VerifyControllerFrontTest extends MockeryTestCase
                 'type' => 'image/jpeg',
                 'tmp_name' => '/tmp/test_front',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 1024
+                'size' => 1024,
             ],
             'id_document_back' => [
                 'name' => 'id_back.jpg',
                 'type' => 'image/jpeg',
                 'tmp_name' => '/tmp/test_back',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 1024
+                'size' => 1024,
             ],
             'address_document' => [
                 'name' => 'bill.pdf',
                 'type' => 'application/pdf',
                 'tmp_name' => '/tmp/test2',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 2048
-            ]
+                'size' => 2048,
+            ],
         ];
 
         $this->documentServiceMock->shouldReceive('requiresBothSides')
@@ -1928,8 +1928,8 @@ class VerifyControllerFrontTest extends MockeryTestCase
                 'type' => 'image/jpeg',
                 'tmp_name' => '/tmp/new_test',
                 'error' => UPLOAD_ERR_OK,
-                'size' => 1024
-            ]
+                'size' => 1024,
+            ],
         ];
 
         $this->toolsMock->shouldReceive('getValue')
