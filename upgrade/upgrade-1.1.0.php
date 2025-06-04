@@ -40,7 +40,7 @@ function upgrade_module_1_1_0($module)
     // Register any new hooks that were added in 1.1.0
     $newHooks = [
         'registerGDPRConsent',
-        'actionDeleteGDPRCustomer', 
+        'actionDeleteGDPRCustomer',
         'actionExportGDPRData',
     ];
 
