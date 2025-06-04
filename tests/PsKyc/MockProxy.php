@@ -143,10 +143,11 @@ class PrestaShopException extends Exception
 {
 }
 
-class ModuleFrontController
+class PskycCronModuleFrontController
 {
     public $module;
     public $context;
+    public $output;
     public $ajax = false;
 
     public function __construct()
@@ -159,7 +160,7 @@ class ModuleFrontController
         return $string;
     }
 
-    protected function ajaxRender(string $content)
+    public function ajaxRender(string $content)
     {
         echo $content;
     }
@@ -177,5 +178,9 @@ class ModuleFrontController
     protected function setTemplate(string $template)
     {
         // no-op for tests
+    }
+    public function postProcess()
+    {
+      
     }
 }
