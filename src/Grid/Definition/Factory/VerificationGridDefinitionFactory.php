@@ -202,6 +202,16 @@ class VerificationGridDefinitionFactory extends AbstractGridDefinitionFactory
                         'route_param_field' => 'id_kyc_verification',
                         'clickable_row' => true,
                     ])
+            )
+            ->add(
+                (new LinkRowAction('customer'))
+                    ->setName($this->trans('Customer', [], 'Admin.Global'))
+                    ->setIcon('account_circle')
+                    ->setOptions([
+                        'route' => 'admin_customers_view',
+                        'route_param_name' => 'customerId',
+                        'route_param_field' => 'id_customer',
+                    ])
             );
     }
 }
