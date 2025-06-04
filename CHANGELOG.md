@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Logo image for the module
 - French translation for the module
+- Display customer note back office
+- Display a redirection to the customer profile in the back office
 
 ### Fixed
 
