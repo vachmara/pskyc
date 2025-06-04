@@ -621,10 +621,15 @@ class Pskyc extends Module
         $cartCategoryIds = [];
 
         foreach ($products as $product) {
-            if (!empty($product['id_category_default'])) {
+            if (!empty($product['id_product'])) {
+                $productCategories = Product::getProductCategories((int) $product['id_product']);
+                $cartCategoryIds = array_merge($cartCategoryIds, $productCategories);
+            } elseif (!empty($product['id_category_default'])) {
                 $cartCategoryIds[] = (int) $product['id_category_default'];
             }
         }
+
+        $cartCategoryIds = array_unique($cartCategoryIds);
 
         return count(array_intersect($kycRequiredCategories, $cartCategoryIds)) > 0;
     }
