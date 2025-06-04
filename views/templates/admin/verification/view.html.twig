@@ -197,7 +197,22 @@
 				</div>
 			{% endif %}
 
-			{# Admin Notes Section #}
+                        {# Customer Note Section #}
+                        {% if verification.customer_note is defined and verification.customer_note %}
+                                <div class="card mt-3">
+                                        <div class="card-header">
+                                                <h4 class="card-header-title">
+                                                        <i class="material-icons">note</i>
+                                                        {{ 'Customer Note'|trans({}, 'Modules.Pskyc.Admin') }}
+                                                </h4>
+                                        </div>
+                                        <div class="card-body">
+                                                <p>{{ verification.customer_note|nl2br }}</p>
+                                        </div>
+                                </div>
+                        {% endif %}
+
+                        {# Admin Notes Section #}
 			<div class="card mt-3">
 				<div class="card-header">
 					<h4 class="card-header-title">
