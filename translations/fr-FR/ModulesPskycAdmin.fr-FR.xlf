@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin-dev" source-language="fr-FR" target-language="fr-FR" datatype="plaintext">
+    <body>
+      <trans-unit id="a21fc1134c006b30e755ca32e3849cf7">
+        <source>KYC Secure Upload</source>
+        <target>KYC Secure Upload</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="c2b1b4c22603bd91226f1545a8711412">
+        <source>Open source KYC document verification and encrypted storage for PrestaShop. GDPR compliant.</source>
+        <target>Vérification de documents KYC open source et stockage chiffré pour PrestaShop. Conforme au RGPD.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="f760988969217966201132acec3c35fa">
+        <source>All KYC verification data and associated documents will be permanently deleted. This action cannot be undone.</source>
+        <target>Toutes les données de vérification KYC et les documents associés seront définitivement supprimés. Cette action ne peut pas être annulée.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="9ba8da419f01d0c1b27e666e6101f589">
+        <source>Invalid CSRF token.</source>
+        <target>Jeton CSRF invalide.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="1642734e93b20d75c176969aa003c26e">
+        <source>Document statuses and notes updated.</source>
+        <target>Statuts des documents et notes mis à jour.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="5173bc3293b5b75eb6a42f30da686928">
+        <source>KYC Verifications</source>
+        <target>Vérifications KYC</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="12bdd0ff20e4f7cb5918bf533d4f5f96">
+        <source>Cannot find verification %verification%</source>
+        <target>Impossible de trouver la vérification %verification%</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="161860e8bb430c4bec6199f28fd675f5">
+        <source>View KYC Verification</source>
+        <target>Voir la vérification KYC</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="f414afafc4ac8bd1ea686a556b460fc5">
+        <source>Note updated.</source>
+        <target>Note mise à jour.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="eab6870f8303c5ba44cfc2f2c6e1a0a3">
+        <source>Error retrieving verification logs.</source>
+        <target>Erreur lors de la récupération des journaux de vérification.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="17351b39c64f160d7c6d78d5a2e4a4eb">
+        <source>Export Verification Logs</source>
+        <target>Exporter les journaux de vérification</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="d37c2bf1bd3143847fca087b354f920e">
+        <source>Customer ID</source>
+        <target>ID client</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="54945fdafec2c65f0f5561d65b165f1a">
+        <source>Customer Email</source>
+        <target>Email client</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="99e6d58317e8f2eb8f036f3307c89c99">
+        <source>Date Submitted</source>
+        <target>Date de soumission</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="915c2a95e35f180f4440993058b60ac6">
+        <source>Date Validated</source>
+        <target>Date de validation</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="2ea989f83006e233627987293f4bde0a">
+        <source>Customer Name</source>
+        <target>Nom du client</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="f28128b38efbc6134dc40751ee21fd29">
+        <source>Documents</source>
+        <target>Documents</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="2d13df6f8b5e4c5af9f87e0dc39df69d">
+        <source>Pending</source>
+        <target>En attente</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="e1521f742cf5771ba06eb2b11fe7f213">
+        <source>Under Review</source>
+        <target>En cours d'examen</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="6f8063417ab31f38d864c28302f3de2f">
+        <source>Approved</source>
+        <target>Approuvé</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="d37b1f6c0512e2118cee17fea015b699">
+        <source>Rejected</source>
+        <target>Rejeté</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="24fe48030f7d3097d5882535b04c3fa8">
+        <source>Expired</source>
+        <target>Expiré</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="50372c63f10a201a6fc265f28a2c98f9">
+        <source>More Info Requested</source>
+        <target>Informations supplémentaires demandées</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="96e3d398260724e0a83da53a2e9f20e7">
+        <source>All statuses</source>
+        <target>Tous les statuts</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="e16f51d653b92d716fd9c6410a5fffdf">
+        <source>New KYC Verification Request - #%id%</source>
+        <target>Nouvelle demande de vérification KYC - #%id%</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="1716fc5bda707aa7ec7b70327c6b1797">
+        <source>Security Note:</source>
+        <target>Note de sécurité :</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="04eabe66013a39394a307599f48e1d2b">
+        <source>All documents are encrypted using AES-256 encryption before storage. The encryption key is automatically generated and stored securely in your database configuration.</source>
+        <target>Tous les documents sont chiffrés avec le chiffrement AES-256 avant stockage. La clé de chiffrement est automatiquement générée et stockée de manière sécurisée dans votre configuration de base de données.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="e928757efb88a0305772195a77df503b">
+        <source>New KYC Verification Request</source>
+        <target>Nouvelle demande de vérification KYC</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="60a39d93b7fdf92c8f8a6115ca4bfa79">
+        <source>A new KYC verification request has been submitted and requires admin review.</source>
+        <target>Une nouvelle demande de vérification KYC a été soumise et nécessite un examen administrateur.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="268e85b916332794a8bb8c70503048b5">
+        <source>Verification ID</source>
+        <target>ID de vérification</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="25c9b3962555138ef5cc9b2d08f04e17">
+        <source>Documents Count</source>
+        <target>Nombre de documents</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="86ff4218cccb683ac8b1ba2ba3a6c2ca">
+        <source>Action Required</source>
+        <target>Action requise</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="360ec304ce3a35eccdc038b325bbf964">
+        <source>Please review the submitted documents and update the verification status in the admin panel.</source>
+        <target>Veuillez examiner les documents soumis et mettre à jour le statut de vérification dans le panneau d'administration.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="9ac6958326ef07635689e54273c2ac61">
+        <source>Review in Admin Panel</source>
+        <target>Examiner dans le panneau d'administration</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="6b4709ebf0819ece9b5bebc24b50bdfa">
+        <source>This is an automated admin notification.</source>
+        <target>Ceci est une notification administrateur automatisée.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="85555d9856619e3943be6c3fa21211cd">
+        <source>Cron Job Configuration</source>
+        <target>Configuration de tâche cron</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="a925a8b94e70e912ce3641d16ee48c25">
+        <source>Configure your server's cron job for automatic KYC maintenance tasks including expiry warnings, document cleanup, and verification updates.</source>
+        <target>Configurez la tâche cron de votre serveur pour les tâches de maintenance KYC automatiques incluant les avertissements d'expiration, le nettoyage des documents et les mises à jour de vérification.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="984844af1d89879ae4f852f2e2b8c02c">
+        <source>Cron URL:</source>
+        <target>URL Cron :</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="59f76f638fd00f30ebe8d37d091ecf68">
+        <source>Recommended Schedule</source>
+        <target>Planification recommandée</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="e130919e23bb4fd2f80d56b31e8b1d7d">
+        <source>Frequency:</source>
+        <target>Fréquence :</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="c512b685438f41daa7386329a3b8f8d3">
+        <source>Daily</source>
+        <target>Quotidienne</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="421b12365f86ff59c88ff2c21cf53a2b">
+        <source>Time:</source>
+        <target>Heure :</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="b1053508bbeb6537241d1709b1c345c1">
+        <source>8:00 AM (server time)</source>
+        <target>8h00 (heure du serveur)</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="723260c7ab29af92b2b67401fa6e7d87">
+        <source>Method:</source>
+        <target>Méthode :</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="d85bf0300b74469478c53111b0b37dcb">
+        <source>HTTP GET request</source>
+        <target>Requête HTTP GET</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="26cf0f3c26cd3fd321e72e50baa54c93">
+        <source>Example Cron Entry</source>
+        <target>Exemple d'entrée Cron</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="f542438a219e373fd7d88280c5461840">
+        <source>Add this line to your server's crontab</source>
+        <target>Ajoutez cette ligne au crontab de votre serveur</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="e6a8e4d71a4e3b5a5309a9a215d14747">
+        <source>The URL includes a security token. Keep it confidential and do not share it publicly.</source>
+        <target>L'URL inclut un jeton de sécurité. Gardez-le confidentiel et ne le partagez pas publiquement.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="3ec365dd533ddb7ef3d1c111186ce872">
+        <source>Details</source>
+        <target>Détails</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="4faebf8a72ac0ae0e481ae6ad610b7f3">
+        <source>Customer Information</source>
+        <target>Informations client</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="dcf9ac5128c95d88e068e223dfe01d27">
+        <source>Verification Status</source>
+        <target>Statut de vérification</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="5c835c22429f25992b4371691ecde1a4">
+        <source>Submitted</source>
+        <target>Soumis</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="601f36275485b26a1accc8a6e6247d05">
+        <source>Validation date</source>
+        <target>Date de validation</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="0674190a178153a9ca03e52f3e8f62f4">
+        <source>Submitted Documents</source>
+        <target>Documents soumis</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="4f67fe16b274bf31a67539fbedb8f8d3">
+        <source>Document Type</source>
+        <target>Type de document</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="31fde7b05ac8952dacf4af8a704074ec">
+        <source>Preview</source>
+        <target>Aperçu</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="c142a73b77f3c3df40777af2651f4915">
+        <source>Side</source>
+        <target>Face</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="25e7568dc652f917fa9290980292ee85">
+        <source>Upload Date</source>
+        <target>Date de téléchargement</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="ec53a8c4f07baed5d8825072c89799be">
+        <source>Status</source>
+        <target>Statut</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="3c5b1af19257e99430a45ad713c94908">
+        <source>Admin Note</source>
+        <target>Note administrateur</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="8836e68e12450f172e24e974edfb983e">
+        <source>No preview</source>
+        <target>Pas d'aperçu</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="5835bab1ade0060909e31a06af2e2cde">
+        <source>Front</source>
+        <target>Recto</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="0557fa923dcee4d0f86b1409f5c2167f">
+        <source>Back</source>
+        <target>Verso</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="3ac705f2acd51a4613f9188c05c91d0d">
+        <source>Valid</source>
+        <target>Valide</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="a67bf8231209b70f6204e0f58bc51bb8">
+        <source>Request Change</source>
+        <target>Demander un changement</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="b8235e7b9ca5aeb915c7895a94ab0dbc">
+        <source>Add note...</source>
+        <target>Ajouter une note...</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="f5ffbdcc57511246e8eb31a12a28352a">
+        <source>Save Document Statuses</source>
+        <target>Enregistrer les statuts des documents</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="7cab5b2f456f909f541ec77334ba294d">
+        <source>Admin Notes</source>
+        <target>Notes administrateur</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="2bd47f1f1b08691c5002184f177b1bc3">
+        <source>Add/Update Note (only visible by the team)</source>
+        <target>Ajouter/Modifier une note (visible seulement par l'équipe)</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="ca9e8a48a9a115ae83c051fd149705ec">
+        <source>Add your notes here...</source>
+        <target>Ajoutez vos notes ici...</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="d06c002d8a232c8121f9a3a1467ea446">
+        <source>Update Note Only</source>
+        <target>Mettre à jour la note uniquement</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

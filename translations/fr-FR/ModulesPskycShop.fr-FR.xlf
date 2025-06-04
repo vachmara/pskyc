@@ -1,0 +1,652 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="admin-dev" source-language="fr-FR" target-language="fr-FR" datatype="plaintext">
+    <body>
+      <trans-unit id="66dff4bc6149738292b7b2737e7e2e8c">
+        <source>Invalid security token.</source>
+        <target>Jeton de sécurité invalide.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="fdeec8a42f9bca6eb42c417d9da14d80">
+        <source>Invalid action.</source>
+        <target>Action invalide.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="d5a03ec61f5c7abfbd1ab4bc06b3216a">
+        <source>Please fill in all required fields.</source>
+        <target>Veuillez remplir tous les champs requis.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="06cd609aa503aa9b52c0b986aa6f0597">
+        <source>Please upload both front and back sides of your identity document.</source>
+        <target>Veuillez télécharger le recto et le verso de votre pièce d'identité.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="73461fbcd297f2041815c558cfcc14bd">
+        <source>Please upload your identity document.</source>
+        <target>Veuillez télécharger votre pièce d'identité.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="ac7bd638e7d7847e448bf1713d47ed94">
+        <source>Please upload your proof of address document.</source>
+        <target>Veuillez télécharger votre justificatif de domicile.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="416462c75dfb54ae23eae17b734a62ac">
+        <source>An error occurred while processing your request.</source>
+        <target>Une erreur s'est produite lors du traitement de votre demande.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="d3c2bcc700d72c14128225e4cbe48787">
+        <source>You already have a verification request in progress.</source>
+        <target>Vous avez déjà une demande de vérification en cours.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="9114e0a83fe87d8d7ff2e726da315988">
+        <source>Failed to create verification request.</source>
+        <target>Échec de la création de la demande de vérification.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="eb90f7fc48b8a1cd568e6931fa88d7db">
+        <source>Your documents have been uploaded successfully and are being reviewed.</source>
+        <target>Vos documents ont été téléchargés avec succès et sont en cours d'examen.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="c0dfb4889496a9eee5986c6639f72c6a">
+        <source>Documents uploaded successfully. Additional documents may be required.</source>
+        <target>Documents téléchargés avec succès. Des documents supplémentaires peuvent être requis.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="9c2ae9b3a2958666d379b14b69693c35">
+        <source>Please select a file to re-upload.</source>
+        <target>Veuillez sélectionner un fichier à retélécharger.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="cafe1fd8cb5dcecc8e47386347546f6d">
+        <source>Document re-uploaded successfully. It will be reviewed by our team.</source>
+        <target>Document retéléchargé avec succès. Il sera examiné par notre équipe.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="224a13b5a1e28383894dc51fdc692e41">
+        <source>Failed to re-upload document.</source>
+        <target>Échec du retéléchargement du document.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="b4fa94e5dfba1e6e1349f0c42948dad0">
+        <source>Invalid file upload.</source>
+        <target>Téléchargement de fichier invalide.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="a7a481bfeaab6556ef2ad23624ea09a4">
+        <source>File upload failed. Please try again.</source>
+        <target>Échec du téléchargement de fichier. Veuillez réessayer.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="e63ba5d664194e00b6f5863cd0de32e5">
+        <source>File size must be less than 10MB.</source>
+        <target>La taille du fichier doit être inférieure à 10 Mo.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="2ce3ada64832080d31d4dde1cea46666">
+        <source>Only JPG, PNG, and PDF files are allowed.</source>
+        <target>Seuls les fichiers JPG, PNG et PDF sont autorisés.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="2916e98db8f062063206338333f871be">
+        <source>KYC - Verify your identity</source>
+        <target>KYC - Vérifiez votre identité</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="5db106d45091dc05ad1725d8f9959c68">
+        <source>Identity Verification Required</source>
+        <target>Vérification d'identité requise</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="60f7e30ad2f289f7ca28ca3d4ba06b33">
+        <source>KYC Documents Received - Verification #%id%</source>
+        <target>Documents KYC reçus - Vérification #%id%</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="8d9b452859721d45484445ecfe10b193">
+        <source>KYC Verification Expiry Warning - #%id%</source>
+        <target>Avertissement d'expiration de vérification KYC - #%id%</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="b9ed7892c783650a9b284a578242f87e">
+        <source>KYC Verification Approved</source>
+        <target>Vérification KYC approuvée</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="a216548988ef285843055fb131d627e7">
+        <source>KYC Verification Rejected</source>
+        <target>Vérification KYC rejetée</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="6a7741f6111108cf14eda35c71364701">
+        <source>KYC Verification Expired</source>
+        <target>Vérification KYC expirée</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="7c1b7a7d62815ee7945839098eb61f41">
+        <source>KYC Verification Status Update</source>
+        <target>Mise à jour du statut de vérification KYC</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="490ecb0dc1c78b6c1c002140bfb5950e">
+        <source>Your identity has been successfully verified!</source>
+        <target>Votre identité a été vérifiée avec succès !</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="24a23d787190f2c4812ff9ab11847a72">
+        <source>Status:</source>
+        <target>Statut :</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="6f8063417ab31f38d864c28302f3de2f">
+        <source>Approved</source>
+        <target>Approuvé</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="be3de2b1ffafc59f6dc3260225fe09be">
+        <source>Valid until:</source>
+        <target>Valide jusqu'au :</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="6e9d94e5fb04de6abaaa3a6e5caf95fe">
+        <source>Submitted on:</source>
+        <target>Soumis le :</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="55a27f864fdaf6b2bb8b939fc25596dd">
+        <source>Current Verification Status</source>
+        <target>Statut de vérification actuel</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="00b38f89b377390e7c1d74d82cc2f858">
+        <source>Pending Review</source>
+        <target>En attente d'examen</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="e1521f742cf5771ba06eb2b11fe7f213">
+        <source>Under Review</source>
+        <target>En cours d'examen</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="d37b1f6c0512e2118cee17fea015b699">
+        <source>Rejected</source>
+        <target>Rejeté</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="83fdea85c28601b55382111feb34af52">
+        <source>More Information Required</source>
+        <target>Informations supplémentaires requises</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="24fe48030f7d3097d5882535b04c3fa8">
+        <source>Expired</source>
+        <target>Expiré</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="292659c2de7f3de1a9ab2abfef6839a4">
+        <source>Uploaded Documents</source>
+        <target>Documents téléchargés</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="2d13df6f8b5e4c5af9f87e0dc39df69d">
+        <source>Pending</source>
+        <target>En attente</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="3ac705f2acd51a4613f9188c05c91d0d">
+        <source>Valid</source>
+        <target>Valide</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="2271b8b6210259fed3255f653201f7ad">
+        <source>Needs Update</source>
+        <target>Nécessite une mise à jour</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="4296fd320beaf61dcf979ff634cf2f2d">
+        <source>Action required:</source>
+        <target>Action requise :</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="aaac769430b6fb94365118d5140e187f">
+        <source>This document was rejected.</source>
+        <target>Ce document a été rejeté.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="bb59ab216be3dc51bab968111f52573d">
+        <source>This document needs to be updated.</source>
+        <target>Ce document doit être mis à jour.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="fc9d3df613063ee57906c461320744e2">
+        <source>Note:</source>
+        <target>Note :</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="4bc5d30ab95e1d59927b0b44cf26023c">
+        <source>Re-upload file</source>
+        <target>Retélécharger le fichier</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="b4e8e25d4d5c5206cc600e0676c88c2e">
+        <source>Re-upload</source>
+        <target>Retélécharger</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="d3d6f4283a6fc11a898c6f5d74d30131">
+        <source>Identity Document</source>
+        <target>Pièce d'identité</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="2f817ccd21a399a1abd7cc06290e979a">
+        <source>Upload a clear photo or scan of your government-issued ID (passport, driver's license, national ID card).</source>
+        <target>Téléchargez une photo ou un scan claire de votre pièce d'identité officielle (passeport, permis de conduire, carte d'identité nationale).</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="4f67fe16b274bf31a67539fbedb8f8d3">
+        <source>Document Type</source>
+        <target>Type de document</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="43feb97197f25f18a35be8e573e131fa">
+        <source>Select document type</source>
+        <target>Sélectionnez le type de document</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="916df6dabccb420c1ee355d7dd7dd89b">
+        <source>Passport</source>
+        <target>Passeport</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="0100349e7a7174eb2db0ebac41d71cc1">
+        <source>Driver's License</source>
+        <target>Permis de conduire</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="0a96ef413fb53fd508abb15b39e4bd3c">
+        <source>National ID Card</source>
+        <target>Carte d'identité nationale</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="e6311d6465288330fa90dfede83a8386">
+        <source>Residence Permit</source>
+        <target>Titre de séjour</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="d59658644cbc88cd09ce9c5d6538126e">
+        <source>Upload Identity Document</source>
+        <target>Télécharger la pièce d'identité</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="2d79152907119a258ff9569edda5d37b">
+        <source>Accepted formats: JPG, PNG, PDF. Maximum size: 10MB.</source>
+        <target>Formats acceptés : JPG, PNG, PDF. Taille maximale : 10 Mo.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="667e25fb0d8beb547333a70c9ba72b93">
+        <source>Front Side</source>
+        <target>Recto</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="1a8adc04355b8a7dc2c6ce66b6985494">
+        <source>Upload the front side of your document</source>
+        <target>Téléchargez le recto de votre document</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="b2af1ba25629e3276a8e2a29cb19afcc">
+        <source>Back Side</source>
+        <target>Verso</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="b215b0d4fe6c456712e6dc9f046e697a">
+        <source>Upload the back side of your document</source>
+        <target>Téléchargez le verso de votre document</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="7a262cb0d3d917313c8ba12f996fe83c">
+        <source>Important:</source>
+        <target>Important :</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="18f8270abbe42ebf3fa33be9c83d97b6">
+        <source>Please ensure both sides of your document are clearly visible and readable. All text and images should be sharp and unobstructed.</source>
+        <target>Veuillez vous assurer que les deux faces de votre document sont clairement visibles et lisibles. Tous les textes et images doivent être nets et sans obstruction.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="827b05360cd22ccbaf3d085aded71570">
+        <source>Proof of Address</source>
+        <target>Justificatif de domicile</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="9dc4a12aaf9d5273eba20b78a7afc676">
+        <source>Upload a recent document showing your current address (utility bill, bank statement, rental agreement, etc.).</source>
+        <target>Téléchargez un document récent indiquant votre adresse actuelle (facture de services publics, relevé bancaire, contrat de location, etc.).</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="3c1653183dd9039828c2cdb7bb7e523a">
+        <source>Utility Bill</source>
+        <target>Facture de services publics</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="fab4b15eec8739d314a3beb5af265975">
+        <source>Bank Statement</source>
+        <target>Relevé bancaire</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="233c827035f7ea66befc2348d683d202">
+        <source>Rental Agreement</source>
+        <target>Contrat de location</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="0a65353e922ee362ce0cf2d2ea50963f">
+        <source>Tax Document</source>
+        <target>Document fiscal</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="f64f345593e9769ec414c81c6870f019">
+        <source>Insurance Statement</source>
+        <target>Attestation d'assurance</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="f1749bab177eff98ed624df3172aee2d">
+        <source>Government Letter</source>
+        <target>Courrier officiel</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="ff10a11dc066f6e49dc39c26c9aca728">
+        <source>Upload Proof of Address</source>
+        <target>Télécharger le justificatif de domicile</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="7a4854838855472eafeb5acb6201798b">
+        <source>Document must be dated within the last 3 months. Accepted formats: JPG, PNG, PDF. Maximum size: 10MB.</source>
+        <target>Le document doit être daté des 3 derniers mois. Formats acceptés : JPG, PNG, PDF. Taille maximale : 10 Mo.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="092bf78f9c97ba171b8232ddff585392">
+        <source>Additional Information</source>
+        <target>Informations supplémentaires</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="90eb94feed65e9914ec5b2c8726e9014">
+        <source>Additional Notes (Optional)</source>
+        <target>Notes supplémentaires (optionnel)</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="98c4de44e2ac3f86e02529f5e01483ca">
+        <source>Any additional information you'd like to provide...</source>
+        <target>Toute information supplémentaire que vous souhaitez fournir...</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="e826e03cc39cd5ef176e4ebca437851d">
+        <source>I consent to the processing of my personal data for identity verification purposes.</source>
+        <target>J'accepte le traitement de mes données personnelles à des fins de vérification d'identité.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="de0ee28219fce9e76ca243cc23ae08d9">
+        <source>I confirm that all uploaded documents are authentic and belong to me.</source>
+        <target>Je confirme que tous les documents téléchargés sont authentiques et m'appartiennent.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="6c49c36c219349fa1238984e2bf97dbf">
+        <source><![CDATA[Security & Privacy]]></source>
+        <target><![CDATA[Sécurité et confidentialité]]></target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="aca919a299432b053b78b54523f20c15">
+        <source>Your documents are encrypted and stored securely. We comply with GDPR and will only use your data for verification purposes.</source>
+        <target>Vos documents sont chiffrés et stockés en toute sécurité. Nous respectons le RGPD et n'utiliserons vos données qu'à des fins de vérification.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="7a2aefc6658e42409c32a8ee215c74bb">
+        <source>Submit for Verification</source>
+        <target>Soumettre pour vérification</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="69e01ae9415e6a1de79ea2654f9cbda4">
+        <source>Uploading documents...</source>
+        <target>Téléchargement des documents...</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="3234270c7cb055f813ab5606d1089187">
+        <source>Please upload the front side of your identity document</source>
+        <target>Veuillez télécharger le recto de votre pièce d'identité</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="30bd23906e21e136a98efdef10b1dd1a">
+        <source>Please upload the back side of your identity document</source>
+        <target>Veuillez télécharger le verso de votre pièce d'identité</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="003fd924834e4d647c219bc24e1ac409">
+        <source>Front side document must be smaller than 10MB</source>
+        <target>Le document recto doit être inférieur à 10 Mo</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="ea8d758dd60e6ab1554716f6a00caf98">
+        <source>Back side document must be smaller than 10MB</source>
+        <target>Le document verso doit être inférieur à 10 Mo</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="6b0fcd3e0d3261e8b26e9d60ad53164f">
+        <source>Please upload your identity document</source>
+        <target>Veuillez télécharger votre pièce d'identité</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="44d6719addb842a785c1ab65df2befbd">
+        <source>Identity document must be smaller than 10MB</source>
+        <target>La pièce d'identité doit être inférieure à 10 Mo</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="d5f4d1fee596d9b7f8b5ab0935d27a7f">
+        <source>Please upload your proof of address document</source>
+        <target>Veuillez télécharger votre justificatif de domicile</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="4bfeec6fed9753e9bb46e85920a6cf48">
+        <source>Address document must be smaller than 10MB</source>
+        <target>Le justificatif de domicile doit être inférieur à 10 Mo</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="5e9f10fd796f12205792ef86c17578e7">
+        <source>Please accept all required terms and conditions</source>
+        <target>Veuillez accepter tous les termes et conditions requis</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="21d104a54fc71a19a325c7305327f1d2">
+        <source>Processing...</source>
+        <target>Traitement en cours...</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="c785829770b9cc83c19b3975523c96d4">
+        <source>Your cart contains products that require identity verification before you can complete your purchase.</source>
+        <target>Votre panier contient des produits nécessitant une vérification d'identité avant de pouvoir finaliser votre achat.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="e9bbdfa993207238a2d2ea1f519a3423">
+        <source>Complete Identity Verification</source>
+        <target>Compléter la vérification d'identité</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="85ce7f761021f4d478be22903e694bf6">
+        <source>You will be redirected to upload your documents.</source>
+        <target>Vous serez redirigé pour télécharger vos documents.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="fbd6e96cf75c09e1be6f265daf5d267b">
+        <source>KYC Document Upload Confirmation</source>
+        <target>Confirmation de téléchargement du document KYC</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="6b7689c986aa3e2e8332d7e84978a3d7">
+        <source>Dear</source>
+        <target>Cher</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="9f5ce2f06ab9de1ee02806dd06ff8b70">
+        <source>Thank you for uploading your KYC verification documents.</source>
+        <target>Merci d'avoir téléchargé vos documents de vérification KYC.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="268e85b916332794a8bb8c70503048b5">
+        <source>Verification ID</source>
+        <target>ID de vérification</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="25e7568dc652f917fa9290980292ee85">
+        <source>Upload Date</source>
+        <target>Date de téléchargement</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="16a4f57be2380c365a94e27f91e100f2">
+        <source>Number of Documents</source>
+        <target>Nombre de documents</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="760912f13d1874b66a2cd47a5ef35870">
+        <source>What happens next?</source>
+        <target>Que se passe-t-il ensuite ?</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="5680a98266bd7919e73cff87962aeeeb">
+        <source>Our verification team will review your documents within 24-48 hours. You will receive an email notification once the review is complete.</source>
+        <target>Notre équipe de vérification examinera vos documents dans un délai de 24 à 48 heures. Vous recevrez une notification par e-mail une fois l'examen terminé.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="b4d08a293f7296deda752cdc4198c960">
+        <source>Check Status</source>
+        <target>Vérifier le statut</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="5a044ee285abd39a46e6774d734e4b45">
+        <source>This is an automated message. Please do not reply to this email.</source>
+        <target>Ceci est un message automatisé. Veuillez ne pas répondre à cet e-mail.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="c4a80c69950e49b17c5c7d10548ccd56">
+        <source>KYC Verification Expiry Warning</source>
+        <target>Avertissement d'expiration de vérification KYC</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="e232478a6694cf57b62ca70a3a500239">
+        <source>Your KYC verification is approaching its expiry date.</source>
+        <target>Votre vérification KYC approche de sa date d'expiration.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="b55afee3a3deb460e6149b486d8d9a49">
+        <source>Current Status</source>
+        <target>Statut actuel</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="39324136240b4e9041e319675edcadeb">
+        <source>Expires On</source>
+        <target>Expire le</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="ac29965c19677fea0dcb4de5d424fad2">
+        <source>Days Remaining</source>
+        <target>Jours restants</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="86ff4218cccb683ac8b1ba2ba3a6c2ca">
+        <source>Action Required</source>
+        <target>Action requise</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="590cbc9bf3c0470e4154e203fe0a78c1">
+        <source>To maintain uninterrupted access to our services, please renew your KYC verification before the expiry date.</source>
+        <target>Pour maintenir un accès ininterrompu à nos services, veuillez renouveler votre vérification KYC avant la date d'expiration.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="a1381e6c67e5ecca802bf4412c2d016c">
+        <source>Renew Verification</source>
+        <target>Renouveler la vérification</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="a8f4358a45b5a7c3134e729dd9c25acb">
+        <source>If you have any questions, please contact our support team.</source>
+        <target>Si vous avez des questions, veuillez contacter notre équipe d'assistance.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="44747bff5b9119003db70c501734d4a7">
+        <source>Your KYC verification status has been updated.</source>
+        <target>Le statut de votre vérification KYC a été mis à jour.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="ec53a8c4f07baed5d8825072c89799be">
+        <source>Status</source>
+        <target>Statut</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="99e6d58317e8f2eb8f036f3307c89c99">
+        <source>Date Submitted</source>
+        <target>Date de soumission</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="9331d9d87d9fa174bdc26812102107c9">
+        <source>Date Processed</source>
+        <target>Date de traitement</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="b33e41c09bd44ea0bdf63d7a939aaca9">
+        <source>Valid Until</source>
+        <target>Valide jusqu'au</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="cc1d6f3625c4eb671d76b6ebf3f6f544">
+        <source>Know Your Customer</source>
+        <target>Connaître votre client</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="af6c0c768191b44c3bc356a66096ab5a">
+        <source>Submission Date</source>
+        <target>Date de soumission</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="ed5b66270e040ab0e0e53d572eef53e9">
+        <source>Verification Date</source>
+        <target>Date de vérification</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="ff594c9df3a9c601720e981793afbf24">
+        <source>Is expired?</source>
+        <target>Est expiré ?</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="06df33001c1d7187fdd81ea1f5b277aa">
+        <source>Actions</source>
+        <target>Actions</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="93cba07454f06a4a960172bbd6e2a435">
+        <source>Yes</source>
+        <target>Oui</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="bafd7322c6e97d25b6299b5d6fe8920b">
+        <source>No</source>
+        <target>Non</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="5d5cd268b8acccf04f63d81c5d0d2cab">
+        <source>View Details</source>
+        <target>Voir les détails</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="b891933df6f2389ebc9973048d4439a9">
+        <source>Manage All KYC Verifications</source>
+        <target>Gérer toutes les vérifications KYC</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="a3987b8daeb1953d3ec145379e587ee0">
+        <source>No KYC verifications found</source>
+        <target>Aucune vérification KYC trouvée</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
