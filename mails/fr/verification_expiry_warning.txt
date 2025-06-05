@@ -1,4 +1,4 @@
-Cher {prénom} {nom},
+Cher {firstname} {lastname},
 
 Votre vérification KYC arrive bientôt à expiration.
 

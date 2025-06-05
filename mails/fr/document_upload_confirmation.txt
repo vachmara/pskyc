@@ -1,12 +1,13 @@
-Une nouvelle demande de vérification KYC a été soumise et doit être examinée par l'administrateur.
+Cher {firstname} {lastname},
 
-Client : {customer_name} ({customer_email})
-Identifiant client : #{customer_id}
-Identifiant de vérification : #{verification_id}
-Nombre de documents : {documents_count}
+Merci d'avoir téléchargé vos documents de vérification KYC.
 
-Veuillez examiner les documents soumis et mettre à jour le statut de vérification dans le panneau d'administration. 
+Identifiant de vérification : {verification_id}
+Date de téléchargement : {upload_date}
+Nombre de documents : {document_count}
 
-Examen dans le panneau d'administration : {admin_verification_url}
+Notre équipe de vérification examinera vos documents dans les 24 à 48 heures. Vous recevrez une notification par e-mail une fois l'examen terminé.
 
-Il s'agit d'une notification administrative automatisée.
+Vérifier le statut : {verification_status_url}
+
+Ceci est un message automatique. Veuillez ne pas répondre à cet e-mail.
