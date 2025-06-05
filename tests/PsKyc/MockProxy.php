@@ -137,7 +137,7 @@ class PrestaShopLogger extends MockProxy
 class Mail extends MockProxy
 {
     protected static $mock;
-    
+
     /**
      * Store the last processed template content for testing
      */
@@ -147,7 +147,7 @@ class Mail extends MockProxy
         'templateVars' => [],
         'subject' => '',
         'recipient' => '',
-        'template' => ''
+        'template' => '',
     ];
 
     /**
@@ -155,7 +155,7 @@ class Mail extends MockProxy
      */
     public static $mockTemplateContent = [
         'html' => 'HTML: Hello {firstname} {lastname}, your verification #{verification_id} is {status_label}. Message: {status_message}',
-        'txt' => 'TXT: Hello {firstname} {lastname}, your verification #{verification_id} is {status_label}. Message: {status_message}'
+        'txt' => 'TXT: Hello {firstname} {lastname}, your verification #{verification_id} is {status_label}. Message: {status_message}',
     ];
 
     /**
@@ -177,7 +177,7 @@ class Mail extends MockProxy
         $idShop = null,
         $bcc = null,
         $replyTo = null,
-        $replyToName = ''
+        $replyToName = '',
     ) {
         // Store call details for testing
         static::$lastProcessedContent['template'] = $template;
@@ -194,9 +194,9 @@ class Mail extends MockProxy
             '{shop_name}' => 'Test Shop',
             '{shop_url}' => 'https://example.com/',
             '{my_account_url}' => 'https://example.com/my-account',
-            '{color}' => '#DB3484'
+            '{color}' => '#DB3484',
         ];
-        
+
         $allTemplateVars = array_merge($defaultVars, $templateVars);
 
         // Simulate PrestaShop's template variable replacement using strtr()
@@ -230,12 +230,12 @@ class Mail extends MockProxy
             'templateVars' => [],
             'subject' => '',
             'recipient' => '',
-            'template' => ''
+            'template' => '',
         ];
-        
+
         static::$mockTemplateContent = [
             'html' => 'HTML: Hello {firstname} {lastname}, your verification #{verification_id} is {status_label}. Message: {status_message}',
-            'txt' => 'TXT: Hello {firstname} {lastname}, your verification #{verification_id} is {status_label}. Message: {status_message}'
+            'txt' => 'TXT: Hello {firstname} {lastname}, your verification #{verification_id} is {status_label}. Message: {status_message}',
         ];
     }
 

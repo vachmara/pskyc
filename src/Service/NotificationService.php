@@ -356,7 +356,7 @@ class NotificationService
         array $templateVars,
         string $recipientEmail,
         ?string $recipientName = null,
-        $langId = null
+        $langId = null,
     ): bool {
         try {
             if (empty($recipientEmail)) {

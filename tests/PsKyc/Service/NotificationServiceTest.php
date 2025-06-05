@@ -13,9 +13,9 @@ namespace Tests\PsKyc\Service;
 
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use PrestaShop\Module\Pskyc\Service\NotificationService;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Routing\RouterInterface;
 
 class NotificationServiceTest extends MockeryTestCase
 {
@@ -33,7 +33,6 @@ class NotificationServiceTest extends MockeryTestCase
 
     protected function setUp(): void
     {
-
         // Ensure mock classes are loaded before using them
         if (!class_exists('Context')) {
             require_once __DIR__ . '/../MockProxy.php';
@@ -46,7 +45,6 @@ class NotificationServiceTest extends MockeryTestCase
         $dbMock = \Mockery::mock();
         $mailMock = \Mockery::mock();
         $languageMock = \Mockery::mock();
-
 
         // Create shop and link mocks
         $shopMock = \Mockery::mock();
@@ -294,7 +292,6 @@ class NotificationServiceTest extends MockeryTestCase
         $this->assertFalse($result);
     }
 
-
     public function testSendAdminNotificationSuccessVerbose()
     {
         $verification = [
@@ -313,6 +310,7 @@ class NotificationServiceTest extends MockeryTestCase
         $this->routerMock->shouldReceive('generate')
             ->withArgs(function ($route, $params) {
                 echo "Router called with route: $route, params: " . json_encode($params) . "\n";
+
                 return $route === 'ps_pskyc_verification_view' && $params['verificationId'] === 1;
             })
             ->andReturn('https://example.com/admin/kyc/verification/1')
@@ -321,6 +319,7 @@ class NotificationServiceTest extends MockeryTestCase
         $this->translatorMock->shouldReceive('trans')
             ->withArgs(function ($key, $params, $domain) {
                 echo "Translator called with key: $key, params: " . json_encode($params) . ", domain: $domain\n";
+
                 return true;
             })
             ->andReturn('New KYC Verification Request - #1')
@@ -329,7 +328,8 @@ class NotificationServiceTest extends MockeryTestCase
         // Mock Mail::Send with debugging
         \Mail::shouldReceive('Send')
             ->withArgs(function (...$args) {
-                echo "Mail::Send called with args: " . json_encode($args[0] ?? 'unknown') . "\n";
+                echo 'Mail::Send called with args: ' . json_encode($args[0] ?? 'unknown') . "\n";
+
                 return true;
             })
             ->andReturn(true)
