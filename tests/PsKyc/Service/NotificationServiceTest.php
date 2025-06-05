@@ -710,7 +710,7 @@ class NotificationServiceTest extends MockeryTestCase
 
         // Mock Configuration::get for PS_SHOP_NAME
         \Configuration::shouldReceive('get')
-            ->with('PS_SHOP_NAME', 'Shop Administrator')
+            ->with('PS_SHOP_NAME')
             ->andReturn('Test Shop')
             ->byDefault();
 
@@ -1216,8 +1216,8 @@ class NotificationServiceTest extends MockeryTestCase
             ->once();
 
         \Configuration::shouldReceive('get')
-            ->with('PS_SHOP_NAME', 'Shop Administrator')
-            ->andReturn('My Test Shop')
+            ->with('PS_SHOP_NAME')
+            ->andReturn('Test Shop')
             ->once();
 
         // Use reflection to access the private getAdminEmails method
@@ -1230,7 +1230,7 @@ class NotificationServiceTest extends MockeryTestCase
         $this->assertIsArray($result);
         $this->assertCount(1, $result);
         $this->assertEquals('shop@example.com', $result[0]['email']);
-        $this->assertEquals('My Test Shop', $result[0]['name']);
+        $this->assertEquals('Test Shop', $result[0]['name']);
     }
 
     public function testGetAdminEmailsFallbackWhenShopEmailIsEmpty()
@@ -1295,8 +1295,8 @@ class NotificationServiceTest extends MockeryTestCase
             ->once();
 
         \Configuration::shouldReceive('get')
-            ->with('PS_SHOP_NAME', 'Shop Administrator')
-            ->andReturn('Fallback Shop')
+            ->with('PS_SHOP_NAME')
+            ->andReturn('Test Shop')
             ->once();
 
         // Mock email validation to return false for invalid emails
@@ -1320,7 +1320,7 @@ class NotificationServiceTest extends MockeryTestCase
         $this->assertIsArray($result);
         $this->assertCount(1, $result);
         $this->assertEquals('valid@shop.com', $result[0]['email']);
-        $this->assertEquals('Fallback Shop', $result[0]['name']);
+        $this->assertEquals('Test Shop', $result[0]['name']);
     }
 
     public function testGetAdminEmailsWithValidConfigEmails()
