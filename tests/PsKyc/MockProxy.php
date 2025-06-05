@@ -137,6 +137,124 @@ class PrestaShopLogger extends MockProxy
 class Mail extends MockProxy
 {
     protected static $mock;
+    
+    /**
+     * Store the last processed template content for testing
+     */
+    public static $lastProcessedContent = [
+        'html' => '',
+        'txt' => '',
+        'templateVars' => [],
+        'subject' => '',
+        'recipient' => '',
+        'template' => ''
+    ];
+
+    /**
+     * Mock template content for testing
+     */
+    public static $mockTemplateContent = [
+        'html' => 'HTML: Hello {firstname} {lastname}, your verification #{verification_id} is {status_label}. Message: {status_message}',
+        'txt' => 'TXT: Hello {firstname} {lastname}, your verification #{verification_id} is {status_label}. Message: {status_message}'
+    ];
+
+    /**
+     * Enhanced Send method that simulates template processing
+     */
+    public static function Send(
+        $idLang,
+        $template,
+        $subject,
+        $templateVars,
+        $to,
+        $toName = null,
+        $from = null,
+        $fromName = null,
+        $fileAttachment = null,
+        $mode_smtp = null,
+        $templatePath = null,
+        $die = false,
+        $idShop = null,
+        $bcc = null,
+        $replyTo = null,
+        $replyToName = ''
+    ) {
+        // Store call details for testing
+        static::$lastProcessedContent['template'] = $template;
+        static::$lastProcessedContent['subject'] = $subject;
+        static::$lastProcessedContent['templateVars'] = $templateVars;
+        static::$lastProcessedContent['recipient'] = is_array($to) ? $to[0] : $to;
+
+        // Simulate template loading (use mock content or fall back to simple template)
+        $templateHtml = static::$mockTemplateContent['html'] ?? 'Default HTML template with {firstname} {lastname}';
+        $templateTxt = static::$mockTemplateContent['txt'] ?? 'Default TXT template with {firstname} {lastname}';
+
+        // Add standard PrestaShop template variables
+        $defaultVars = [
+            '{shop_name}' => 'Test Shop',
+            '{shop_url}' => 'https://example.com/',
+            '{my_account_url}' => 'https://example.com/my-account',
+            '{color}' => '#DB3484'
+        ];
+        
+        $allTemplateVars = array_merge($defaultVars, $templateVars);
+
+        // Simulate PrestaShop's template variable replacement using strtr()
+        $processedHtml = strtr($templateHtml, $allTemplateVars);
+        $processedTxt = strtr($templateTxt, $allTemplateVars);
+
+        // Store processed content for test assertions
+        static::$lastProcessedContent['html'] = $processedHtml;
+        static::$lastProcessedContent['txt'] = $processedTxt;
+
+        // Call the original mock if it exists, otherwise return success
+        if (static::$mock) {
+            return static::$mock->Send(
+                $idLang, $template, $subject, $templateVars, $to, $toName,
+                $from, $fromName, $fileAttachment, $mode_smtp, $templatePath,
+                $die, $idShop, $bcc, $replyTo, $replyToName
+            );
+        }
+
+        return true; // Default success for testing
+    }
+
+    /**
+     * Reset mock state between tests
+     */
+    public static function resetMockState()
+    {
+        static::$lastProcessedContent = [
+            'html' => '',
+            'txt' => '',
+            'templateVars' => [],
+            'subject' => '',
+            'recipient' => '',
+            'template' => ''
+        ];
+        
+        static::$mockTemplateContent = [
+            'html' => 'HTML: Hello {firstname} {lastname}, your verification #{verification_id} is {status_label}. Message: {status_message}',
+            'txt' => 'TXT: Hello {firstname} {lastname}, your verification #{verification_id} is {status_label}. Message: {status_message}'
+        ];
+    }
+
+    /**
+     * Set custom mock template content for specific tests
+     */
+    public static function setMockTemplateContent($html, $txt = null)
+    {
+        static::$mockTemplateContent['html'] = $html;
+        static::$mockTemplateContent['txt'] = $txt ?? $html;
+    }
+
+    /**
+     * Get the last processed template content
+     */
+    public static function getLastProcessedContent()
+    {
+        return static::$lastProcessedContent;
+    }
 }
 
 class PrestaShopException extends Exception

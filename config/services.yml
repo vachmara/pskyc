@@ -90,6 +90,7 @@ services:
   PrestaShop\Module\Pskyc\Service\NotificationService:
     arguments:
       - '@translator'
+      - '@router'
 
   PrestaShop\Module\Pskyc\Service\MaintenanceService:
     arguments:
