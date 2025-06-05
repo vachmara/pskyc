@@ -41,6 +41,7 @@ services:
       - '@PrestaShop\Module\Pskyc\Repository\VerificationRepository'
       - '@PrestaShop\Module\Pskyc\Service\EncryptionService'
 
+  # Front-end notification service without router (uses Context Link)
   PrestaShop\Module\Pskyc\Service\NotificationService:
     class: 'PrestaShop\Module\Pskyc\Service\NotificationService'
     arguments:
@@ -64,4 +65,3 @@ services:
       - '@PrestaShop\Module\Pskyc\Repository\DocumentRepository'
       - '@PrestaShop\Module\Pskyc\Repository\CustomerRepository'
       - '@PrestaShop\Module\Pskyc\Repository\LogRepository'
-      

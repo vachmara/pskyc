@@ -13,7 +13,6 @@ namespace Tests\PsKyc\Service;
 
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use PrestaShop\Module\Pskyc\Service\NotificationService;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -21,9 +20,6 @@ class NotificationServiceTest extends MockeryTestCase
 {
     /** @var TranslatorInterface */
     private $translatorMock;
-
-    /** @var RouterInterface */
-    private $routerMock;
 
     /** @var EngineInterface */
     private $templatingMock;
@@ -45,6 +41,7 @@ class NotificationServiceTest extends MockeryTestCase
         $dbMock = \Mockery::mock();
         $mailMock = \Mockery::mock();
         $languageMock = \Mockery::mock();
+        $validateMock = \Mockery::mock();
 
         // Create shop and link mocks
         $shopMock = \Mockery::mock();
@@ -62,6 +59,7 @@ class NotificationServiceTest extends MockeryTestCase
         \PrestaShopLogger::setStaticExpectations($loggerMock);
         \Db::setStaticExpectations($dbMock);
         \Mail::setStaticExpectations($mailMock);
+        \Validate::setStaticExpectations($validateMock);
 
         // Configure default expectations
         $loggerMock->shouldReceive('addLog')->byDefault();
@@ -72,6 +70,10 @@ class NotificationServiceTest extends MockeryTestCase
         $configMock->shouldReceive('get')
             ->with('PS_LANG_DEFAULT')
             ->andReturn(1)
+            ->byDefault();
+        $configMock->shouldReceive('get')
+            ->with('PS_SHOP_EMAIL')
+            ->andReturn('shop@example.com')
             ->byDefault();
 
         // Configure shop and link mocks
@@ -87,26 +89,33 @@ class NotificationServiceTest extends MockeryTestCase
 
         // Set up service dependencies
         $this->translatorMock = \Mockery::mock(TranslatorInterface::class);
-        $this->routerMock = \Mockery::mock(RouterInterface::class);
         $this->templatingMock = \Mockery::mock(EngineInterface::class);
 
         // Configure default translator behavior
         $this->translatorMock->shouldReceive('trans')
-            ->andReturn('Translated text')
+            ->andReturn('translated text')
             ->byDefault();
 
-        $this->service = new NotificationService($this->translatorMock, $this->routerMock, $this->templatingMock);
+        // Create service with only translator - no router needed
+        $this->service = new NotificationService($this->translatorMock);
     }
 
     public function testConstructorWithTemplating()
     {
-        $service = new NotificationService($this->translatorMock, $this->routerMock, $this->templatingMock);
+        $service = new NotificationService($this->translatorMock);
         $this->assertInstanceOf(NotificationService::class, $service);
     }
 
     public function testConstructorWithoutTemplating()
     {
-        $service = new NotificationService($this->translatorMock, $this->routerMock);
+        $service = new NotificationService($this->translatorMock);
+        $this->assertInstanceOf(NotificationService::class, $service);
+    }
+
+    public function testConstructorWithoutRouter()
+    {
+        // Test front-end context without router
+        $service = new NotificationService($this->translatorMock);
         $this->assertInstanceOf(NotificationService::class, $service);
     }
 
@@ -306,44 +315,38 @@ class NotificationServiceTest extends MockeryTestCase
             'id_customer' => 1,
         ];
 
-        // Set up all expectations with debugging
-        $this->routerMock->shouldReceive('generate')
-            ->withArgs(function ($route, $params) {
-                echo "Router called with route: $route, params: " . json_encode($params) . "\n";
-
-                return $route === 'ps_pskyc_verification_view' && $params['verificationId'] === 1;
-            })
-            ->andReturn('https://example.com/admin/kyc/verification/1')
+        // Set up Configuration expectations
+        \Configuration::shouldReceive('get')
+            ->with('PSKYC_ADMIN_EMAILS')
+            ->andReturn('admin@example.com')
             ->once();
 
-        $this->translatorMock->shouldReceive('trans')
-            ->withArgs(function ($key, $params, $domain) {
-                echo "Translator called with key: $key, params: " . json_encode($params) . ", domain: $domain\n";
-
-                return true;
-            })
-            ->andReturn('New KYC Verification Request - #1')
-            ->once();
-
-        // Mock Mail::Send with debugging
-        \Mail::shouldReceive('Send')
-            ->withArgs(function (...$args) {
-                echo 'Mail::Send called with args: ' . json_encode($args[0] ?? 'unknown') . "\n";
-
-                return true;
-            })
+        // Set up Validate expectations
+        \Validate::shouldReceive('isEmail')
+            ->with('admin@example.com')
             ->andReturn(true)
             ->once();
 
+        // Set up simple context expectations (only shop base URL needed)
         $this->setupContextExpectations();
-        $this->setupAdminEmailsExpectations();
+
+        // Set up translator expectations
+        $this->translatorMock->shouldReceive('trans')
+            ->with('New KYC Verification Request - #%id%', ['%id%' => 1], 'Modules.Pskyc.Admin')
+            ->andReturn('New KYC Verification Request - #1')
+            ->once();
+
+        // Mock Mail::Send to return true
+        \Mail::shouldReceive('Send')
+            ->andReturn(true)
+            ->once();
 
         $result = $this->service->sendAdminNotification($verification, $customer);
 
         $this->assertTrue($result);
     }
 
-    public function testSendAdminNotificationNoAdminEmails()
+    public function testSendAdminNotificationAdminEmailsEmpty()
     {
         $verification = [
             'id_kyc_verification' => 1,
@@ -357,21 +360,17 @@ class NotificationServiceTest extends MockeryTestCase
             'id_customer' => 1,
         ];
 
-        $this->setupContextExpectations();
-
-        \Db::shouldReceive('getInstance')
-            ->once()
-            ->andReturnSelf();
-        \Db::shouldReceive('executeS')
-            ->once()
-            ->andReturn([]);
+        // Mock Configuration::get for PSKYC_ADMIN_EMAILS to return empty
+        \Configuration::shouldReceive('get')
+            ->with('PSKYC_ADMIN_EMAILS')
+            ->andReturn('')
+            ->once();
 
         $result = $this->service->sendAdminNotification($verification, $customer);
-
-        $this->assertFalse($result);
+        $this->assertFalse($result, 'Expected false when admin emails are empty');
     }
 
-    public function testSendAdminNotificationException()
+    public function testSendAdminNotificationAdminEmailsThrowException()
     {
         $verification = [
             'id_kyc_verification' => 1,
@@ -385,21 +384,25 @@ class NotificationServiceTest extends MockeryTestCase
             'id_customer' => 1,
         ];
 
-        // First, set up getAdminEmails to return valid admin emails
-        $adminEmails = [
-            ['email' => 'admin@example.com', 'name' => 'Admin User'],
-        ];
+        \Configuration::shouldReceive('get')
+            ->with('PSKYC_ADMIN_EMAILS')
+            ->andReturn('admin@example.com')
+            ->once();
 
-        \Db::shouldReceive('getInstance')
-            ->once()
-            ->andReturnSelf();
-        \Db::shouldReceive('executeS')
-            ->once()
-            ->andReturn($adminEmails);
+        // Set up Validate expectations
+        \Validate::shouldReceive('isEmail')
+            ->with('admin@example.com')
+            ->andReturn(true)
+            ->once();
 
-        // Then make the translator throw an exception when called
+        // Mock translator to throw an exception on trans
         $this->translatorMock->shouldReceive('trans')
-            ->with('New KYC Verification Request - #%id%', ['%id%' => 1], 'Modules.Pskyc.Admin')
+            ->once()
+            ->with(
+                'New KYC Verification Request - #%id%',
+                ['%id%' => 1],
+                'Modules.Pskyc.Admin'
+            )
             ->andThrow(new \Exception('Translation service failed'));
 
         \PrestaShopLogger::shouldReceive('addLog')
@@ -409,6 +412,25 @@ class NotificationServiceTest extends MockeryTestCase
         $result = $this->service->sendAdminNotification($verification, $customer);
 
         $this->assertFalse($result);
+    }
+
+    public function testGetStatusLabelDefault()
+    {
+        // Test the default case when status doesn't match any predefined values
+        $this->translatorMock->shouldReceive('trans')
+            ->with('Unknown', [], 'Modules.Pskyc.Shop')
+            ->andReturn('Unknown')
+            ->once();
+
+        // Use reflection to access the private getStatusLabel method
+        $reflection = new \ReflectionClass($this->service);
+        $method = $reflection->getMethod('getStatusLabel');
+        $method->setAccessible(true);
+
+        // Test with an unknown/invalid status
+        $result = $method->invokeArgs($this->service, ['invalid_status']);
+
+        $this->assertEquals('Unknown', $result);
     }
 
     public function testSendExpiryWarningSuccess()
@@ -523,68 +545,6 @@ class NotificationServiceTest extends MockeryTestCase
         $result = $method->invokeArgs($this->service, ['pending']);
 
         $this->assertEquals('KYC Verification Status Update', $result);
-    }
-
-    public function testGetAdminEmailsSuccess()
-    {
-        $adminEmails = [
-            ['email' => 'admin1@example.com', 'name' => 'Admin One'],
-            ['email' => 'admin2@example.com', 'name' => 'Admin Two'],
-        ];
-
-        \Db::shouldReceive('getInstance')
-            ->once()
-            ->andReturnSelf();
-        \Db::shouldReceive('executeS')
-            ->once()
-            ->andReturn($adminEmails);
-
-        $reflection = new \ReflectionClass($this->service);
-        $method = $reflection->getMethod('getAdminEmails');
-        $method->setAccessible(true);
-
-        $result = $method->invokeArgs($this->service, []);
-
-        $this->assertEquals(2, count($result));
-        $this->assertEquals('admin1@example.com', $result[0]['email']);
-        $this->assertEquals('Admin One', $result[0]['name']);
-    }
-
-    public function testGetAdminEmailsEmpty()
-    {
-        \Db::shouldReceive('getInstance')
-            ->once()
-            ->andReturnSelf();
-        \Db::shouldReceive('executeS')
-            ->once()
-            ->andReturn([]);
-
-        $reflection = new \ReflectionClass($this->service);
-        $method = $reflection->getMethod('getAdminEmails');
-        $method->setAccessible(true);
-
-        $result = $method->invokeArgs($this->service, []);
-
-        $this->assertEquals([], $result);
-    }
-
-    public function testGetAdminEmailsException()
-    {
-        \Db::shouldReceive('getInstance')
-            ->once()
-            ->andThrow(new \Exception('Database error'));
-
-        \PrestaShopLogger::shouldReceive('addLog')
-            ->once()
-            ->with(\Mockery::pattern('/Error getting admin emails:/'), 3, null, 'Pskyc');
-
-        $reflection = new \ReflectionClass($this->service);
-        $method = $reflection->getMethod('getAdminEmails');
-        $method->setAccessible(true);
-
-        $result = $method->invokeArgs($this->service, []);
-
-        $this->assertEquals([], $result);
     }
 
     public function testSendThemeEmailSuccess()
@@ -724,6 +684,11 @@ class NotificationServiceTest extends MockeryTestCase
         $linkMock->shouldReceive('getAdminLink')
             ->with('AdminModules')
             ->andReturn('https://example.com/admin/modules');
+
+        // Add missing AdminPskycVerification link for admin notifications with specific parameters
+        $linkMock->shouldReceive('getAdminLink')
+            ->with('AdminPskycVerification', true, \Mockery::any())
+            ->andReturn('https://example.com/admin/kyc/verification/123');
     }
 
     /**
@@ -731,16 +696,34 @@ class NotificationServiceTest extends MockeryTestCase
      */
     private function setupAdminEmailsExpectations()
     {
-        $adminEmails = [
-            ['email' => 'admin@example.com', 'name' => 'Admin User'],
-        ];
+        // Mock Configuration::get for PSKYC_ADMIN_EMAILS - return a valid email
+        \Configuration::shouldReceive('get')
+            ->with('PSKYC_ADMIN_EMAILS')
+            ->andReturn('admin@example.com')
+            ->byDefault();
 
-        \Db::shouldReceive('getInstance')
-            ->once()
-            ->andReturnSelf();
-        \Db::shouldReceive('executeS')
-            ->once()
-            ->andReturn($adminEmails);
+        // Mock Configuration::get for PS_SHOP_EMAIL as fallback
+        \Configuration::shouldReceive('get')
+            ->with('PS_SHOP_EMAIL')
+            ->andReturn('shop@example.com')
+            ->byDefault();
+
+        // Mock Configuration::get for PS_SHOP_NAME
+        \Configuration::shouldReceive('get')
+            ->with('PS_SHOP_NAME', 'Shop Administrator')
+            ->andReturn('Test Shop')
+            ->byDefault();
+
+        // Mock Validate::isEmail to return true for our test emails
+        \Validate::shouldReceive('isEmail')
+            ->with('admin@example.com')
+            ->andReturn(true)
+            ->byDefault();
+
+        \Validate::shouldReceive('isEmail')
+            ->with('shop@example.com')
+            ->andReturn(true)
+            ->byDefault();
     }
 
     /**
@@ -925,15 +908,21 @@ class NotificationServiceTest extends MockeryTestCase
             'TXT: KYC from {customer_name} ({customer_email}) ID:{customer_id}. #{verification_id} with {document_count} docs. URL: {admin_verification_url}'
         );
 
-        $this->setupContextExpectations();
-        $this->setupAdminEmailsExpectations();
-        $this->setupMailExpectations(true);
-
-        // Set up router expectation for admin verification URL
-        $this->routerMock->shouldReceive('generate')
-            ->with('ps_pskyc_verification_view', ['verificationId' => 789])
-            ->andReturn('https://example.com/admin/kyc/verification/789')
+        // Set up Configuration expectations
+        \Configuration::shouldReceive('get')
+            ->with('PSKYC_ADMIN_EMAILS')
+            ->andReturn('admin@example.com')
             ->once();
+
+        // Set up Validate expectations
+        \Validate::shouldReceive('isEmail')
+            ->with('admin@example.com')
+            ->andReturn(true)
+            ->once();
+
+        // Set up simple context expectations (only shop base URL needed)
+        $this->setupContextExpectations();
+        $this->setupMailExpectations(true);
 
         // Set up translator expectation for the subject
         $this->translatorMock->shouldReceive('trans')
@@ -952,22 +941,22 @@ class NotificationServiceTest extends MockeryTestCase
         $this->assertEquals('New KYC Verification Request - #789', $processedContent['subject']);
         $this->assertEquals('admin@example.com', $processedContent['recipient']);
 
-        // Check that all template variables were properly replaced in HTML content
-        $expectedHtmlContent = 'New KYC request from Bob Wilson (bob.wilson@example.com) - Customer ID: 42. Verification #789 has 2 documents. Review at: https://example.com/admin/kyc/verification/789';
+        // Check that all template variables were properly replaced in HTML content (now expects shop base URL)
+        $expectedHtmlContent = 'New KYC request from Bob Wilson (bob.wilson@example.com) - Customer ID: 42. Verification #789 has 2 documents. Review at: https://example.com/';
         $this->assertEquals($expectedHtmlContent, $processedContent['html']);
 
-        // Check that all template variables were properly replaced in TXT content
-        $expectedTxtContent = 'TXT: KYC from Bob Wilson (bob.wilson@example.com) ID:42. #789 with 2 docs. URL: https://example.com/admin/kyc/verification/789';
+        // Check that all template variables were properly replaced in TXT content (now expects shop base URL)
+        $expectedTxtContent = 'TXT: KYC from Bob Wilson (bob.wilson@example.com) ID:42. #789 with 2 docs. URL: https://example.com/';
         $this->assertEquals($expectedTxtContent, $processedContent['txt']);
 
-        // Verify specific template variables were passed correctly
+        // Verify specific template variables were passed correctly (admin_verification_url now uses shop base URL)
         $templateVars = $processedContent['templateVars'];
         $this->assertEquals('Bob Wilson', $templateVars['{customer_name}']);
         $this->assertEquals('bob.wilson@example.com', $templateVars['{customer_email}']);
         $this->assertEquals(42, $templateVars['{customer_id}']);
         $this->assertEquals(789, $templateVars['{verification_id}']);
         $this->assertEquals(2, $templateVars['{document_count}']);
-        $this->assertEquals('https://example.com/admin/kyc/verification/789', $templateVars['{admin_verification_url}']);
+        $this->assertEquals('https://example.com/', $templateVars['{admin_verification_url}']); // Updated to expect shop base URL
     }
 
     public function testSendExpiryWarningTemplateVariables()
@@ -1211,5 +1200,276 @@ class NotificationServiceTest extends MockeryTestCase
         // Check that special characters are properly replaced in content
         $expectedHtmlContent = 'Customer: José García-López, Note: Documents verified with special chars: àáâãäåæçèéêë & symbols!';
         $this->assertEquals($expectedHtmlContent, $processedContent['html']);
+    }
+
+    public function testGetAdminEmailsFallbackToShopEmail()
+    {
+        // Test the fallback path when PSKYC_ADMIN_EMAILS is empty
+        \Configuration::shouldReceive('get')
+            ->with('PSKYC_ADMIN_EMAILS')
+            ->andReturn('')
+            ->once();
+
+        \Configuration::shouldReceive('get')
+            ->with('PS_SHOP_EMAIL')
+            ->andReturn('shop@example.com')
+            ->once();
+
+        \Configuration::shouldReceive('get')
+            ->with('PS_SHOP_NAME', 'Shop Administrator')
+            ->andReturn('My Test Shop')
+            ->once();
+
+        // Use reflection to access the private getAdminEmails method
+        $reflection = new \ReflectionClass($this->service);
+        $method = $reflection->getMethod('getAdminEmails');
+        $method->setAccessible(true);
+
+        $result = $method->invoke($this->service);
+
+        $this->assertIsArray($result);
+        $this->assertCount(1, $result);
+        $this->assertEquals('shop@example.com', $result[0]['email']);
+        $this->assertEquals('My Test Shop', $result[0]['name']);
+    }
+
+    public function testGetAdminEmailsFallbackWhenShopEmailIsEmpty()
+    {
+        // Test the fallback path when both PSKYC_ADMIN_EMAILS and PS_SHOP_EMAIL are empty
+        \Configuration::shouldReceive('get')
+            ->with('PSKYC_ADMIN_EMAILS')
+            ->andReturn('')
+            ->once();
+
+        \Configuration::shouldReceive('get')
+            ->with('PS_SHOP_EMAIL')
+            ->andReturn('')
+            ->once();
+
+        // Use reflection to access the private getAdminEmails method
+        $reflection = new \ReflectionClass($this->service);
+        $method = $reflection->getMethod('getAdminEmails');
+        $method->setAccessible(true);
+
+        $result = $method->invoke($this->service);
+
+        $this->assertIsArray($result);
+        $this->assertEmpty($result);
+    }
+
+    public function testGetAdminEmailsFallbackWhenShopEmailIsNull()
+    {
+        // Test the fallback path when PSKYC_ADMIN_EMAILS is empty and PS_SHOP_EMAIL is null
+        \Configuration::shouldReceive('get')
+            ->with('PSKYC_ADMIN_EMAILS')
+            ->andReturn(null)
+            ->once();
+
+        \Configuration::shouldReceive('get')
+            ->with('PS_SHOP_EMAIL')
+            ->andReturn(null)
+            ->once();
+
+        // Use reflection to access the private getAdminEmails method
+        $reflection = new \ReflectionClass($this->service);
+        $method = $reflection->getMethod('getAdminEmails');
+        $method->setAccessible(true);
+
+        $result = $method->invoke($this->service);
+
+        $this->assertIsArray($result);
+        $this->assertEmpty($result);
+    }
+
+    public function testGetAdminEmailsWithValidConfigButInvalidEmails()
+    {
+        // Test when PSKYC_ADMIN_EMAILS contains invalid emails and fallback is needed
+        \Configuration::shouldReceive('get')
+            ->with('PSKYC_ADMIN_EMAILS')
+            ->andReturn('invalid-email, another-invalid')
+            ->once();
+
+        \Configuration::shouldReceive('get')
+            ->with('PS_SHOP_EMAIL')
+            ->andReturn('valid@shop.com')
+            ->once();
+
+        \Configuration::shouldReceive('get')
+            ->with('PS_SHOP_NAME', 'Shop Administrator')
+            ->andReturn('Fallback Shop')
+            ->once();
+
+        // Mock email validation to return false for invalid emails
+        \Validate::shouldReceive('isEmail')
+            ->with('invalid-email')
+            ->andReturn(false)
+            ->once();
+
+        \Validate::shouldReceive('isEmail')
+            ->with('another-invalid')
+            ->andReturn(false)
+            ->once();
+
+        // Use reflection to access the private getAdminEmails method
+        $reflection = new \ReflectionClass($this->service);
+        $method = $reflection->getMethod('getAdminEmails');
+        $method->setAccessible(true);
+
+        $result = $method->invoke($this->service);
+
+        $this->assertIsArray($result);
+        $this->assertCount(1, $result);
+        $this->assertEquals('valid@shop.com', $result[0]['email']);
+        $this->assertEquals('Fallback Shop', $result[0]['name']);
+    }
+
+    public function testGetAdminEmailsWithValidConfigEmails()
+    {
+        // Test when PSKYC_ADMIN_EMAILS contains valid emails (no fallback needed)
+        \Configuration::shouldReceive('get')
+            ->with('PSKYC_ADMIN_EMAILS')
+            ->andReturn('admin1@example.com, admin2@example.com')
+            ->once();
+
+        // Mock email validation to return true for valid emails
+        \Validate::shouldReceive('isEmail')
+            ->with('admin1@example.com')
+            ->andReturn(true)
+            ->once();
+
+        \Validate::shouldReceive('isEmail')
+            ->with('admin2@example.com')
+            ->andReturn(true)
+            ->once();
+
+        // Use reflection to access the private getAdminEmails method
+        $reflection = new \ReflectionClass($this->service);
+        $method = $reflection->getMethod('getAdminEmails');
+        $method->setAccessible(true);
+
+        $result = $method->invoke($this->service);
+
+        $this->assertIsArray($result);
+        $this->assertCount(2, $result);
+        $this->assertEquals('admin1@example.com', $result[0]['email']);
+        $this->assertEquals('Administrator', $result[0]['name']);
+        $this->assertEquals('admin2@example.com', $result[1]['email']);
+        $this->assertEquals('Administrator', $result[1]['name']);
+    }
+
+    public function testGetAdminEmailsWithMixedValidInvalidEmails()
+    {
+        // Test when PSKYC_ADMIN_EMAILS contains mix of valid and invalid emails
+        \Configuration::shouldReceive('get')
+            ->with('PSKYC_ADMIN_EMAILS')
+            ->andReturn('valid@example.com, invalid-email, another@valid.com')
+            ->once();
+
+        // Mock email validation
+        \Validate::shouldReceive('isEmail')
+            ->with('valid@example.com')
+            ->andReturn(true)
+            ->once();
+
+        \Validate::shouldReceive('isEmail')
+            ->with('invalid-email')
+            ->andReturn(false)
+            ->once();
+
+        \Validate::shouldReceive('isEmail')
+            ->with('another@valid.com')
+            ->andReturn(true)
+            ->once();
+
+        // Use reflection to access the private getAdminEmails method
+        $reflection = new \ReflectionClass($this->service);
+        $method = $reflection->getMethod('getAdminEmails');
+        $method->setAccessible(true);
+
+        $result = $method->invoke($this->service);
+
+        $this->assertIsArray($result);
+        $this->assertCount(2, $result); // Only valid emails should be included
+        $this->assertEquals('valid@example.com', $result[0]['email']);
+        $this->assertEquals('Administrator', $result[0]['name']);
+        $this->assertEquals('another@valid.com', $result[1]['email']);
+        $this->assertEquals('Administrator', $result[1]['name']);
+    }
+
+    public function testGetAdminEmailsExceptionHandling()
+    {
+        // Test exception handling in getAdminEmails method
+        \Configuration::shouldReceive('get')
+            ->with('PSKYC_ADMIN_EMAILS')
+            ->andThrow(new \Exception('Configuration error'))
+            ->once();
+
+        \PrestaShopLogger::shouldReceive('addLog')
+            ->once()
+            ->with(\Mockery::pattern('/Error getting admin emails:/'), 3, null, 'Pskyc');
+
+        // Use reflection to access the private getAdminEmails method
+        $reflection = new \ReflectionClass($this->service);
+        $method = $reflection->getMethod('getAdminEmails');
+        $method->setAccessible(true);
+
+        $result = $method->invoke($this->service);
+
+        $this->assertIsArray($result);
+    }
+
+    public function testGetAdminEmailsExceptionHandlingWithEmptyShopEmail()
+    {
+        // Test exception handling when even the fallback shop email is empty
+        \Configuration::shouldReceive('get')
+            ->with('PSKYC_ADMIN_EMAILS')
+            ->andThrow(new \Exception('Configuration error'))
+            ->once();
+
+        \PrestaShopLogger::shouldReceive('addLog')
+            ->once()
+            ->with(\Mockery::pattern('/Error getting admin emails:/'), 3, null, 'Pskyc');
+
+        // Use reflection to access the private getAdminEmails method
+        $reflection = new \ReflectionClass($this->service);
+        $method = $reflection->getMethod('getAdminEmails');
+        $method->setAccessible(true);
+
+        $result = $method->invoke($this->service);
+
+        $this->assertIsArray($result);
+        $this->assertEmpty($result);
+    }
+
+    public function testGetAdminEmailsWithWhitespaceHandling()
+    {
+        // Test that the method properly handles emails with extra whitespace
+        \Configuration::shouldReceive('get')
+            ->with('PSKYC_ADMIN_EMAILS')
+            ->andReturn('  admin1@example.com  ,   admin2@example.com   ')
+            ->once();
+
+        // Mock email validation - note that trim() should be applied
+        \Validate::shouldReceive('isEmail')
+            ->with('admin1@example.com')
+            ->andReturn(true)
+            ->once();
+
+        \Validate::shouldReceive('isEmail')
+            ->with('admin2@example.com')
+            ->andReturn(true)
+            ->once();
+
+        // Use reflection to access the private getAdminEmails method
+        $reflection = new \ReflectionClass($this->service);
+        $method = $reflection->getMethod('getAdminEmails');
+        $method->setAccessible(true);
+
+        $result = $method->invoke($this->service);
+
+        $this->assertIsArray($result);
+        $this->assertCount(2, $result);
+        $this->assertEquals('admin1@example.com', $result[0]['email']);
+        $this->assertEquals('admin2@example.com', $result[1]['email']);
     }
 }

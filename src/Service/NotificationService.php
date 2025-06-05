@@ -14,7 +14,6 @@ namespace PrestaShop\Module\Pskyc\Service;
 if (!defined('_PS_VERSION_')) {
     exit;
 }
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
@@ -31,11 +30,6 @@ class NotificationService
     private $translator;
 
     /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    /**
      * @var \Context
      */
     private $context;
@@ -44,12 +38,10 @@ class NotificationService
      * NotificationService constructor
      *
      * @param TranslatorInterface $translator Translator service for internationalization
-     * @param RouterInterface $router Router service for URL generation
      */
-    public function __construct(TranslatorInterface $translator, RouterInterface $router)
+    public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
-        $this->router = $router;
         $this->context = \Context::getContext();
     }
 
@@ -154,6 +146,7 @@ class NotificationService
     {
         try {
             $adminEmails = $this->getAdminEmails();
+
             if (empty($adminEmails)) {
                 return false;
             }
@@ -164,10 +157,7 @@ class NotificationService
                 '{customer_id}' => $customer['id_customer'],
                 '{verification_id}' => $verification['id_kyc_verification'],
                 '{document_count}' => $verification['document_count'] ?? 0,
-                '{admin_verification_url}' => $this->router->generate(
-                    'ps_pskyc_verification_view',
-                    ['verificationId' => $verification['id_kyc_verification']]
-                ),
+                '{admin_verification_url}' => $this->context->shop->getBaseURL(true),
             ];
 
             $subject = $this->translator->trans(
@@ -307,30 +297,58 @@ class NotificationService
     }
 
     /**
-     * Get admin emails from database
+     * Get admin emails from PSKYC configuration
+     *
+     * Uses PSKYC_ADMIN_EMAILS configuration setting with fallback to shop email
      *
      * @return array Array of admin email addresses and names
      */
     private function getAdminEmails(): array
     {
         try {
-            $sql = 'SELECT e.email, CONCAT(e.firstname, " ", e.lastname) as name 
-                    FROM ' . _DB_PREFIX_ . 'employee e 
-                    WHERE e.active = 1';
+            // Get configured admin emails
+            $adminEmailsConfig = \Configuration::get('PSKYC_ADMIN_EMAILS');
 
-            $db = \Db::getInstance();
-            $adminEmails = $db->executeS($sql);
+            if (empty($adminEmailsConfig)) {
+                // Fallback to shop email
+                $shopEmail = \Configuration::get('PS_SHOP_EMAIL');
+                if (empty($shopEmail)) {
+                    return [];
+                }
 
-            if (empty($adminEmails)) {
-                return [];
+                return [
+                    [
+                        'email' => $shopEmail,
+                        'name' => \Configuration::get('PS_SHOP_NAME'),
+                    ],
+                ];
             }
 
-            return array_map(function ($admin) {
-                return [
-                    'email' => $admin['email'],
-                    'name' => $admin['name'],
-                ];
-            }, $adminEmails);
+            // Parse comma-separated emails
+            $emails = array_map('trim', explode(',', $adminEmailsConfig));
+            $adminEmails = [];
+
+            foreach ($emails as $email) {
+                if (\Validate::isEmail($email)) {
+                    $adminEmails[] = [
+                        'email' => $email,
+                        'name' => 'Administrator', // Generic name for configured emails
+                    ];
+                }
+            }
+
+            // If no valid emails found, fallback to shop email
+            if (empty($adminEmails)) {
+                $shopEmail = \Configuration::get('PS_SHOP_EMAIL');
+                if (!empty($shopEmail)) {
+                    $adminEmails[] = [
+                        'email' => $shopEmail,
+                        'name' => \Configuration::get('PS_SHOP_NAME'),
+                    ];
+                }
+            }
+
+            return $adminEmails;
         } catch (\Exception $e) {
             \PrestaShopLogger::addLog('Error getting admin emails: ' . $e->getMessage(), 3, null, 'Pskyc');
 

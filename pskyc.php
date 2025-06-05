@@ -41,7 +41,7 @@ class Pskyc extends Module
     {
         $this->name = 'pskyc';
         $this->tab = 'administration';
-        $this->version = '1.1.0';
+        $this->version = '1.1.1';
         $this->author = 'Valentin Chmara';
         $this->need_instance = 1;
 
