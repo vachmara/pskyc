@@ -1495,6 +1495,11 @@ class NotificationServiceTest extends MockeryTestCase
             ->once();
 
         $this->setupContextExpectations();
+        \Mail::resetMockState();
+        \Mail::setMockTemplateContent(
+            'Verification #{verification_id} for {customer_name} ({customer_email}) was {status_label}: {status_message}. URL: {admin_verification_url}',
+            'TXT: #{verification_id} {status_label} {status_message} {admin_verification_url}'
+        );
         $this->setupMailExpectations(true);
 
         $this->translatorMock->shouldReceive('trans')
@@ -1508,6 +1513,25 @@ class NotificationServiceTest extends MockeryTestCase
         $result = $this->service->sendAdminStatusChangeNotification($verification, $customer);
 
         $this->assertTrue($result);
+
+        $processedContent = \Mail::getLastProcessedContent();
+        $this->assertEquals('admin_verification_status', $processedContent['template']);
+        $this->assertEquals('KYC Verification Approved', $processedContent['subject']);
+        $this->assertEquals('admin@example.com', $processedContent['recipient']);
+
+        $expectedHtml = 'Verification #5 for Adam West (adam.west@example.com) was Approved: ok. URL: https://example.com/';
+        $this->assertEquals($expectedHtml, $processedContent['html']);
+        $expectedTxt = 'TXT: #5 Approved ok https://example.com/';
+        $this->assertEquals($expectedTxt, $processedContent['txt']);
+
+        $templateVars = $processedContent['templateVars'];
+        $this->assertEquals('Adam West', $templateVars['{customer_name}']);
+        $this->assertEquals('adam.west@example.com', $templateVars['{customer_email}']);
+        $this->assertEquals(10, $templateVars['{customer_id}']);
+        $this->assertEquals(5, $templateVars['{verification_id}']);
+        $this->assertEquals('Approved', $templateVars['{status_label}']);
+        $this->assertEquals('ok', $templateVars['{status_message}']);
+        $this->assertEquals('https://example.com/', $templateVars['{admin_verification_url}']);
     }
 
     public function testSendAdminStatusChangeNotificationAdminEmailsEmpty()
@@ -1592,7 +1616,18 @@ class NotificationServiceTest extends MockeryTestCase
             ->once();
 
         $this->setupContextExpectations();
-        \Mail::shouldReceive('Send')->twice()->andReturn(true);
+        \Mail::shouldReceive('Send')
+            ->once()
+            ->withArgs(function ($langId, $template, $subject, $vars, $to) {
+                return $to === 'admin1@example.com' && $template === 'admin_verification_status';
+            })
+            ->andReturn(true);
+        \Mail::shouldReceive('Send')
+            ->once()
+            ->withArgs(function ($langId, $template, $subject, $vars, $to) {
+                return $to === 'admin2@example.com' && $template === 'admin_verification_status';
+            })
+            ->andReturn(true);
 
         $this->translatorMock->shouldReceive('trans')
             ->with('Approved', [], 'Modules.Pskyc.Shop')
