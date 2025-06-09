@@ -154,8 +154,8 @@ class Mail extends MockProxy
      * Mock template content for testing
      */
     public static $mockTemplateContent = [
-        'html' => 'HTML: Hello {firstname} {lastname}, your verification #{verification_id} is {status_label}. Message: {status_message}',
-        'txt' => 'TXT: Hello {firstname} {lastname}, your verification #{verification_id} is {status_label}. Message: {status_message}',
+        'html' => 'HTML: Hello {firstname} {lastname}, your verification #{verification_id} is {status_label}',
+        'txt' => 'TXT: Hello {firstname} {lastname}, your verification #{verification_id} is {status_label}',
     ];
 
     /**
@@ -234,8 +234,8 @@ class Mail extends MockProxy
         ];
 
         static::$mockTemplateContent = [
-            'html' => 'HTML: Hello {firstname} {lastname}, your verification #{verification_id} is {status_label}. Message: {status_message}',
-            'txt' => 'TXT: Hello {firstname} {lastname}, your verification #{verification_id} is {status_label}. Message: {status_message}',
+            'html' => 'HTML: Hello {firstname} {lastname}, your verification #{verification_id} is {status_label}',
+            'txt' => 'TXT: Hello {firstname} {lastname}, your verification #{verification_id} is {status_label}',
         ];
     }
 
