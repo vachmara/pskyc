@@ -1524,4 +1524,213 @@ class NotificationServiceTest extends MockeryTestCase
 
         $this->assertFalse($result);
     }
+
+    public function testSendAdminStatusChangeNotificationExceptionHandling()
+    {
+        $verification = [
+            'id_kyc_verification' => 6,
+            'status' => 'approved',
+        ];
+
+        $customer = [
+            'firstname' => 'Eve',
+            'lastname' => 'Adams',
+            'email' => 'eve.adams@example.com',
+            'id_customer' => 11,
+        ];
+
+        \Configuration::shouldReceive('get')
+            ->with('PSKYC_ADMIN_EMAILS')
+            ->andReturn('admin@example.com')
+            ->once();
+
+        \Validate::shouldReceive('isEmail')
+            ->with('admin@example.com')
+            ->andReturn(true)
+            ->once();
+
+        $this->translatorMock->shouldReceive('trans')
+            ->with('Approved', [], 'Modules.Pskyc.Shop')
+            ->andThrow(new \Exception('Translator failed'));
+
+        \PrestaShopLogger::shouldReceive('addLog')
+            ->once()
+            ->with(\Mockery::pattern('/KYC admin notification error:/'), 3, null, 'Pskyc');
+
+        $result = $this->service->sendAdminStatusChangeNotification($verification, $customer);
+
+        $this->assertFalse($result);
+    }
+
+    public function testSendAdminStatusChangeNotificationMultipleEmails()
+    {
+        $verification = [
+            'id_kyc_verification' => 7,
+            'status' => 'approved',
+        ];
+
+        $customer = [
+            'firstname' => 'Jane',
+            'lastname' => 'Doe',
+            'email' => 'jane.doe@example.com',
+            'id_customer' => 12,
+        ];
+
+        \Configuration::shouldReceive('get')
+            ->with('PSKYC_ADMIN_EMAILS')
+            ->andReturn('admin1@example.com, admin2@example.com')
+            ->once();
+
+        \Validate::shouldReceive('isEmail')
+            ->with('admin1@example.com')
+            ->andReturn(true)
+            ->once();
+
+        \Validate::shouldReceive('isEmail')
+            ->with('admin2@example.com')
+            ->andReturn(true)
+            ->once();
+
+        $this->setupContextExpectations();
+        \Mail::shouldReceive('Send')->twice()->andReturn(true);
+
+        $this->translatorMock->shouldReceive('trans')
+            ->with('Approved', [], 'Modules.Pskyc.Shop')
+            ->andReturn('Approved');
+
+        $this->translatorMock->shouldReceive('trans')
+            ->with('KYC Verification Approved', [], 'Modules.Pskyc.Shop')
+            ->andReturn('KYC Verification Approved');
+
+        $result = $this->service->sendAdminStatusChangeNotification($verification, $customer);
+
+        $this->assertTrue($result);
+
+        $processedContent = \Mail::getLastProcessedContent();
+        $this->assertEquals('admin2@example.com', $processedContent['recipient']);
+    }
+
+    public function testSendAdminStatusChangeNotificationInvalidEmailsFallback()
+    {
+        $verification = [
+            'id_kyc_verification' => 8,
+            'status' => 'approved',
+        ];
+
+        $customer = [
+            'firstname' => 'Paul',
+            'lastname' => 'Smith',
+            'email' => 'paul.smith@example.com',
+            'id_customer' => 13,
+        ];
+
+        \Configuration::shouldReceive('get')
+            ->with('PSKYC_ADMIN_EMAILS')
+            ->andReturn('invalid-email')
+            ->once();
+
+        \Validate::shouldReceive('isEmail')
+            ->with('invalid-email')
+            ->andReturn(false)
+            ->once();
+
+        \Configuration::shouldReceive('get')
+            ->with('PS_SHOP_EMAIL')
+            ->andReturn('shop@example.com')
+            ->once();
+
+        \Validate::shouldReceive('isEmail')
+            ->with('shop@example.com')
+            ->andReturn(true)
+            ->once();
+
+        \Configuration::shouldReceive('get')
+            ->with('PS_SHOP_NAME')
+            ->andReturn('Test Shop')
+            ->once();
+
+        $this->setupContextExpectations();
+        $this->setupMailExpectations(true);
+
+        $this->translatorMock->shouldReceive('trans')
+            ->with('Approved', [], 'Modules.Pskyc.Shop')
+            ->andReturn('Approved');
+
+        $this->translatorMock->shouldReceive('trans')
+            ->with('KYC Verification Approved', [], 'Modules.Pskyc.Shop')
+            ->andReturn('KYC Verification Approved');
+
+        $result = $this->service->sendAdminStatusChangeNotification($verification, $customer);
+
+        $this->assertTrue($result);
+
+        $processedContent = \Mail::getLastProcessedContent();
+        $this->assertEquals('shop@example.com', $processedContent['recipient']);
+    }
+
+    public function testSendAdminStatusChangeNotificationTemplateVariables()
+    {
+        $verification = [
+            'id_kyc_verification' => 9,
+            'status' => 'rejected',
+            'admin_note' => 'Bad docs',
+        ];
+
+        $customer = [
+            'firstname' => 'Sarah',
+            'lastname' => 'Connor',
+            'email' => 's.connor@example.com',
+            'id_customer' => 14,
+        ];
+
+        \Mail::resetMockState();
+        \Mail::setMockTemplateContent(
+            'Verification #{verification_id} for {customer_name} was {status_label}: {status_message}. URL: {admin_verification_url}',
+            'TXT: #{verification_id} {status_label} {status_message} {admin_verification_url}'
+        );
+
+        \Configuration::shouldReceive('get')
+            ->with('PSKYC_ADMIN_EMAILS')
+            ->andReturn('admin@example.com')
+            ->once();
+
+        \Validate::shouldReceive('isEmail')
+            ->with('admin@example.com')
+            ->andReturn(true)
+            ->once();
+
+        $this->setupContextExpectations();
+        $this->setupMailExpectations(true);
+
+        $this->translatorMock->shouldReceive('trans')
+            ->with('Rejected', [], 'Modules.Pskyc.Shop')
+            ->andReturn('Rejected');
+
+        $this->translatorMock->shouldReceive('trans')
+            ->with('KYC Verification Rejected', [], 'Modules.Pskyc.Shop')
+            ->andReturn('KYC Verification Rejected');
+
+        $result = $this->service->sendAdminStatusChangeNotification($verification, $customer);
+
+        $this->assertTrue($result);
+
+        $processedContent = \Mail::getLastProcessedContent();
+        $this->assertEquals('admin_verification_status', $processedContent['template']);
+        $this->assertEquals('KYC Verification Rejected', $processedContent['subject']);
+        $this->assertEquals('admin@example.com', $processedContent['recipient']);
+
+        $expectedHtml = 'Verification #9 for Sarah Connor was Rejected: Bad docs. URL: https://example.com/';
+        $this->assertEquals($expectedHtml, $processedContent['html']);
+        $expectedTxt = 'TXT: #9 Rejected Bad docs https://example.com/';
+        $this->assertEquals($expectedTxt, $processedContent['txt']);
+
+        $templateVars = $processedContent['templateVars'];
+        $this->assertEquals('Sarah Connor', $templateVars['{customer_name}']);
+        $this->assertEquals('s.connor@example.com', $templateVars['{customer_email}']);
+        $this->assertEquals(14, $templateVars['{customer_id}']);
+        $this->assertEquals(9, $templateVars['{verification_id}']);
+        $this->assertEquals('Rejected', $templateVars['{status_label}']);
+        $this->assertEquals('Bad docs', $templateVars['{status_message}']);
+        $this->assertEquals('https://example.com/', $templateVars['{admin_verification_url}']);
+    }
 }
