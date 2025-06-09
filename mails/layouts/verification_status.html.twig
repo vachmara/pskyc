@@ -66,18 +66,7 @@
 							{/if}
 						</table>
 
-						<p>{status_message}</p>
-
-						{if isset($admin_note)}
-						<table class="table" cellpadding="10" cellspacing="0" style="width:100%; border: 1px solid {note_border_color}; background-color: {note_bg_color}; margin: 15px 0;">
-							<tr>
-								<td>
-									<strong>{note_title}:</strong><br>
-									{admin_note}
-								</td>
-							</tr>
-						</table>
-						{/if}
+                                                {# Admin notes are not sent to customers anymore #}
 
 						<table cellpadding="0" cellspacing="0" style="margin: 20px auto;">
 							<tr>

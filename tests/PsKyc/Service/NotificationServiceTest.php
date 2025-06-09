@@ -761,8 +761,8 @@ class NotificationServiceTest extends MockeryTestCase
 
         // Set a custom template to test all variables used in status notifications
         \Mail::setMockTemplateContent(
-            'Dear {firstname} {lastname}, your KYC verification #{verification_id} status is now: {status_label}. Admin note: {status_message}. Submitted on: {date_submitted}.',
-            'TXT: Dear {firstname} {lastname}, verification #{verification_id} is {status_label}. Note: {status_message}. Date: {date_submitted}.'
+            'Dear {firstname} {lastname}, your KYC verification #{verification_id} status is now: {status_label}. Submitted on: {date_submitted}.',
+            'TXT: Dear {firstname} {lastname}, verification #{verification_id} is {status_label}. Date: {date_submitted}.'
         );
 
         $this->setupContextExpectations();
@@ -790,11 +790,11 @@ class NotificationServiceTest extends MockeryTestCase
         $this->assertEquals('jane.smith@example.com', $processedContent['recipient']);
 
         // Check that all template variables were properly replaced in HTML content
-        $expectedHtmlContent = 'Dear Jane Smith, your KYC verification #123 status is now: Approved. Admin note: All documents verified successfully. Submitted on: 2025-01-01 10:00:00.';
+        $expectedHtmlContent = 'Dear Jane Smith, your KYC verification #123 status is now: Approved. Submitted on: 2025-01-01 10:00:00.';
         $this->assertEquals($expectedHtmlContent, $processedContent['html']);
 
         // Check that all template variables were properly replaced in TXT content
-        $expectedTxtContent = 'TXT: Dear Jane Smith, verification #123 is Approved. Note: All documents verified successfully. Date: 2025-01-01 10:00:00.';
+        $expectedTxtContent = 'TXT: Dear Jane Smith, verification #123 is Approved. Date: 2025-01-01 10:00:00.';
         $this->assertEquals($expectedTxtContent, $processedContent['txt']);
 
         // Verify specific template variables were passed correctly
@@ -803,7 +803,6 @@ class NotificationServiceTest extends MockeryTestCase
         $this->assertEquals('Smith', $templateVars['{lastname}']);
         $this->assertEquals(123, $templateVars['{verification_id}']);
         $this->assertEquals('Approved', $templateVars['{status_label}']);
-        $this->assertEquals('All documents verified successfully', $templateVars['{status_message}']);
         $this->assertEquals('2025-01-01 10:00:00', $templateVars['{date_submitted}']);
     }
 
@@ -1051,8 +1050,8 @@ class NotificationServiceTest extends MockeryTestCase
 
             // Set a custom template to test status-specific variables
             \Mail::setMockTemplateContent(
-                'Dear {firstname} {lastname}, verification #{verification_id} status: {status_label}. Note: {status_message}. Submitted: {date_submitted}',
-                'TXT: {firstname} {lastname}, #{verification_id}: {status_label}. Note: {status_message}. Date: {date_submitted}'
+                'Dear {firstname} {lastname}, verification #{verification_id} status: {status_label}. Submitted: {date_submitted}',
+                'TXT: {firstname} {lastname}, #{verification_id}: {status_label}. Date: {date_submitted}'
             );
 
             $verification = array_merge($baseVerification, ['status' => $status]);
@@ -1088,7 +1087,6 @@ class NotificationServiceTest extends MockeryTestCase
             $this->assertEquals('User', $templateVars['{lastname}']);
             $this->assertEquals(100, $templateVars['{verification_id}']);
             $this->assertEquals($expectedLabel, $templateVars['{status_label}']);
-            $this->assertEquals('Test admin note', $templateVars['{status_message}']);
             $this->assertEquals('2025-01-01 10:00:00', $templateVars['{date_submitted}']);
         }
     }
@@ -1114,8 +1112,8 @@ class NotificationServiceTest extends MockeryTestCase
 
         // Set a custom template to test empty/missing values
         \Mail::setMockTemplateContent(
-            'Status: {status_label}, Note: "{status_message}"',
-            'TXT: Status: {status_label}, Note: "{status_message}"'
+            'Status: {status_label}',
+            'TXT: Status: {status_label}'
         );
 
         $this->setupContextExpectations();
@@ -1140,10 +1138,9 @@ class NotificationServiceTest extends MockeryTestCase
         // Verify that empty admin_note is handled correctly
         $templateVars = $processedContent['templateVars'];
         $this->assertEquals('Pending Review', $templateVars['{status_label}']);
-        $this->assertEquals('', $templateVars['{status_message}']); // Should be empty string when admin_note is missing
 
         // Check that empty values are properly replaced in content
-        $expectedHtmlContent = 'Status: Pending Review, Note: ""';
+        $expectedHtmlContent = 'Status: Pending Review';
         $this->assertEquals($expectedHtmlContent, $processedContent['html']);
     }
 
@@ -1168,8 +1165,8 @@ class NotificationServiceTest extends MockeryTestCase
 
         // Set a custom template to test special characters
         \Mail::setMockTemplateContent(
-            'Customer: {firstname} {lastname}, Note: {status_message}',
-            'TXT: Customer: {firstname} {lastname}, Note: {status_message}'
+            'Customer: {firstname} {lastname}',
+            'TXT: Customer: {firstname} {lastname}'
         );
 
         $this->setupContextExpectations();
@@ -1195,10 +1192,9 @@ class NotificationServiceTest extends MockeryTestCase
         $templateVars = $processedContent['templateVars'];
         $this->assertEquals('José', $templateVars['{firstname}']);
         $this->assertEquals('García-López', $templateVars['{lastname}']);
-        $this->assertEquals('Documents verified with special chars: àáâãäåæçèéêë & symbols!', $templateVars['{status_message}']);
 
         // Check that special characters are properly replaced in content
-        $expectedHtmlContent = 'Customer: José García-López, Note: Documents verified with special chars: àáâãäåæçèéêë & symbols!';
+        $expectedHtmlContent = 'Customer: José García-López';
         $this->assertEquals($expectedHtmlContent, $processedContent['html']);
     }
 
