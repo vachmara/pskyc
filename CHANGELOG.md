@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Admin email notification when verification status changes
 
+### Fixed
+- Fix remove admin note in status mail notification
+
 ## [1.1.1] - 2025-06-05
 
 ### Fixed

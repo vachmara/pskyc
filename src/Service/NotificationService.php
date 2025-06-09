@@ -64,7 +64,7 @@ class NotificationService
                 '{lastname}' => $customer['lastname'],
                 '{verification_id}' => $verification['id_kyc_verification'],
                 '{status_label}' => $this->getStatusLabel($verification['status']),
-                '{status_message}' => $verification['admin_note'] ?? '',
+                // Do not expose internal admin notes to customers
                 '{date_submitted}' => $verification['date_submitted'],
             ];
 

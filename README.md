@@ -59,7 +59,7 @@ This module uses standard PrestaShop-required PHP extensions:
 - .htaccess restricts direct access
 - GDPR retention and deletion supported
 
-## Email Flow Diagram
+## Flow Diagram
 
 ```mermaid
 flowchart TD
