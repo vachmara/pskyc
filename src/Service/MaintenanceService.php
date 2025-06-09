@@ -215,6 +215,11 @@ class MaintenanceService
                                 $customer,
                                 'approved'
                             );
+                            // Notify administrators of the status change
+                            $this->notificationService->sendAdminStatusChangeNotification(
+                                $verification,
+                                $customer
+                            );
                             if ($sent) {
                                 ++$results['notifications_sent'];
                             }

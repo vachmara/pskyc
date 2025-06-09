@@ -376,6 +376,12 @@ class VerificationService
                             $customerData,
                             $previousStatus
                         );
+
+                        // Notify administrators of the status change
+                        $this->notificationService->sendAdminStatusChangeNotification(
+                            $updatedVerification,
+                            $customerData
+                        );
                     }
                 }
 

@@ -1,0 +1,9 @@
+Verification #{verification_id} status updated to {status_label}.
+
+Customer: {customer_name} ({customer_email})
+Customer ID: #{customer_id}
+Message: {status_message}
+
+Review in Admin Panel: {admin_verification_url}
+
+This is an automated admin notification.

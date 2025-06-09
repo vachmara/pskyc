@@ -188,6 +188,58 @@ class NotificationService
     }
 
     /**
+     * Send admin notification for verification status change
+     *
+     * Notifies administrators when a customer's verification status is updated
+     *
+     * @param array $verification Verification record from database
+     * @param array $customer Customer record from database
+     *
+     * @return bool True if email was sent successfully, false otherwise
+     */
+    public function sendAdminStatusChangeNotification(array $verification, array $customer): bool
+    {
+        try {
+            $adminEmails = $this->getAdminEmails();
+
+            if (empty($adminEmails)) {
+                return false;
+            }
+
+            $templateVars = [
+                '{customer_name}' => $customer['firstname'] . ' ' . $customer['lastname'],
+                '{customer_email}' => $customer['email'],
+                '{customer_id}' => $customer['id_customer'],
+                '{verification_id}' => $verification['id_kyc_verification'],
+                '{status_label}' => $this->getStatusLabel($verification['status']),
+                '{status_message}' => $verification['admin_note'] ?? '',
+                '{admin_verification_url}' => $this->context->shop->getBaseURL(true),
+            ];
+
+            $subject = $this->getEmailSubjectForStatus($verification['status']);
+
+            $success = true;
+            foreach ($adminEmails as $adminEmail) {
+                $result = $this->sendThemeEmail(
+                    'admin_verification_status',
+                    $subject,
+                    $templateVars,
+                    $adminEmail['email'],
+                    $adminEmail['name'],
+                    \Configuration::get('PS_LANG_DEFAULT')
+                );
+                $success = $success && $result;
+            }
+
+            return $success;
+        } catch (\Exception $e) {
+            \PrestaShopLogger::addLog('KYC admin notification error: ' . $e->getMessage(), 3, null, 'Pskyc');
+
+            return false;
+        }
+    }
+
+    /**
      * Send expiry warning notification to customer
      *
      * Warns customers that their documents will expire soon

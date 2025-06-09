@@ -1472,4 +1472,60 @@ class NotificationServiceTest extends MockeryTestCase
         $this->assertEquals('admin1@example.com', $result[0]['email']);
         $this->assertEquals('admin2@example.com', $result[1]['email']);
     }
+
+    public function testSendAdminStatusChangeNotificationSuccess()
+    {
+        $verification = [
+            'id_kyc_verification' => 5,
+            'status' => 'approved',
+            'admin_note' => 'ok',
+        ];
+
+        $customer = [
+            'firstname' => 'Adam',
+            'lastname' => 'West',
+            'email' => 'adam.west@example.com',
+            'id_customer' => 10,
+        ];
+
+        \Configuration::shouldReceive('get')
+            ->with('PSKYC_ADMIN_EMAILS')
+            ->andReturn('admin@example.com')
+            ->once();
+
+        \Validate::shouldReceive('isEmail')
+            ->with('admin@example.com')
+            ->andReturn(true)
+            ->once();
+
+        $this->setupContextExpectations();
+        $this->setupMailExpectations(true);
+
+        $this->translatorMock->shouldReceive('trans')
+            ->with('Approved', [], 'Modules.Pskyc.Shop')
+            ->andReturn('Approved');
+
+        $this->translatorMock->shouldReceive('trans')
+            ->with('KYC Verification Approved', [], 'Modules.Pskyc.Shop')
+            ->andReturn('KYC Verification Approved');
+
+        $result = $this->service->sendAdminStatusChangeNotification($verification, $customer);
+
+        $this->assertTrue($result);
+    }
+
+    public function testSendAdminStatusChangeNotificationAdminEmailsEmpty()
+    {
+        $verification = ['id_kyc_verification' => 5, 'status' => 'approved'];
+        $customer = ['firstname' => 'Adam', 'lastname' => 'West', 'email' => 'adam.west@example.com', 'id_customer' => 10];
+
+        \Configuration::shouldReceive('get')
+            ->with('PSKYC_ADMIN_EMAILS')
+            ->andReturn('')
+            ->once();
+
+        $result = $this->service->sendAdminStatusChangeNotification($verification, $customer);
+
+        $this->assertFalse($result);
+    }
 }
