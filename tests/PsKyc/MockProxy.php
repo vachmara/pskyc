@@ -220,7 +220,9 @@ class Mail extends MockProxy
     }
 
     /**
-     * Reset mock state between tests
+     * Resets the mock email state to default values for template content and processed data.
+     *
+     * Clears the last processed email content and restores the mock template content to its initial state. Intended for use between tests to ensure isolation.
      */
     public static function resetMockState()
     {

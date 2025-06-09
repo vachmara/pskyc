@@ -46,15 +46,14 @@ class NotificationService
     }
 
     /**
-     * Send verification status change notification to customer
+     * Sends an email notification to a customer when their KYC verification status changes.
      *
-     * Notifies the customer when their KYC verification status changes
+     * Prepares and sends a status update email using the customer's language and relevant verification details.
      *
-     * @param array $verification Verification record from database
-     * @param array $customer Customer record from database
-     * @param string|null $previousStatus Previous verification status (if applicable)
-     *
-     * @return bool True if email was sent successfully, false otherwise
+     * @param array $verification The KYC verification record.
+     * @param array $customer The customer record.
+     * @param string|null $previousStatus The previous verification status, if available.
+     * @return bool True if the email was sent successfully, false otherwise.
      */
     public function sendStatusChangeNotification(array $verification, array $customer, ?string $previousStatus = null): bool
     {
