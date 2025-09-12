@@ -499,11 +499,11 @@
     const idFrontBackUpload = document.getElementById('id-front-back-upload');
 
     if (idDocumentType) {
-      idDocumentType.addEventListener('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        const requiresBothSides = selectedOption.getAttribute('data-requires-both-sides');
+      function toggleIdDocumentFields() {
+        const selectedOption = idDocumentType.options[idDocumentType.selectedIndex];
+        const requiresBothSides = selectedOption && selectedOption.getAttribute('data-requires-both-sides') === 'true';
 
-        if (requiresBothSides === 'true') {
+        if (requiresBothSides) {
           idSingleUpload.style.display = 'none';
           idFrontBackUpload.style.display = 'block';
           // Clear single upload and make front/back required
@@ -518,7 +518,10 @@
           document.getElementById('id_document_front').removeAttribute('required');
           document.getElementById('id_document_back').removeAttribute('required');
         }
-      });
+      }
+
+      idDocumentType.addEventListener('change', toggleIdDocumentFields);
+      toggleIdDocumentFields();
     }
 
     // Form validation
