@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fix remove admin note in status mail notification
+- Display both ID card sides when required in KYC form
 
 ## [1.1.1] - 2025-06-05
 
