@@ -546,51 +546,51 @@
           const backDoc = document.getElementById('id_document_back');
 
           if (!frontDoc.files[0]) {
-            errors.push('{l s="Please upload the front side of your identity document" d="Modules.Pskyc.Shop"}');
+            errors.push('{l s="Please upload the front side of your identity document" d="Modules.Pskyc.Shop" js=1}');
             valid = false;
           }
           if (!backDoc.files[0]) {
-            errors.push('{l s="Please upload the back side of your identity document" d="Modules.Pskyc.Shop"}');
+            errors.push('{l s="Please upload the back side of your identity document" d="Modules.Pskyc.Shop" js=1}');
             valid = false;
           }
 
           // Check file sizes (10MB limit)
           if (frontDoc.files[0] && frontDoc.files[0].size > 10 * 1024 * 1024) {
-            errors.push('{l s="Front side document must be smaller than 10MB" d="Modules.Pskyc.Shop"}');
+            errors.push('{l s="Front side document must be smaller than 10MB" d="Modules.Pskyc.Shop" js=1}');
             valid = false;
           }
           if (backDoc.files[0] && backDoc.files[0].size > 10 * 1024 * 1024) {
-            errors.push('{l s="Back side document must be smaller than 10MB" d="Modules.Pskyc.Shop"}');
+            errors.push('{l s="Back side document must be smaller than 10MB" d="Modules.Pskyc.Shop" js=1}');
             valid = false;
           }
         } else {
           const idDoc = document.getElementById('id_document');
 
           if (!idDoc.files[0]) {
-            errors.push('{l s="Please upload your identity document" d="Modules.Pskyc.Shop"}');
+            errors.push('{l s="Please upload your identity document" d="Modules.Pskyc.Shop" js=1}');
             valid = false;
           }
 
           // Check file sizes (10MB limit)
           if (idDoc.files[0] && idDoc.files[0].size > 10 * 1024 * 1024) {
-            errors.push('{l s="Identity document must be smaller than 10MB" d="Modules.Pskyc.Shop"}');
+            errors.push('{l s="Identity document must be smaller than 10MB" d="Modules.Pskyc.Shop" js=1}');
             valid = false;
           }
         }
 
         // Check address document
         if (!addressDoc.files[0]) {
-          errors.push('{l s="Please upload your proof of address document" d="Modules.Pskyc.Shop"}');
+          errors.push('{l s="Please upload your proof of address document" d="Modules.Pskyc.Shop" js=1}');
           valid = false;
         }
 
         if (addressDoc.files[0] && addressDoc.files[0].size > 10 * 1024 * 1024) {
-          errors.push('{l s="Address document must be smaller than 10MB" d="Modules.Pskyc.Shop"}');
+          errors.push('{l s="Address document must be smaller than 10MB" d="Modules.Pskyc.Shop" js=1}');
           valid = false;
         }
 
         if (!consent.checked || !authenticity.checked) {
-          errors.push('{l s="Please accept all required terms and conditions" d="Modules.Pskyc.Shop"}');
+          errors.push('{l s="Please accept all required terms and conditions" d="Modules.Pskyc.Shop" js=1}');
           valid = false;
         }
 
@@ -607,7 +607,7 @@
         if (progress && submitBtn) {
           progress.style.display = 'block';
           submitBtn.disabled = true;
-          submitBtn.innerHTML = '<i class="material-icons">hourglass_empty</i> {l s="Processing..." d="Modules.Pskyc.Shop"}';
+          submitBtn.innerHTML = '<i class="material-icons">hourglass_empty</i> {l s="Processing..." d="Modules.Pskyc.Shop" js=1}';
         }
       });
     }
