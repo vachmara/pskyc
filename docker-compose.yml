@@ -1,7 +1,7 @@
 name: flashlight-test-module
 services:
   prestashop:
-    image: prestashop/prestashop-flashlight:latest
+    image: prestashop/prestashop-flashlight:8.1.2-nginx
     depends_on:
       mysql:
         condition: service_healthy
