@@ -12,10 +12,12 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 use PrestaShop\Module\Pskyc\Service\VerificationService;
+use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
 use PrestaShop\PrestaShop\Core\MailTemplate\Layout\Layout;
 use PrestaShop\PrestaShop\Core\MailTemplate\ThemeCatalogInterface;
 use PrestaShop\PrestaShop\Core\MailTemplate\ThemeCollectionInterface;
 use PrestaShop\PrestaShop\Core\MailTemplate\ThemeInterface;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 /**
  * Class Pskyc
@@ -431,48 +433,23 @@ class Pskyc extends Module
             return;
         }
 
-        try {
-            /** @var VerificationService $verificationService */
-            $verificationService = $this->get('PrestaShop\Module\Pskyc\Service\VerificationService');
-        } catch (Exception $e) {
-            PrestaShopLogger::addLog('KYC admin customer hook error: ' . $e->getMessage(), 3, null, 'Pskyc');
+        $verifications = $this->loadCustomerVerifications($customerId);
 
-            return;
-        }
-
-        $verifications = $verificationService->getVerificationsByCustomerId($customerId) ?? [];
-
-        try {
-            $router = $this->get('router');
-        } catch (Exception $e) {
-            PrestaShopLogger::addLog('KYC admin router service error: ' . $e->getMessage(), 2, null, 'Pskyc');
-            $router = false;
-        }
-        $verificationIndexUrl = null;
-
-        if ($router !== false) {
-            try {
-                $verificationIndexUrl = $router->generate('ps_pskyc_verification_index');
-            } catch (Exception $e) {
-                PrestaShopLogger::addLog('KYC admin route generation error: ' . $e->getMessage(), 2, null, 'Pskyc');
-            }
-        }
-
-        if ($verificationIndexUrl === null) {
-            $verificationIndexUrl = $this->context->link->getAdminLink('AdminModules') . '&configure=' . $this->name;
-        }
+        $router = $this->resolveRouter();
+        $verificationIndexUrl = $this->resolveVerificationIndexUrl($router);
 
         foreach ($verifications as &$verification) {
             $verification['view_url'] = $verificationIndexUrl;
 
             if ($router !== false) {
-                try {
-                    $verification['view_url'] = $router->generate(
-                        'ps_pskyc_verification_view',
-                        ['verificationId' => (int) ($verification['id_kyc_verification'] ?? 0)]
-                    );
-                } catch (Exception $e) {
-                    PrestaShopLogger::addLog('KYC admin verification view route error: ' . $e->getMessage(), 2, null, 'Pskyc');
+                $viewUrl = $this->generateRoute(
+                    $router,
+                    'ps_pskyc_verification_view',
+                    ['verificationId' => (int) ($verification['id_kyc_verification'] ?? 0)]
+                );
+
+                if ($viewUrl !== null) {
+                    $verification['view_url'] = $viewUrl;
                 }
             }
         }
@@ -489,6 +466,250 @@ class Pskyc extends Module
             'customerId' => $customerId,
             'verificationIndexUrl' => $verificationIndexUrl,
         ]);
+    }
+
+    /**
+     * Load customer verifications using the service container when possible with SQL fallback.
+     *
+     * @param int $customerId
+     *
+     * @return array
+     */
+    private function loadCustomerVerifications(int $customerId): array
+    {
+        $verificationService = $this->resolveVerificationService();
+
+        if ($verificationService instanceof VerificationService) {
+            try {
+                $verifications = $verificationService->getVerificationsByCustomerId($customerId);
+                if (is_array($verifications)) {
+                    return $verifications;
+                }
+            } catch (Exception $e) {
+                $this->logOnce(
+                    'verification_service_runtime_error',
+                    'KYC verification service error: ' . $e->getMessage(),
+                    2
+                );
+            }
+        }
+
+        return $this->fetchVerificationsFallback($customerId);
+    }
+
+    /**
+     * Resolve verification service from the available container implementations.
+     *
+     * @return VerificationService|null
+     */
+    private function resolveVerificationService(): ?VerificationService
+    {
+        $serviceIds = [
+            VerificationService::class,
+            'prestashop.module.pskyc.service.verification',
+        ];
+
+        $symfonyContainerClass = '\\PrestaShop\\PrestaShop\\Adapter\\SymfonyContainer';
+        if (class_exists($symfonyContainerClass)) {
+            $container = SymfonyContainer::getInstance();
+            if ($container !== null) {
+                foreach ($serviceIds as $serviceId) {
+                    if ($container->has($serviceId)) {
+                        try {
+                            $service = $container->get($serviceId);
+                            if ($service instanceof VerificationService) {
+                                return $service;
+                            }
+                        } catch (Exception $e) {
+                            $this->logOnce(
+                                'verification_service_container_error',
+                                'KYC verification service container error: ' . $e->getMessage(),
+                                2
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
+        foreach ($serviceIds as $serviceId) {
+            try {
+                $service = $this->get($serviceId);
+                if ($service instanceof VerificationService) {
+                    return $service;
+                }
+            } catch (ServiceNotFoundException $e) {
+                continue;
+            } catch (Exception $e) {
+                $this->logOnce(
+                    'verification_service_module_error',
+                    'KYC verification service retrieval error: ' . $e->getMessage(),
+                    2
+                );
+            }
+        }
+
+        $this->logOnce(
+            'verification_service_missing',
+            'KYC verification service unavailable, using SQL fallback in admin customer widget.',
+            2
+        );
+
+        return null;
+    }
+
+    /**
+     * Fetch verifications directly from the database when the service container is unavailable.
+     *
+     * @param int $customerId
+     *
+     * @return array
+     */
+    private function fetchVerificationsFallback(int $customerId): array
+    {
+        try {
+            $query = new DbQuery();
+            $query->select('id_kyc_verification, status, date_submitted, date_validated, date_expiry');
+            $query->from(_DB_PREFIX_ . 'kyc_verification');
+            $query->where('id_customer = ' . (int) $customerId);
+            $query->orderBy('date_submitted DESC');
+
+            $results = Db::getInstance()->executeS($query);
+            if (!is_array($results)) {
+                return [];
+            }
+
+            foreach ($results as &$verification) {
+                $verification['is_expired'] = $this->isVerificationExpiredByDate($verification['date_expiry'] ?? null);
+            }
+            unset($verification);
+
+            return $results;
+        } catch (PrestaShopDatabaseException $e) {
+            $this->logOnce('verification_fallback_db_error', 'KYC fallback query error: ' . $e->getMessage(), 3);
+        } catch (Exception $e) {
+            $this->logOnce('verification_fallback_generic_error', 'KYC fallback unexpected error: ' . $e->getMessage(), 3);
+        }
+
+        return [];
+    }
+
+    /**
+     * Determine if a verification has expired based on the expiry date string.
+     *
+     * @param string|null $expiryDate
+     *
+     * @return bool
+     */
+    private function isVerificationExpiredByDate(?string $expiryDate): bool
+    {
+        if (empty($expiryDate)) {
+            return false;
+        }
+
+        $timestamp = strtotime($expiryDate);
+        if ($timestamp === false) {
+            return false;
+        }
+
+        return $timestamp < time();
+    }
+
+    /**
+     * Safely resolve the Symfony router service.
+     *
+     * @return false|object
+     */
+    private function resolveRouter()
+    {
+        $symfonyContainerClass = '\\PrestaShop\\PrestaShop\\Adapter\\SymfonyContainer';
+        if (class_exists($symfonyContainerClass)) {
+            $container = SymfonyContainer::getInstance();
+            if ($container !== null && $container->has('router')) {
+                try {
+                    return $container->get('router');
+                } catch (Exception $e) {
+                    $this->logOnce('router_container_error', 'KYC admin router container error: ' . $e->getMessage(), 2);
+                }
+            }
+        }
+
+        try {
+            return $this->get('router');
+        } catch (Exception $e) {
+            $this->logOnce('router_service_error', 'KYC admin router service error: ' . $e->getMessage(), 2);
+
+            return false;
+        }
+    }
+
+    /**
+     * Resolve the verification index URL using the router fallback when necessary.
+     *
+     * @param false|object $router
+     *
+     * @return string
+     */
+    private function resolveVerificationIndexUrl($router): string
+    {
+        if ($router !== false) {
+            $url = $this->generateRoute($router, 'ps_pskyc_verification_index');
+            if ($url !== null) {
+                return $url;
+            }
+        }
+
+        return $this->context->link->getAdminLink('AdminModules') . '&configure=' . $this->name;
+    }
+
+    /**
+     * Generate a Symfony route safely, returning null when unavailable.
+     *
+     * @param false|object $router
+     * @param string $routeName
+     * @param array $parameters
+     *
+     * @return string|null
+     */
+    private function generateRoute($router, string $routeName, array $parameters = []): ?string
+    {
+        if ($router === false || $router === null) {
+            return null;
+        }
+
+        try {
+            return $router->generate($routeName, $parameters);
+        } catch (Exception $e) {
+            $this->logOnce(
+                'route_generation_error_' . $routeName,
+                'KYC admin route generation error: ' . $e->getMessage(),
+                2
+            );
+        }
+
+        return null;
+    }
+
+    /**
+     * Log a message only once per request lifecycle to avoid flooding the PrestaShop log table.
+     *
+     * @param string $key
+     * @param string $message
+     * @param int $severity
+     *
+     * @return void
+     */
+    private function logOnce(string $key, string $message, int $severity = 1): void
+    {
+        static $logged = [];
+
+        if (isset($logged[$key])) {
+            return;
+        }
+
+        $logged[$key] = true;
+
+        PrestaShopLogger::addLog($message, $severity, null, 'Pskyc');
     }
 
     /**

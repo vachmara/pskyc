@@ -79,6 +79,10 @@ services:
       - '@PrestaShop\Module\Pskyc\Service\NotificationService'
       - '@PrestaShop\Module\Pskyc\Repository\CustomerRepository'
 
+  prestashop.module.pskyc.service.verification:
+    alias: 'PrestaShop\Module\Pskyc\Service\VerificationService'
+    public: true
+
   PrestaShop\Module\Pskyc\Service\DocumentService:
     arguments:
       - '@PrestaShop\Module\Pskyc\Repository\DocumentRepository'

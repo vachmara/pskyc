@@ -4,12 +4,16 @@ ps_pskyc_verification_index:
   methods: [GET]
   defaults:
     _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::indexAction'
+    _legacy_controller: 'AdminPskycVerification'
+    _legacy_link: 'AdminPskycVerification'
 
 ps_pskyc_verification_search:
   path: /pskyc/verification
   methods: [POST]
   defaults:
     _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::searchAction'
+    _legacy_controller: 'AdminPskycVerification'
+    _legacy_link: 'AdminPskycVerification'
 
 # Add a reset route for filters
 ps_pskyc_verification_reset:
@@ -17,12 +21,16 @@ ps_pskyc_verification_reset:
   methods: [POST]
   defaults:
     _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::searchAction'
+    _legacy_controller: 'AdminPskycVerification'
+    _legacy_link: 'AdminPskycVerification'
 
 ps_pskyc_verification_view:
   path: /pskyc/verification/{verificationId}/view
   methods: [GET]
   defaults:
     _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::viewAction'
+    _legacy_controller: 'AdminPskycVerification'
+    _legacy_link: 'AdminPskycVerification'
   requirements:
     verificationId: \d+
 
@@ -31,6 +39,8 @@ ps_pskyc_verification_update_note:
   methods: [POST]
   defaults:
     _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::updateNoteAction'
+    _legacy_controller: 'AdminPskycVerification'
+    _legacy_link: 'AdminPskycVerification'
   requirements:
     verificationId: \d+
 
@@ -39,12 +49,16 @@ ps_pskyc_verification_export_logs:
   methods: [GET]
   defaults:
     _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\VerificationController::exportLogsAction'
+    _legacy_controller: 'AdminPskycVerification'
+    _legacy_link: 'AdminPskycVerification'
 
 ps_pskyc_document_download:
   path: /pskyc/document/{documentId}/{preview}
   methods: [GET]
   defaults:
     _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\DocumentController::downloadAction'
+    _legacy_controller: 'AdminPskycVerification'
+    _legacy_link: 'AdminPskycVerification'
     preview: 0
   requirements:
     documentId: '\d+'
@@ -55,5 +69,7 @@ ps_pskyc_document_update_status:
   methods: [POST]
   defaults:
     _controller: 'PrestaShop\Module\Pskyc\Controller\Admin\DocumentController::updateStatusAction'
+    _legacy_controller: 'AdminPskycVerification'
+    _legacy_link: 'AdminPskycVerification'
   requirements:
     verificationId: \d+
