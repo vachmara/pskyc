@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fix remove admin note in status mail notification
 - Escape KYC form validation messages and loading labels for safe front-office JavaScript handling when two-sided IDs are required
+- Only compatible with PrestaShop 8.1 and 8.2 (not 8.0 anymore)
+- Update GitHub Actions and docker-compose to use PrestaShop 8.1 and 8.2
 
 ## [1.1.1] - 2025-06-05
 

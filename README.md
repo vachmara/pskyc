@@ -20,7 +20,7 @@ Open source, GDPR-compliant KYC document verification for PrestaShop.
 ## Requirements
 
 ### PrestaShop Compatibility
-- **PrestaShop:** 8.0.0 or higher
+- **PrestaShop:** 8.1 or 8.2 (9.0+ planned)
 - **PHP:** 8.1 or higher
 
 ### PHP Extensions
