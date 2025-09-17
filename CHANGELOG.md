@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fix remove admin note in status mail notification
-- Escape KYC form JavaScript translations so both ID card sides display when required
+- Escape KYC form validation messages and loading labels for safe front-office JavaScript handling when two-sided IDs are required
 
 ## [1.1.1] - 2025-06-05
 

@@ -253,15 +253,27 @@
       </div>
 
       <div class="form-actions">
-        <button type="submit" class="btn btn-primary btn-lg" id="submit-verification">
-          <i class="material-icons">cloud_upload</i>
-          {l s='Submit for Verification' d='Modules.Pskyc.Shop'}
+        <button type="submit" class="btn btn-primary btn-lg" id="submit-verification" aria-live="polite">
+          <i class="material-icons" aria-hidden="true" data-processing-icon="hourglass_empty">cloud_upload</i>
+          <span id="submit-verification-label"
+            data-processing-text="{l s='Processing...' d='Modules.Pskyc.Shop'|escape:'html':'UTF-8'}">{l s='Submit for Verification' d='Modules.Pskyc.Shop'}</span>
         </button>
         <div class="upload-progress" id="upload-progress" style="display: none;">
           <div class="progress">
             <div class="progress-bar" role="progressbar" style="width: 0%"></div>
           </div>
           <p class="progress-text">{l s='Uploading documents...' d='Modules.Pskyc.Shop'}</p>
+        </div>
+        <div id="kyc-validation-messages" hidden
+          data-front-required="{l s='Please upload the front side of your identity document' d='Modules.Pskyc.Shop'|escape:'html':'UTF-8'}"
+          data-back-required="{l s='Please upload the back side of your identity document' d='Modules.Pskyc.Shop'|escape:'html':'UTF-8'}"
+          data-front-too-large="{l s='Front side document must be smaller than 10MB' d='Modules.Pskyc.Shop'|escape:'html':'UTF-8'}"
+          data-back-too-large="{l s='Back side document must be smaller than 10MB' d='Modules.Pskyc.Shop'|escape:'html':'UTF-8'}"
+          data-single-required="{l s='Please upload your identity document' d='Modules.Pskyc.Shop'|escape:'html':'UTF-8'}"
+          data-single-too-large="{l s='Identity document must be smaller than 10MB' d='Modules.Pskyc.Shop'|escape:'html':'UTF-8'}"
+          data-address-required="{l s='Please upload your proof of address document' d='Modules.Pskyc.Shop'|escape:'html':'UTF-8'}"
+          data-address-too-large="{l s='Address document must be smaller than 10MB' d='Modules.Pskyc.Shop'|escape:'html':'UTF-8'}"
+          data-terms-required="{l s='Please accept all required terms and conditions' d='Modules.Pskyc.Shop'|escape:'html':'UTF-8'}">
         </div>
       </div>
     </form>
@@ -497,6 +509,10 @@
     const idDocumentType = document.getElementById('id_document_type');
     const idSingleUpload = document.getElementById('id-single-upload');
     const idFrontBackUpload = document.getElementById('id-front-back-upload');
+    const validationMessagesEl = document.getElementById('kyc-validation-messages');
+    const validationMessages = validationMessagesEl ? validationMessagesEl.dataset : {};
+    const submitButtonLabel = document.getElementById('submit-verification-label');
+    const submitProcessingText = submitButtonLabel ? submitButtonLabel.dataset.processingText : '';
 
     if (idDocumentType) {
       function toggleIdDocumentFields() {
@@ -546,51 +562,51 @@
           const backDoc = document.getElementById('id_document_back');
 
           if (!frontDoc.files[0]) {
-            errors.push('{l s="Please upload the front side of your identity document" d="Modules.Pskyc.Shop" js=1}');
+            errors.push(validationMessages.frontRequired || 'Please upload the front side of your identity document');
             valid = false;
           }
           if (!backDoc.files[0]) {
-            errors.push('{l s="Please upload the back side of your identity document" d="Modules.Pskyc.Shop" js=1}');
+            errors.push(validationMessages.backRequired || 'Please upload the back side of your identity document');
             valid = false;
           }
 
           // Check file sizes (10MB limit)
           if (frontDoc.files[0] && frontDoc.files[0].size > 10 * 1024 * 1024) {
-            errors.push('{l s="Front side document must be smaller than 10MB" d="Modules.Pskyc.Shop" js=1}');
+            errors.push(validationMessages.frontTooLarge || 'Front side document must be smaller than 10MB');
             valid = false;
           }
           if (backDoc.files[0] && backDoc.files[0].size > 10 * 1024 * 1024) {
-            errors.push('{l s="Back side document must be smaller than 10MB" d="Modules.Pskyc.Shop" js=1}');
+            errors.push(validationMessages.backTooLarge || 'Back side document must be smaller than 10MB');
             valid = false;
           }
         } else {
           const idDoc = document.getElementById('id_document');
 
           if (!idDoc.files[0]) {
-            errors.push('{l s="Please upload your identity document" d="Modules.Pskyc.Shop" js=1}');
+            errors.push(validationMessages.singleRequired || 'Please upload your identity document');
             valid = false;
           }
 
           // Check file sizes (10MB limit)
           if (idDoc.files[0] && idDoc.files[0].size > 10 * 1024 * 1024) {
-            errors.push('{l s="Identity document must be smaller than 10MB" d="Modules.Pskyc.Shop" js=1}');
+            errors.push(validationMessages.singleTooLarge || 'Identity document must be smaller than 10MB');
             valid = false;
           }
         }
 
         // Check address document
         if (!addressDoc.files[0]) {
-          errors.push('{l s="Please upload your proof of address document" d="Modules.Pskyc.Shop" js=1}');
+          errors.push(validationMessages.addressRequired || 'Please upload your proof of address document');
           valid = false;
         }
 
         if (addressDoc.files[0] && addressDoc.files[0].size > 10 * 1024 * 1024) {
-          errors.push('{l s="Address document must be smaller than 10MB" d="Modules.Pskyc.Shop" js=1}');
+          errors.push(validationMessages.addressTooLarge || 'Address document must be smaller than 10MB');
           valid = false;
         }
 
         if (!consent.checked || !authenticity.checked) {
-          errors.push('{l s="Please accept all required terms and conditions" d="Modules.Pskyc.Shop" js=1}');
+          errors.push(validationMessages.termsRequired || 'Please accept all required terms and conditions');
           valid = false;
         }
 
@@ -603,11 +619,19 @@
         // Show progress
         const progress = document.getElementById('upload-progress');
         const submitBtn = document.getElementById('submit-verification');
+        const submitBtnIcon = submitBtn ? submitBtn.querySelector('.material-icons') : null;
 
         if (progress && submitBtn) {
           progress.style.display = 'block';
           submitBtn.disabled = true;
-          submitBtn.innerHTML = '<i class="material-icons">hourglass_empty</i> {l s="Processing..." d="Modules.Pskyc.Shop" js=1}';
+          submitBtn.setAttribute('aria-busy', 'true');
+          if (submitButtonLabel && submitProcessingText) {
+            submitButtonLabel.textContent = submitProcessingText;
+          }
+          if (submitBtnIcon) {
+            const processingIcon = submitBtnIcon.dataset.processingIcon || 'hourglass_empty';
+            submitBtnIcon.textContent = processingIcon;
+          }
         }
       });
     }
