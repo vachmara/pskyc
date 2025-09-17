@@ -60,7 +60,7 @@ class Pskyc extends Module
         $this->confirmUninstall = $warning;
         $this->confirmReset = $warning;
 
-        $this->ps_versions_compliancy = ['min' => '8.1', 'max' => '8.2'];
+        $this->ps_versions_compliancy = ['min' => '8.0', 'max' => '8.2'];
 
         // Define admin tabs following PrestaShop 8 official documentation
         $this->tabs = [
