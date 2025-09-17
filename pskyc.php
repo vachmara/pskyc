@@ -60,9 +60,9 @@ class Pskyc extends Module
         $this->confirmUninstall = $warning;
         $this->confirmReset = $warning;
 
-        $this->ps_versions_compliancy = ['min' => '8.0', 'max' => '8.2'];
+        $this->ps_versions_compliancy = ['min' => '8.0', 'max' => '9.9.99'];
 
-        // Define admin tabs following PrestaShop 8 official documentation
+        // Define admin tabs following modern PrestaShop 8/9 official documentation
         $this->tabs = [
             [
                 'route_name' => 'ps_pskyc_verification_index',

@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Official PrestaShop 9 compatibility documentation and CI coverage
+
 ### Fixed
 - Fix remove admin note in status mail notification
 - Escape KYC form validation messages and loading labels for safe front-office JavaScript handling when two-sided IDs are required
@@ -70,6 +73,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ready for PrestaShop 8.0+ environments
 - Please report any issues on GitHub
 
-[Unreleased]: https://github.com/vachmara/pskyc/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/vachmara/pskyc/compare/v1.1.1...HEAD
 [1.1.0]: https://github.com/vachmara/pskyc/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/vachmara/pskyc/releases/tag/v1.0.0

@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PHP Version](https://img.shields.io/badge/PHP-8.1%2B-blue.svg)](https://www.php.net/)
-[![PrestaShop](https://img.shields.io/badge/PrestaShop-8.0%2B-orange.svg)](https://www.prestashop.com/)
+[![PrestaShop](https://img.shields.io/badge/PrestaShop-8.x%20%26%209.x-orange.svg)](https://www.prestashop.com/)
 [![Packagist Version](https://img.shields.io/packagist/v/vachmara/pskyc.svg)](https://packagist.org/packages/vachmara/pskyc)
 [![Packagist Downloads](https://img.shields.io/packagist/dt/vachmara/pskyc.svg)](https://packagist.org/packages/vachmara/pskyc)
 [![CI Tests](https://github.com/vachmara/pskyc/workflows/CI%20Tests/badge.svg)](https://github.com/vachmara/pskyc/actions)
@@ -20,7 +20,11 @@ Open source, GDPR-compliant KYC document verification for PrestaShop.
 ## Requirements
 
 ### PrestaShop Compatibility
-- **PrestaShop:** 8.0.0 or higher
+- **PrestaShop:** 8.0.x – 9.0.x
+
+#### Tested PrestaShop releases
+
+Official continuous integration covers PrestaShop 8.0, 8.1, 8.2 and 9.0 Docker images to ensure ongoing compatibility across both major branches.
 - **PHP:** 8.1 or higher
 
 ### PHP Extensions
@@ -33,7 +37,7 @@ This module uses standard PrestaShop-required PHP extensions:
 - **json** - For configuration data (standard PrestaShop requirement)
 - **mbstring** - For string handling (standard PrestaShop requirement)
 
-*All listed extensions are standard PrestaShop 8 requirements, so no additional server configuration is needed.*
+*All listed extensions are standard PrestaShop 8/9 requirements, so no additional server configuration is needed.*
 
 ## Features
 

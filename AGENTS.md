@@ -1,6 +1,6 @@
 # KYC Secure Upload - AI Agent Guide
 
-Welcome to the KYC Secure Upload project! This document provides essential information for AI agents and developers contributing to this PrestaShop 8 module.
+Welcome to the KYC Secure Upload project! This document provides essential information for AI agents and developers contributing to this PrestaShop 8/9 module.
 
 ## 📋 Project Overview
 
@@ -134,7 +134,7 @@ git push origin feat/customer-document-preview
 - **Unit Tests**: All new services and repositories must have tests
 - **Integration Tests**: Test admin controllers and front workflows
 - **Coverage**: Maintain 90%+ test coverage
-- **Manual Testing**: Test in PrestaShop 8.0+ environment
+- **Manual Testing**: Test in PrestaShop 8.0+ and 9.0+ environments
 
 ## 📝 Changelog Management
 
@@ -193,6 +193,7 @@ We follow [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) format in `CH
 ## 📚 Resources
 
 - [PrestaShop 8 Module Documentation](https://devdocs.prestashop-project.org/8/modules/)
+- [PrestaShop 9 Module Documentation](https://devdocs.prestashop-project.org/9/modules/)
 - [Project Contributing Guidelines](CONTRIBUTING.md)
 - [Changelog](CHANGELOG.md)
 - [License](LICENSE.md)
