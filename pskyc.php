@@ -426,15 +426,58 @@ class Pskyc extends Module
      */
     public function hookDisplayAdminCustomers()
     {
-        $customerId = Tools::getValue('id_customer');
-        if (!$customerId) {
+        $customerId = (int) Tools::getValue('id_customer');
+        if ($customerId <= 0) {
             return;
         }
-        /** @var VerificationService $verificationService */
-        $verificationService = $this->get('PrestaShop\Module\Pskyc\Service\VerificationService');
-        $verifications = $verificationService->getVerificationsByCustomerId($customerId);
 
-        // Render the Twig template instead of Smarty
+        try {
+            /** @var VerificationService $verificationService */
+            $verificationService = $this->get('PrestaShop\Module\Pskyc\Service\VerificationService');
+        } catch (Exception $e) {
+            PrestaShopLogger::addLog('KYC admin customer hook error: ' . $e->getMessage(), 3, null, 'Pskyc');
+
+            return;
+        }
+
+        $verifications = $verificationService->getVerificationsByCustomerId($customerId) ?? [];
+
+        try {
+            $router = $this->get('router');
+        } catch (Exception $e) {
+            PrestaShopLogger::addLog('KYC admin router service error: ' . $e->getMessage(), 2, null, 'Pskyc');
+            $router = false;
+        }
+        $verificationIndexUrl = null;
+
+        if ($router !== false) {
+            try {
+                $verificationIndexUrl = $router->generate('ps_pskyc_verification_index');
+            } catch (Exception $e) {
+                PrestaShopLogger::addLog('KYC admin route generation error: ' . $e->getMessage(), 2, null, 'Pskyc');
+            }
+        }
+
+        if ($verificationIndexUrl === null) {
+            $verificationIndexUrl = $this->context->link->getAdminLink('AdminModules') . '&configure=' . $this->name;
+        }
+
+        foreach ($verifications as &$verification) {
+            $verification['view_url'] = $verificationIndexUrl;
+
+            if ($router !== false) {
+                try {
+                    $verification['view_url'] = $router->generate(
+                        'ps_pskyc_verification_view',
+                        ['verificationId' => (int) ($verification['id_kyc_verification'] ?? 0)]
+                    );
+                } catch (Exception $e) {
+                    PrestaShopLogger::addLog('KYC admin verification view route error: ' . $e->getMessage(), 2, null, 'Pskyc');
+                }
+            }
+        }
+        unset($verification);
+
         $twig = $this->get('twig');
         if ($twig === false) {
             return;
@@ -442,8 +485,9 @@ class Pskyc extends Module
 
         return $twig->render('@Modules/pskyc/views/templates/admin/customers/kyc_status.html.twig', [
             'verifications' => $verifications,
-            'count' => count($verifications ?? []),
+            'count' => count($verifications),
             'customerId' => $customerId,
+            'verificationIndexUrl' => $verificationIndexUrl,
         ]);
     }
 

@@ -6,7 +6,7 @@
 <div class="col">
   <div class="card">
     <h3 class="card-header">
-      <i class="material-icons">verified_user</i> {{ 'Know Your Customer'|trans({}, 'Modules.Pskyc.Shop') }}
+      <i class="material-icons">verified_user</i> {{ 'Know Your Customer'|trans({}, 'Modules.Pskyc.Admin') }}
       <span class="badge badge-primary rounded">{{ count }}</span>
     </h3>
     <div class="card-body">
@@ -15,11 +15,11 @@
           <table class="table table-striped table-hover">
             <thead>
               <tr>
-                <th>{{ 'Status'|trans({}, 'Modules.Pskyc.Shop') }}</th>
-                <th>{{ 'Submission Date'|trans({}, 'Modules.Pskyc.Shop') }}</th>
-                <th>{{ 'Verification Date'|trans({}, 'Modules.Pskyc.Shop') }}</th>
-                <th>{{ 'Is expired?'|trans({}, 'Modules.Pskyc.Shop') }}</th>
-                <th class="text-center">{{ 'Actions'|trans({}, 'Modules.Pskyc.Shop') }}</th>
+                <th>{{ 'Status'|trans({}, 'Modules.Pskyc.Admin') }}</th>
+                <th>{{ 'Submission Date'|trans({}, 'Modules.Pskyc.Admin') }}</th>
+                <th>{{ 'Verification Date'|trans({}, 'Modules.Pskyc.Admin') }}</th>
+                <th>{{ 'Is expired?'|trans({}, 'Modules.Pskyc.Admin') }}</th>
+                <th class="text-center">{{ 'Actions'|trans({}, 'Modules.Pskyc.Admin') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -29,17 +29,17 @@
                     {% if verification.status == 'pending' %}
                       <span class="badge badge-warning">
                         <i class="material-icons">schedule</i>
-                        {{ 'Pending Review'|trans({}, 'Modules.Pskyc.Shop') }}
+                        {{ 'Pending Review'|trans({}, 'Modules.Pskyc.Admin') }}
                       </span>
                     {% elseif verification.status == 'approved' %}
                       <span class="badge badge-success">
                         <i class="material-icons">check_circle</i>
-                        {{ 'Approved'|trans({}, 'Modules.Pskyc.Shop') }}
+                        {{ 'Approved'|trans({}, 'Modules.Pskyc.Admin') }}
                       </span>
                     {% elseif verification.status == 'rejected' %}
                       <span class="badge badge-danger">
                         <i class="material-icons">cancel</i>
-                        {{ 'Rejected'|trans({}, 'Modules.Pskyc.Shop') }}
+                        {{ 'Rejected'|trans({}, 'Modules.Pskyc.Admin') }}
                       </span>
                     {% else %}
                       <span class="badge badge-secondary">
@@ -67,21 +67,21 @@
                       {% if verification.is_expired %}
                         <span class="badge badge-danger">
                           <i class="material-icons">warning</i>
-                          {{ 'Yes'|trans({}, 'Modules.Pskyc.Shop') }}
+                          {{ 'Yes'|trans({}, 'Modules.Pskyc.Admin') }}
                         </span>
                       {% else %}
                         <span class="badge badge-success">
                           <i class="material-icons">check_circle</i>
-                          {{ 'No'|trans({}, 'Modules.Pskyc.Shop') }}
+                          {{ 'No'|trans({}, 'Modules.Pskyc.Admin') }}
                         </span>
                       {% endif %}
                     </small>
                   </td>
                   <td class="text-center">
                     <div class="btn-group btn-group-sm" role="group">
-                      <a href="{{ path('ps_pskyc_verification_view', {verificationId: verification.id_kyc_verification}) }}"
+                      <a href="{{ verification.view_url }}"
                          class="btn btn-outline-primary btn-sm"
-                         title="{{ 'View Details'|trans({}, 'Modules.Pskyc.Shop') }}">
+                         title="{{ 'View Details'|trans({}, 'Modules.Pskyc.Admin') }}">
                         <i class="material-icons">visibility</i>
                       </a>
                     </div>
@@ -92,15 +92,15 @@
           </table>
         </div>
         <div class="mt-3">
-          <a href="{{ path('ps_pskyc_verification_index') }}"
+          <a href="{{ verificationIndexUrl }}"
              class="btn btn-primary">
             <i class="material-icons">launch</i>
-            {{ 'Manage All KYC Verifications'|trans({}, 'Modules.Pskyc.Shop') }}
+            {{ 'Manage All KYC Verifications'|trans({}, 'Modules.Pskyc.Admin') }}
           </a>
         </div>
       {% else %}
         <div class="alert alert-info">
-          <strong>{{ 'No KYC verifications found'|trans({}, 'Modules.Pskyc.Shop') }}</strong>
+          <strong>{{ 'No KYC verifications found'|trans({}, 'Modules.Pskyc.Admin') }}</strong>
         </div>
       {% endif %}
     </div>
