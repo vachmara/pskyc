@@ -41,7 +41,7 @@ class Pskyc extends Module
     {
         $this->name = 'pskyc';
         $this->tab = 'administration';
-        $this->version = '1.1.1';
+        $this->version = '1.1.2';
         $this->author = 'Valentin Chmara';
         $this->need_instance = 1;
 
@@ -60,7 +60,11 @@ class Pskyc extends Module
         $this->confirmUninstall = $warning;
         $this->confirmReset = $warning;
 
-        $this->ps_versions_compliancy = ['min' => '8.0', 'max' => '8.2'];
+        // Restrict module compatibility to PrestaShop 8.x (exclude PrestaShop 9)
+        $this->ps_versions_compliancy = [
+            'min' => '8.0.0',
+            'max' => '8.99.99',
+        ];
 
         // Define admin tabs following PrestaShop 8 official documentation
         $this->tabs = [
