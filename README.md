@@ -52,6 +52,16 @@ This module uses standard PrestaShop-required PHP extensions:
 2. Upload to your PrestaShop back office (Modules > Module Manager > Upload)
 3. Configure in the modules section
 
+## Third-Party Checkout Integration
+
+This module works seamlessly with PrestaShop's standard checkout and is compatible with third-party checkout modules like **Prestahero One Page Checkout**.
+
+📖 **[Complete Integration Guide](INTEGRATION.md)** - Comprehensive documentation for integrating with third-party checkout modules including:
+- Prestahero One Page Checkout
+- Custom checkout modules
+- Override examples and best practices
+- Troubleshooting and extension points
+
 ## Security
 
 - Files are stored encrypted with OpenSSL (`AES-256-CBC`)
