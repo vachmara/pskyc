@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- Comprehensive integration guide for third-party checkout modules (INTEGRATION.md)
+- Support for Prestahero One Page Checkout & Social Login module
+- `hookActionValidateOrder` for pre-order KYC validation (works with third-party checkouts)
+- `hookDisplayBeforeCarrier` for displaying KYC warnings in checkout
+- `hookActionFrontControllerSetMedia` for loading KYC frontend assets
+- Frontend CSS and JavaScript for checkout validation
+- KYC warning template for checkout pages
+- Override class examples for Prestahero integration
+- Troubleshooting section for common integration issues
+
+### Changed
+- Updated README.md to reference integration guide
+- Enhanced hook documentation with detailed parameter information
+
 ## [1.1.2] - 2025-09-17
 
 ### Fixed
