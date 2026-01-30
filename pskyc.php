@@ -815,9 +815,9 @@ class Pskyc extends Module
         $controller = $this->context->controller;
 
         // Only load on checkout and account pages
-        if ($controller instanceof OrderController ||
-            $controller instanceof ModuleFrontController ||
-            (isset($controller->php_self) && $controller->php_self === 'my-account')) {
+        if ($controller instanceof OrderController
+            || $controller instanceof ModuleFrontController
+            || (isset($controller->php_self) && $controller->php_self === 'my-account')) {
             // Register CSS
             $this->context->controller->registerStylesheet(
                 'module-pskyc-front',
