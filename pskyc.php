@@ -816,7 +816,7 @@ class Pskyc extends Module
 
         // Only load on checkout and account pages
         if ($controller instanceof OrderController
-            || ($controller instanceof ModuleFrontController && isset($controller->module) && $controller->module->name === $this->name)
+            || ($controller instanceof ModuleFrontController && $controller->module->name === $this->name)
             || (isset($controller->php_self) && $controller->php_self === 'my-account')) {
             // Register CSS
             $this->context->controller->registerStylesheet(
