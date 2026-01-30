@@ -469,8 +469,9 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
             if (empty($context->customer->id)) {
                 $this->ajaxRender(json_encode([
                     'success' => false,
-                    'message' => 'Customer not logged in'
+                    'message' => 'Customer not logged in',
                 ]));
+
                 return;
             }
 
@@ -487,8 +488,9 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
                 'success' => true,
                 'status' => $status,
                 'isApproved' => $isApproved,
-                'requiresVerification' => !$isApproved
+                'requiresVerification' => !$isApproved,
             ]));
+
             return;
         }
 

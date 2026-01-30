@@ -2000,7 +2000,7 @@ class VerifyControllerFrontTest extends MockeryTestCase
         $controller->shouldReceive('ajaxRender')
             ->with(json_encode([
                 'success' => false,
-                'message' => 'Customer not logged in'
+                'message' => 'Customer not logged in',
             ]))
             ->once();
 
@@ -2031,7 +2031,7 @@ class VerifyControllerFrontTest extends MockeryTestCase
                 'success' => true,
                 'status' => 'none',
                 'isApproved' => false,
-                'requiresVerification' => true
+                'requiresVerification' => true,
             ]))
             ->once();
 
@@ -2069,7 +2069,7 @@ class VerifyControllerFrontTest extends MockeryTestCase
                 'success' => true,
                 'status' => 'approved',
                 'isApproved' => true,
-                'requiresVerification' => false
+                'requiresVerification' => false,
             ]))
             ->once();
 
@@ -2107,7 +2107,7 @@ class VerifyControllerFrontTest extends MockeryTestCase
                 'success' => true,
                 'status' => 'pending',
                 'isApproved' => false,
-                'requiresVerification' => true
+                'requiresVerification' => true,
             ]))
             ->once();
 
