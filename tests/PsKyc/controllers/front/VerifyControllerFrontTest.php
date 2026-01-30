@@ -1976,4 +1976,164 @@ class VerifyControllerFrontTest extends MockeryTestCase
         $this->assertNotEmpty($controller->success);
         $this->assertStringContainsString('Document re-uploaded successfully', $controller->success[0]);
     }
+
+    public function testPostProcessAjaxStatusCheckCustomerNotLoggedIn()
+    {
+        $this->toolsMock->shouldReceive('isSubmit')
+            ->with('ajax')
+            ->andReturn(true);
+        $this->toolsMock->shouldReceive('getValue')
+            ->with('action')
+            ->andReturn('checkStatus');
+        $this->toolsMock->shouldReceive('isSubmit')
+            ->with(\Mockery::any())
+            ->andReturn(false);
+
+        $this->customerMock->id = null;
+
+        $controller = \Mockery::mock('PskycVerifyModuleFrontController[ajaxRender]')
+            ->shouldAllowMockingProtectedMethods()
+            ->makePartial();
+        $controller->module = $this->moduleMock;
+        $controller->context = $this->contextMock;
+
+        $controller->shouldReceive('ajaxRender')
+            ->with(json_encode([
+                'success' => false,
+                'message' => 'Customer not logged in'
+            ]))
+            ->once();
+
+        $controller->postProcess();
+    }
+
+    public function testPostProcessAjaxStatusCheckNoVerification()
+    {
+        $this->toolsMock->shouldReceive('isSubmit')
+            ->with('ajax')
+            ->andReturn(true);
+        $this->toolsMock->shouldReceive('getValue')
+            ->with('action')
+            ->andReturn('checkStatus');
+
+        $this->customerMock->id = 1;
+
+        $controller = \Mockery::mock('PskycVerifyModuleFrontController[ajaxRender,getCustomerVerification]')
+            ->shouldAllowMockingProtectedMethods()
+            ->makePartial();
+        $controller->module = $this->moduleMock;
+        $controller->context = $this->contextMock;
+
+        $controller->shouldReceive('getCustomerVerification')
+            ->andReturn(null);
+        $controller->shouldReceive('ajaxRender')
+            ->with(json_encode([
+                'success' => true,
+                'status' => 'none',
+                'isApproved' => false,
+                'requiresVerification' => true
+            ]))
+            ->once();
+
+        $reflection = new \ReflectionClass($controller);
+        $initMethod = $reflection->getMethod('initializeServices');
+        $initMethod->setAccessible(true);
+        $initMethod->invoke($controller);
+
+        $controller->postProcess();
+    }
+
+    public function testPostProcessAjaxStatusCheckVerificationApproved()
+    {
+        $this->toolsMock->shouldReceive('isSubmit')
+            ->with('ajax')
+            ->andReturn(true);
+        $this->toolsMock->shouldReceive('getValue')
+            ->with('action')
+            ->andReturn('checkStatus');
+
+        $this->customerMock->id = 1;
+
+        $verification = ['status' => 'approved'];
+
+        $controller = \Mockery::mock('PskycVerifyModuleFrontController[ajaxRender,getCustomerVerification]')
+            ->shouldAllowMockingProtectedMethods()
+            ->makePartial();
+        $controller->module = $this->moduleMock;
+        $controller->context = $this->contextMock;
+
+        $controller->shouldReceive('getCustomerVerification')
+            ->andReturn($verification);
+        $controller->shouldReceive('ajaxRender')
+            ->with(json_encode([
+                'success' => true,
+                'status' => 'approved',
+                'isApproved' => true,
+                'requiresVerification' => false
+            ]))
+            ->once();
+
+        $reflection = new \ReflectionClass($controller);
+        $initMethod = $reflection->getMethod('initializeServices');
+        $initMethod->setAccessible(true);
+        $initMethod->invoke($controller);
+
+        $controller->postProcess();
+    }
+
+    public function testPostProcessAjaxStatusCheckVerificationPending()
+    {
+        $this->toolsMock->shouldReceive('isSubmit')
+            ->with('ajax')
+            ->andReturn(true);
+        $this->toolsMock->shouldReceive('getValue')
+            ->with('action')
+            ->andReturn('checkStatus');
+
+        $this->customerMock->id = 1;
+
+        $verification = ['status' => 'pending'];
+
+        $controller = \Mockery::mock('PskycVerifyModuleFrontController[ajaxRender,getCustomerVerification]')
+            ->shouldAllowMockingProtectedMethods()
+            ->makePartial();
+        $controller->module = $this->moduleMock;
+        $controller->context = $this->contextMock;
+
+        $controller->shouldReceive('getCustomerVerification')
+            ->andReturn($verification);
+        $controller->shouldReceive('ajaxRender')
+            ->with(json_encode([
+                'success' => true,
+                'status' => 'pending',
+                'isApproved' => false,
+                'requiresVerification' => true
+            ]))
+            ->once();
+
+        $reflection = new \ReflectionClass($controller);
+        $initMethod = $reflection->getMethod('initializeServices');
+        $initMethod->setAccessible(true);
+        $initMethod->invoke($controller);
+
+        $controller->postProcess();
+    }
+
+    public function testPostProcessNonAjaxDoesNothing()
+    {
+        $this->toolsMock->shouldReceive('isSubmit')
+            ->with('ajax')
+            ->andReturn(false);
+
+        $controller = \Mockery::mock('PskycVerifyModuleFrontController[ajaxRender]')
+            ->shouldAllowMockingProtectedMethods()
+            ->makePartial();
+        $controller->module = $this->moduleMock;
+        $controller->context = $this->contextMock;
+
+        $controller->shouldReceive('ajaxRender')
+            ->never();
+
+        $controller->postProcess();
+    }
 }

@@ -453,6 +453,49 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
     }
 
     /**
+     * Handle AJAX requests for KYC status checking
+     *
+     * Returns JSON response with current verification status
+     *
+     * @return void
+     */
+    public function postProcess()
+    {
+        if (Tools::isSubmit('ajax') && Tools::getValue('action') === 'checkStatus') {
+            $this->ajax = true;
+            $this->initializeServices();
+
+            $context = Context::getContext();
+            if (empty($context->customer->id)) {
+                $this->ajaxRender(json_encode([
+                    'success' => false,
+                    'message' => 'Customer not logged in'
+                ]));
+                return;
+            }
+
+            $verification = $this->getCustomerVerification();
+            $status = 'none';
+            $isApproved = false;
+
+            if ($verification) {
+                $status = $verification['status'];
+                $isApproved = $status === 'approved';
+            }
+
+            $this->ajaxRender(json_encode([
+                'success' => true,
+                'status' => $status,
+                'isApproved' => $isApproved,
+                'requiresVerification' => !$isApproved
+            ]));
+            return;
+        }
+
+        // No parent postProcess for front controllers
+    }
+
+    /**
      * Get breadcrumb links for the page
      *
      * Builds navigation breadcrumb including "My Account" and current page

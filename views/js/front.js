@@ -94,9 +94,66 @@
         
         // Function to check KYC status
         function checkKycStatus() {
-            // This is a placeholder - actual implementation would require
-            // an AJAX endpoint in the module
-            console.log('KYC status check would be performed here');
+            // Make AJAX call to check KYC status
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', prestashop.urls.base_url + 'module/pskyc/verify', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var response = JSON.parse(xhr.responseText);
+                            if (response.success) {
+                                // Dispatch event with status
+                                dispatchKycEvent('statusChecked', {
+                                    status: response.status,
+                                    isApproved: response.isApproved,
+                                    requiresVerification: response.requiresVerification
+                                });
+                                
+                                // Update UI if needed
+                                updateKycWarning(response);
+                            }
+                        } catch (e) {
+                            console.error('Failed to parse KYC status response:', e);
+                        }
+                    } else {
+                        console.error('Failed to check KYC status:', xhr.status);
+                    }
+                }
+            };
+            
+            xhr.send('ajax=1&action=checkStatus');
+        }
+        
+        // Function to update KYC warning based on status
+        function updateKycWarning(response) {
+            var kycWarning = document.querySelector('.pskyc-checkout-warning');
+            
+            if (response.isApproved) {
+                // Remove warning if approved
+                if (kycWarning) {
+                    kycWarning.style.display = 'none';
+                }
+            } else {
+                // Show or update warning
+                if (!kycWarning) {
+                    // Create warning element if it doesn't exist
+                    kycWarning = document.createElement('div');
+                    kycWarning.className = 'pskyc-checkout-warning alert alert-warning';
+                    kycWarning.setAttribute('data-kyc-required', 'true');
+                    kycWarning.setAttribute('data-kyc-url', prestashop.urls.base_url + 'module/pskyc/verify');
+                    kycWarning.innerHTML = '<p>Identity verification is required before completing your order.</p>';
+                    
+                    // Insert at top of checkout
+                    var checkoutContainer = document.querySelector('.checkout-step, #checkout, .cart-summary') || document.body;
+                    checkoutContainer.insertBefore(kycWarning, checkoutContainer.firstChild);
+                } else {
+                    kycWarning.style.display = 'block';
+                }
+            }
         }
         
         // Check on page load
