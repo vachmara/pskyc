@@ -118,6 +118,9 @@ class Pskyc extends Module
 
         return parent::install()
             && $this->registerHook('actionCheckoutRender')
+            && $this->registerHook('actionValidateOrder')
+            && $this->registerHook('displayBeforeCarrier')
+            && $this->registerHook('actionFrontControllerSetMedia')
             && $this->registerHook('displayAdminCustomers')
             && $this->registerHook('displayAdminOrder')
             && $this->registerHook('displayCustomerAccount')
@@ -688,6 +691,147 @@ class Pskyc extends Module
         /** @var VerificationService $verificationService */
         $verificationService = $this->get('PrestaShop\Module\Pskyc\Service\VerificationService');
         $verificationService->deleteVerificationsByCustomerId($customer->id);
+    }
+
+    /**
+     * Hook executed before order validation
+     *
+     * Critical hook for third-party checkout modules (e.g., Prestahero)
+     * Blocks order creation if KYC verification is required but not approved
+     *
+     * @param array $params Contains ['cart', 'order', 'customer']
+     *
+     * @return bool True to allow order, false to block
+     */
+    public function hookActionValidateOrder($params)
+    {
+        if (!isset($params['cart']) || !isset($params['customer'])) {
+            return true;
+        }
+
+        $cart = $params['cart'];
+        $customer = $params['customer'];
+
+        // Check if customer is a guest - allow guest checkout
+        if (!$customer->id || $customer->is_guest) {
+            return true;
+        }
+
+        // Check if KYC is required for cart products
+        $kycRequired = $this->isKycRequiredForCart($cart);
+
+        if (!$kycRequired) {
+            return true;
+        }
+
+        // Get customer's verification status
+        /** @var VerificationService $verificationService */
+        $verificationService = $this->get('PrestaShop\\Module\\Pskyc\\Service\\VerificationService');
+        $verification = $verificationService->getMostRecentVerification($customer->id);
+
+        // Allow order only if verification is approved
+        if ($verification && $verification['status'] === 'approved') {
+            return true;
+        }
+
+        // KYC required but not approved - block order
+        // Log the event for debugging
+        PrestaShopLogger::addLog(
+            'KYC: Order blocked for customer ' . $customer->id . ' - verification required',
+            1,
+            null,
+            'Pskyc'
+        );
+
+        // Set error message in context
+        if (isset($this->context->controller)) {
+            $this->context->controller->errors[] = $this->trans(
+                'Identity verification is required before placing an order. Please complete the verification process.',
+                [],
+                'Modules.Pskyc.Shop'
+            );
+        }
+
+        return false;
+    }
+
+    /**
+     * Hook displayed before carrier selection in checkout
+     *
+     * Shows a warning if KYC verification is required but not completed
+     * Works with both standard and third-party checkout modules
+     *
+     * @param array $params
+     *
+     * @return string HTML content
+     */
+    public function hookDisplayBeforeCarrier($params)
+    {
+        $context = Context::getContext();
+
+        // Check if customer is logged in
+        if (!$context->customer->id || $context->customer->is_guest) {
+            return '';
+        }
+
+        // Check if KYC is required for cart products
+        $kycRequired = $this->isKycRequiredForCart($context->cart);
+
+        if (!$kycRequired) {
+            return '';
+        }
+
+        // Get customer's verification status
+        /** @var VerificationService $verificationService */
+        $verificationService = $this->get('PrestaShop\\Module\\Pskyc\\Service\\VerificationService');
+        $verification = $verificationService->getMostRecentVerification($context->customer->id);
+
+        // Only show warning if not approved
+        if ($verification && $verification['status'] === 'approved') {
+            return '';
+        }
+
+        // Build verification URL
+        $verifyUrl = $context->link->getModuleLink($this->name, 'verify', [], true);
+
+        // Assign template variables
+        $this->context->smarty->assign([
+            'kyc_verify_url' => $verifyUrl,
+            'kyc_status' => $verification ? $verification['status'] : 'not_started',
+        ]);
+
+        return $this->fetch('module:' . $this->name . '/views/templates/front/checkout/kyc-warning.tpl');
+    }
+
+    /**
+     * Hook to load CSS/JS assets on front pages
+     *
+     * Loads KYC-related assets when needed (checkout pages, account pages)
+     *
+     * @return void
+     */
+    public function hookActionFrontControllerSetMedia()
+    {
+        $controller = $this->context->controller;
+
+        // Only load on checkout and account pages
+        if ($controller instanceof OrderController
+            || ($controller instanceof ModuleFrontController && $controller->module->name === $this->name)
+            || (isset($controller->php_self) && $controller->php_self === 'my-account')) {
+            // Register CSS
+            $this->context->controller->registerStylesheet(
+                'module-pskyc-front',
+                'modules/' . $this->name . '/views/css/front.css',
+                ['media' => 'all', 'priority' => 150]
+            );
+
+            // Register JS
+            $this->context->controller->registerJavascript(
+                'module-pskyc-front',
+                'modules/' . $this->name . '/views/js/front.js',
+                ['position' => 'bottom', 'priority' => 150]
+            );
+        }
     }
 
     /**
