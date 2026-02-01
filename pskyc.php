@@ -118,7 +118,7 @@ class Pskyc extends Module
 
         return parent::install()
             && $this->registerHook('actionCheckoutRender')
-            && $this->registerHook('actionValidateOrder')
+            && $this->registerHook('actionValidateOrderBefore')
             && $this->registerHook('displayBeforeCarrier')
             && $this->registerHook('actionFrontControllerSetMedia')
             && $this->registerHook('displayAdminCustomers')
@@ -201,6 +201,7 @@ class Pskyc extends Module
 
         // Assign template variables
         $this->context->smarty->assign([
+            'module_version' => $this->version,
             'module_dir' => $this->_path,
             'form_html' => $this->renderForm(),
             'errors' => $errors,
@@ -696,32 +697,24 @@ class Pskyc extends Module
     /**
      * Hook executed before order validation
      *
-     * Critical hook for third-party checkout modules (e.g., Prestahero)
-     * Blocks order creation if KYC verification is required but not approved
+     * In PrestaShop 8, this behavior is injected via a PaymentModule override.
+     * In future PrestaShop versions where a native "validate order before" hook is available,
+     * this method can be wired to that native hook.
+     * Blocks order creation if KYC verification is required but not approved.
      *
-     * @param array $params Contains ['cart', 'order', 'customer']
-     *
-     * @return bool True to allow order, false to block
+     * @param array $params Contains ['cart', 'customer']
      */
-    public function hookActionValidateOrder($params)
+    public function hookActionValidateOrderBefore($params)
     {
-        if (!isset($params['cart']) || !isset($params['customer'])) {
-            return true;
+        $cart = $params['cart'] ?? null;
+        $customer = $params['customer'] ?? null;
+
+        if (!$cart || !$customer || !$customer->id || $customer->is_guest) {
+            return;
         }
 
-        $cart = $params['cart'];
-        $customer = $params['customer'];
-
-        // Check if customer is a guest - allow guest checkout
-        if (!$customer->id || $customer->is_guest) {
-            return true;
-        }
-
-        // Check if KYC is required for cart products
-        $kycRequired = $this->isKycRequiredForCart($cart);
-
-        if (!$kycRequired) {
-            return true;
+        if (!$this->isKycRequiredForCart($cart)) {
+            return;
         }
 
         // Get customer's verification status
@@ -734,25 +727,18 @@ class Pskyc extends Module
             return true;
         }
 
-        // KYC required but not approved - block order
+        // KYC required but not approved - redirect to verification page
         // Log the event for debugging
         PrestaShopLogger::addLog(
-            'KYC: Order blocked for customer ' . $customer->id . ' - verification required',
+            'KYC: Order blocked for customer ' . $customer->id . ' - verification required, redirecting to KYC page',
             1,
             null,
             'Pskyc'
         );
 
-        // Set error message in context
-        if (isset($this->context->controller)) {
-            $this->context->controller->errors[] = $this->trans(
-                'Identity verification is required before placing an order. Please complete the verification process.',
-                [],
-                'Modules.Pskyc.Shop'
-            );
-        }
-
-        return false;
+        // Redirect to KYC verification page
+        $kycUrl = $this->context->link->getModuleLink($this->name, 'verify', ['kyc_required' => 1], true);
+        Tools::redirect($kycUrl);
     }
 
     /**

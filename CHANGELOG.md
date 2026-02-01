@@ -12,10 +12,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - AJAX status checking for improved customer experience during verification
 - Quick start guide for checkout integration
 - Implementation summary documentation
+- Clean redirects to KYC verification page instead of throwing exceptions
+- Contextual alerts with URL parameters for better user feedback
+- French translation for alert messages
 
 ### Changed
 - Updated README.md to reference integration guide
 - Enhanced hook documentation with detailed parameter information
+- Updated order validation hook to actionValidateOrderBefore with version-specific handling for PrestaShop 8 and 9 compatibility
 
 ## [1.1.2] - 2025-09-17
 
