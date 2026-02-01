@@ -14,11 +14,11 @@ namespace Tests\PsKyc\Service;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use PrestaShop\Module\Pskyc\Service\NotificationService;
 use Symfony\Component\Templating\EngineInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class NotificationServiceTest extends MockeryTestCase
 {
-    /** @var TranslatorInterface */
+    /** @var \Symfony\Contracts\Translation\TranslatorInterface */
     private $translatorMock;
 
     /** @var EngineInterface */
