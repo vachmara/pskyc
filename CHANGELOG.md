@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - AJAX status checking for improved customer experience during verification
 - Quick start guide for checkout integration
 - Implementation summary documentation
+- Prestashop 9 compatibility testing and validation
 - Clean redirects to KYC verification page instead of throwing exceptions
 - Contextual alerts with URL parameters for better user feedback
 - French translation for alert messages
@@ -23,11 +24,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.1.2] - 2025-09-17
 
+### Added
+- Official PrestaShop 9 compatibility documentation and CI coverage
+
 ### Fixed
 - Fix remove admin note in status mail notification
 - Escape KYC form validation messages and loading labels for safe front-office JavaScript handling when two-sided IDs are required
-- Only compatible with PrestaShop 8.1 and 8.2 (not 8.0 anymore)
-- Update GitHub Actions and docker-compose to use PrestaShop 8.1 and 8.2
 
 ## [1.1.1] - 2025-06-05
 
@@ -88,6 +90,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ready for PrestaShop 8.0+ environments
 - Please report any issues on GitHub
 
-[Unreleased]: https://github.com/vachmara/pskyc/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/vachmara/pskyc/compare/v1.1.1...HEAD
 [1.1.0]: https://github.com/vachmara/pskyc/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/vachmara/pskyc/releases/tag/v1.0.0

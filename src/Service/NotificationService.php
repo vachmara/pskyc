@@ -14,12 +14,12 @@ namespace PrestaShop\Module\Pskyc\Service;
 if (!defined('_PS_VERSION_')) {
     exit;
 }
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class NotificationService
  *
- * Handles email notifications for KYC verification status changes using PrestaShop 8's modern email theme system
+ * Handles email notifications for KYC verification status changes using PrestaShop 8/9's modern email theme system
  * Sends automated emails to customers and administrators
  */
 class NotificationService

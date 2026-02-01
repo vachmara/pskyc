@@ -1,7 +1,7 @@
 {
     "type": "prestashop-module",
     "name": "vachmara/pskyc",
-    "description": "Open source, GDPR-compliant KYC document verification for PrestaShop 8.",
+    "description": "Open source, GDPR-compliant KYC document verification for PrestaShop 8 and 9.",
     "license": "MIT",
     "homepage": "https://github.com/vachmara/pskyc",
     "keywords": [

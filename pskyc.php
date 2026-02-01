@@ -60,13 +60,9 @@ class Pskyc extends Module
         $this->confirmUninstall = $warning;
         $this->confirmReset = $warning;
 
-        // Restrict module compatibility to PrestaShop 8.x (exclude PrestaShop 9)
-        $this->ps_versions_compliancy = [
-            'min' => '8.0.0',
-            'max' => '8.99.99',
-        ];
+        $this->ps_versions_compliancy = ['min' => '8.0', 'max' => '9.9.99'];
 
-        // Define admin tabs following PrestaShop 8 official documentation
+        // Define admin tabs following modern PrestaShop 8/9 official documentation
         $this->tabs = [
             [
                 'route_name' => 'ps_pskyc_verification_index',
@@ -191,7 +187,7 @@ class Pskyc extends Module
         $verificationUrl = '';
         try {
             $router = $this->get('router');
-            if ($router !== false) {
+            if ($router) {
                 $verificationUrl = $router->generate('ps_pskyc_verification_index');
             }
         } catch (Exception $e) {
@@ -444,7 +440,7 @@ class Pskyc extends Module
 
         // Render the Twig template instead of Smarty
         $twig = $this->get('twig');
-        if ($twig === false) {
+        if (!$twig) {
             return;
         }
 

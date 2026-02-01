@@ -440,7 +440,7 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
     {
         try {
             $customerRepository = $this->module->get('PrestaShop\Module\Pskyc\Repository\CustomerRepository');
-            if ($customerRepository === false) {
+            if (!$customerRepository) {
                 return null;
             }
             $customerData = $customerRepository->getCustomerData($customerId);
