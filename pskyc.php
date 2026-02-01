@@ -697,9 +697,10 @@ class Pskyc extends Module
     /**
      * Hook executed before order validation
      *
-     * For PS8: injected via PaymentModule override
-     * For PS9+: native hook
-     * Blocks order creation if KYC verification is required but not approved
+     * In PrestaShop 8, this behavior is injected via a PaymentModule override.
+     * In future PrestaShop versions where a native "validate order before" hook is available,
+     * this method can be wired to that native hook.
+     * Blocks order creation if KYC verification is required but not approved.
      *
      * @param array $params Contains ['cart', 'customer']
      */
