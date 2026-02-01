@@ -187,7 +187,7 @@ class Pskyc extends Module
         $verificationUrl = '';
         try {
             $router = $this->get('router');
-            if (!$router) {
+            if ($router) {
                 $verificationUrl = $router->generate('ps_pskyc_verification_index');
             }
         } catch (Exception $e) {
