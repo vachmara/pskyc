@@ -337,6 +337,11 @@
         <target>Enregistrer les statuts des documents</target>
         <note>Line: </note>
       </trans-unit>
+      <trans-unit id="fbbddb052fd200e7d05593f6918e3ab3">
+        <source>Customer Note</source>
+        <target>Note client</target>
+        <note>Line: </note>
+      </trans-unit>
       <trans-unit id="7cab5b2f456f909f541ec77334ba294d">
         <source>Admin Notes</source>
         <target>Notes administrateur</target>

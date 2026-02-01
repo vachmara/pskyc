@@ -97,6 +97,11 @@
         <target>KYC - Vérifiez votre identité</target>
         <note>Line: </note>
       </trans-unit>
+      <trans-unit id="428701debb702bf0ab6c9e1c343df2fc">
+        <source>Identity verification is required before placing an order. Please complete the verification process.</source>
+        <target>Une vérification d'identité est requise avant de passer une commande. Veuillez suivre la procédure de vérification.</target>
+        <note>Line: </note>
+      </trans-unit>
       <trans-unit id="5db106d45091dc05ad1725d8f9959c68">
         <source>Identity Verification Required</source>
         <target>Vérification d'identité requise</target>
@@ -110,6 +115,36 @@
       <trans-unit id="8d9b452859721d45484445ecfe10b193">
         <source>KYC Verification Expiry Warning - #%id%</source>
         <target>Avertissement d'expiration de vérification KYC - #%id%</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="6f8063417ab31f38d864c28302f3de2f">
+        <source>Approved</source>
+        <target>Approuvé</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="d37b1f6c0512e2118cee17fea015b699">
+        <source>Rejected</source>
+        <target>Rejeté</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="00b38f89b377390e7c1d74d82cc2f858">
+        <source>Pending Review</source>
+        <target>En attente d'examen</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="24fe48030f7d3097d5882535b04c3fa8">
+        <source>Expired</source>
+        <target>Expiré</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="83fdea85c28601b55382111feb34af52">
+        <source>More Information Required</source>
+        <target>Informations supplémentaires requises</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="88183b946cc5f0e8c96b2e66e1c74a7e">
+        <source>Unknown</source>
+        <target>Inconnu</target>
         <note>Line: </note>
       </trans-unit>
       <trans-unit id="b9ed7892c783650a9b284a578242f87e">
@@ -142,11 +177,6 @@
         <target>Statut :</target>
         <note>Line: </note>
       </trans-unit>
-      <trans-unit id="6f8063417ab31f38d864c28302f3de2f">
-        <source>Approved</source>
-        <target>Approuvé</target>
-        <note>Line: </note>
-      </trans-unit>
       <trans-unit id="be3de2b1ffafc59f6dc3260225fe09be">
         <source>Valid until:</source>
         <target>Valide jusqu'au :</target>
@@ -162,29 +192,9 @@
         <target>Statut de vérification actuel</target>
         <note>Line: </note>
       </trans-unit>
-      <trans-unit id="00b38f89b377390e7c1d74d82cc2f858">
-        <source>Pending Review</source>
-        <target>En attente d'examen</target>
-        <note>Line: </note>
-      </trans-unit>
       <trans-unit id="e1521f742cf5771ba06eb2b11fe7f213">
         <source>Under Review</source>
         <target>En cours d'examen</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="d37b1f6c0512e2118cee17fea015b699">
-        <source>Rejected</source>
-        <target>Rejeté</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="83fdea85c28601b55382111feb34af52">
-        <source>More Information Required</source>
-        <target>Informations supplémentaires requises</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="24fe48030f7d3097d5882535b04c3fa8">
-        <source>Expired</source>
-        <target>Expiré</target>
         <note>Line: </note>
       </trans-unit>
       <trans-unit id="292659c2de7f3de1a9ab2abfef6839a4">
@@ -394,7 +404,7 @@
       </trans-unit>
       <trans-unit id="6c49c36c219349fa1238984e2bf97dbf">
         <source><![CDATA[Security & Privacy]]></source>
-        <target><![CDATA[Sécurité et confidentialité]]></target>
+        <target>Sécurité et confidentialité</target>
         <note>Line: </note>
       </trans-unit>
       <trans-unit id="aca919a299432b053b78b54523f20c15">
@@ -412,56 +422,6 @@
         <target>Téléchargement des documents...</target>
         <note>Line: </note>
       </trans-unit>
-      <trans-unit id="3234270c7cb055f813ab5606d1089187">
-        <source>Please upload the front side of your identity document</source>
-        <target>Veuillez télécharger le recto de votre pièce d'identité</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="30bd23906e21e136a98efdef10b1dd1a">
-        <source>Please upload the back side of your identity document</source>
-        <target>Veuillez télécharger le verso de votre pièce d'identité</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="003fd924834e4d647c219bc24e1ac409">
-        <source>Front side document must be smaller than 10MB</source>
-        <target>Le document recto doit être inférieur à 10 Mo</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="ea8d758dd60e6ab1554716f6a00caf98">
-        <source>Back side document must be smaller than 10MB</source>
-        <target>Le document verso doit être inférieur à 10 Mo</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="6b0fcd3e0d3261e8b26e9d60ad53164f">
-        <source>Please upload your identity document</source>
-        <target>Veuillez télécharger votre pièce d'identité</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="44d6719addb842a785c1ab65df2befbd">
-        <source>Identity document must be smaller than 10MB</source>
-        <target>La pièce d'identité doit être inférieure à 10 Mo</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="d5f4d1fee596d9b7f8b5ab0935d27a7f">
-        <source>Please upload your proof of address document</source>
-        <target>Veuillez télécharger votre justificatif de domicile</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="4bfeec6fed9753e9bb46e85920a6cf48">
-        <source>Address document must be smaller than 10MB</source>
-        <target>Le justificatif de domicile doit être inférieur à 10 Mo</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="5e9f10fd796f12205792ef86c17578e7">
-        <source>Please accept all required terms and conditions</source>
-        <target>Veuillez accepter tous les termes et conditions requis</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="21d104a54fc71a19a325c7305327f1d2">
-        <source>Processing...</source>
-        <target>Traitement en cours...</target>
-        <note>Line: </note>
-      </trans-unit>
       <trans-unit id="c785829770b9cc83c19b3975523c96d4">
         <source>Your cart contains products that require identity verification before you can complete your purchase.</source>
         <target>Votre panier contient des produits nécessitant une vérification d'identité avant de pouvoir finaliser votre achat.</target>
@@ -475,6 +435,56 @@
       <trans-unit id="85ce7f761021f4d478be22903e694bf6">
         <source>You will be redirected to upload your documents.</source>
         <target>Vous serez redirigé pour télécharger vos documents.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="58cf4d1b652ee30175d524063571e989">
+        <source>Your documents are pending review.</source>
+        <target>Vos documents sont en attente d'examen.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="456fc905912f299a7e05eba87670a98a">
+        <source>Your documents are currently under review.</source>
+        <target>Vos documents sont actuellement en cours d'examen.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="932275ed39711c565d5c737d2ab923dd">
+        <source>You will be notified once the verification is complete.</source>
+        <target>Vous serez averti une fois la vérification terminée.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="1f0b1410b93759de44ef282abff86ccf">
+        <source>You cannot complete your order until your identity is verified and approved.</source>
+        <target>Vous ne pouvez pas finaliser votre commande tant que votre identité n'a pas été vérifiée et approuvée.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="6a5325ddb0a7cd171bea495b593979c8">
+        <source>Your verification was not approved.</source>
+        <target>Votre vérification n'a pas été approuvée.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="65f5ec30e56913339548b229512ca6e9">
+        <source>Additional information is required.</source>
+        <target>Des informations supplémentaires sont requises.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="51823ed6e653563b9d882dd5bcb5b69b">
+        <source>Update Your Verification</source>
+        <target>Mettez à jour votre vérification</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="b6817a77236512b5f54946a7b2bb91d9">
+        <source>Please complete the verification process to proceed with your order.</source>
+        <target>Veuillez terminer le processus de vérification pour poursuivre votre commande.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="f0c1d406251c346552b6080325157e87">
+        <source>Start Verification</source>
+        <target>Lancer la vérification</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="1764b29ced0d1a60e7c3c7ab828a4cde">
+        <source>Your order requires identity verification. Please complete the verification process below.</source>
+        <target>Votre commande nécessite une vérification d'identité. Veuillez compléter le processus de vérification ci-dessous.</target>
         <note>Line: </note>
       </trans-unit>
       <trans-unit id="fbd6e96cf75c09e1be6f265daf5d267b">
@@ -645,11 +655,6 @@
       <trans-unit id="a3987b8daeb1953d3ec145379e587ee0">
         <source>No KYC verifications found</source>
         <target>Aucune vérification KYC trouvée</target>
-        <note>Line: </note>
-      </trans-unit>
-      <trans-unit id="f8d6b3c4e5a7b9c2d4e6f8a1b3c5d7e9">
-        <source>Your order requires identity verification. Please complete the verification process below.</source>
-        <target>Votre commande nécessite une vérification d'identité. Veuillez compléter le processus de vérification ci-dessous.</target>
         <note>Line: </note>
       </trans-unit>
     </body>
