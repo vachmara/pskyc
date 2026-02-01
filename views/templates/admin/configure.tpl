@@ -46,7 +46,7 @@
             <div class="col-md-6">
                 <h4>{l s='Current Status' mod='pskyc'}</h4>
                 <ul class="list-unstyled">
-                    <li><strong>{l s='Version:' mod='pskyc'}</strong> 0.1.0</li>
+                    <li><strong>{l s='Version:' mod='pskyc'}</strong> {$module_version|escape:'html':'UTF-8'}</li>
                     <li><strong>{l s='Upload Directory:' mod='pskyc'}</strong> {$module_dir|escape:'html':'UTF-8'}secure_upload/</li>
                     <li><strong>{l s='Encryption:' mod='pskyc'}</strong> 
                         {if function_exists('openssl_encrypt')}

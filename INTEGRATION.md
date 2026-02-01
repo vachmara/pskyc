@@ -28,7 +28,7 @@ The KYC Secure Upload module leverages the following PrestaShop hooks for checko
 | Hook Name | Type | Trigger Point | Purpose | Parameters |
 |-----------|------|---------------|---------|------------|
 | `actionCheckoutRender` | Action | Before checkout page renders | Inject KYC step into checkout process | `['checkoutProcess']` |
-| `actionValidateOrder` | Action | Before order confirmation | Block order if KYC not approved | `['cart', 'order', 'customer']` |
+| `actionValidateOrderBefore` | Action | Before order validation | Block order if KYC not approved | `['cart', 'customer', 'currency', 'id_order_state', 'payment_method']` |
 | `displayBeforeCarrier` | Display | Before carrier selection | Show KYC warning/requirements | `[]` |
 | `displayCustomerAccount` | Display | Customer account page | Display KYC verification link | `[]` |
 | `actionFrontControllerSetMedia` | Action | Page asset loading | Load KYC-related CSS/JS | `[]` |
@@ -50,7 +50,7 @@ There are several approaches to integrate KYC verification with third-party chec
 
 ### 1. Pre-Order Validation Hook (Recommended)
 
-Use the `actionValidateOrder` hook to block order creation if KYC is not approved.
+Use the `actionValidateOrderBefore` hook to block order creation if KYC is not approved.
 
 **Pros:**
 - ✅ Works with any checkout module
@@ -82,6 +82,85 @@ Inject JavaScript that validates KYC status before order submission.
 
 **Cons:**
 - ⚠️ Can be bypassed (always use server-side validation too)
+
+## PrestaShop 8.x Compatibility Matrix (Important)
+
+The **KYC Secure Upload** module provides a PrestaShop-9–style `actionValidateOrderBefore` hook on **PrestaShop 8.x** through an **optional `PaymentModule` override shim**.
+
+This allows blocking order creation *server-side* **only if the checkout module uses `PaymentModule::validateOrder()`**.
+
+Because many checkout modules modify or replace the core order-validation flow, compatibility must be assessed per module.
+
+> **TODO (maintainers):** Before completing this matrix, identify whether each checkout/payment module calls  
+> `PaymentModule::validateOrder()` → (Hard-block possible),  
+> OR bypasses it → (Requires module-specific integration).
+
+---
+
+### Compatibility Levels
+- **A — Fully Compatible**  
+  Uses core `PaymentModule::validateOrder()` → PS8 hard-block works.
+- **B — Partially Compatible**  
+  Uses some core hooks but may bypass parts of validation → soft-block + payment gating recommended.
+- **C — Requires Integration**  
+  Custom flow / AJAX confirm controller → override shim has no effect.
+- **D — Unknown / Not Tested**
+
+### Risk Levels
+- **Low**: Standard checkout flow
+- **Medium**: OPC with custom rendering but calls `validateOrder()`
+- **High**: OPC creates orders via custom controllers / endpoints
+
+---
+
+## Checkout Module Compatibility Matrix
+
+| Checkout Module | Vendor | PS8 Compatibility | Enforcement Level | Risk | Notes |
+|-----------------|--------|------------------|-------------------|-------|-------|
+| **Default Checkout** | PrestaShop | **A** | Hard-block + Payment Gating | Low | Fully standard; recommended baseline. |
+| **Prestahero One Page Checkout** | PrestaHero | **B / C (verify)** | Soft-block; may need integration | Medium/High | Some versions skip standard hooks; confirm if `validateOrder()` is used. |
+| **Knowband SuperCheckout** | Knowband | **C (likely)** | Soft-block; integration recommended | High | Known to bypass multiple core hooks; confirm their "confirm order" controller. |
+| **One Page Checkout PS** | PresTeamShop | **B / C (verify)** | Soft-block | Medium | Hybrid OPC; may or may not trigger core validation. |
+| **Revolut / Stripe / PayPal modules** | Payments | **A** | Hard-block | Low | Most payment modules call `validateOrder()` normally. |
+| **Custom Checkout Modules** | Varies | **D** | Varies | High | Must check call chain manually. |
+
+> ⚠ **Warning:**  
+> On PrestaShop 8.x, the hard-block mechanism **only works** with checkout modules that call  
+> `PaymentModule::validateOrder()`.  
+> Modules that bypass this method require **specific integration** (controller override or validation hook in their flow).
+
+---
+
+## How to Verify a Module's Compatibility (Quick Test)
+
+1. **Search the module for:**  
+   ```
+   validateOrder(
+   ```
+   If found → Likely **A** (hard-block possible).
+
+2. If not found, search for:  
+   ```
+   placeOrder(
+   createOrder(
+   OrderController(
+   ajaxValidate
+   ```
+   → Likely **C** (custom confirm flow → override shim won't execute).
+
+3. Test by enabling KYC hard-block and attempting checkout:
+   - If hook fires → module is compatible.  
+   - If order is created anyway → requires integration.
+
+---
+
+## Summary
+
+- **PS9 → native hard-block** (no overrides)  
+- **PS8 → optional override shim** adds `actionValidateOrderBefore`  
+- Works with modules using **standard core validation**  
+- Custom OPC modules may require **module-specific integration**  
+- Always enable **payment gating** for consistent UX
 
 ---
 
@@ -217,7 +296,7 @@ The KYC module provides extension points for third-party modules:
 #### Issue: Customer can complete order without KYC approval
 
 **Possible causes:**
-1. `actionValidateOrder` hook not registered
+1. `actionValidateOrderBefore` hook not registered
 2. KYC required categories not configured
 3. Service error not properly handled
 
@@ -314,6 +393,6 @@ Found an issue or want to improve this guide?
 
 ---
 
-**Last Updated:** 2025-01-28
-**Module Version:** 1.1.2+
+**Last Updated:** 2026-02-01
+**Module Version:** 1.1.3
 **Tested with:** PrestaShop 8.1.x, 8.2.x

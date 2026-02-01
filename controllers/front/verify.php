@@ -85,6 +85,7 @@ class PskycVerifyModuleFrontController extends ModuleFrontController
             'verification' => $verification,
             'documents' => $documents,
             'token' => sha1($context->customer->secure_key),
+            'kyc_required_alert' => (bool) Tools::getValue('kyc_required'),
         ]);
 
         $this->context->smarty->tpl_vars['page']->value['body_classes']['page-customer-account'] = true;
