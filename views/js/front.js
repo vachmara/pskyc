@@ -187,7 +187,7 @@
         
         // Dispatch ready event
         dispatchKycEvent('ready', {
-            version: '1.1.2'
+            version: '1.1.3'
         });
     }
     
@@ -201,6 +201,6 @@
     // Expose utility functions for other scripts
     window.pskyc = {
         dispatchEvent: dispatchKycEvent,
-        version: '1.1.2'
+        version: '1.1.3'
     };
 })();
