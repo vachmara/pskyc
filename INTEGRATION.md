@@ -28,7 +28,7 @@ The KYC Secure Upload module leverages the following PrestaShop hooks for checko
 | Hook Name | Type | Trigger Point | Purpose | Parameters |
 |-----------|------|---------------|---------|------------|
 | `actionCheckoutRender` | Action | Before checkout page renders | Inject KYC step into checkout process | `['checkoutProcess']` |
-| `actionValidateOrder` | Action | Before order confirmation | Block order if KYC not approved | `['cart', 'order', 'customer']` |
+| `actionValidateOrderBefore` | Action | Before order validation | Block order if KYC not approved | `['cart', 'customer', 'currency', 'id_order_state', 'payment_method']` |
 | `displayBeforeCarrier` | Display | Before carrier selection | Show KYC warning/requirements | `[]` |
 | `displayCustomerAccount` | Display | Customer account page | Display KYC verification link | `[]` |
 | `actionFrontControllerSetMedia` | Action | Page asset loading | Load KYC-related CSS/JS | `[]` |
@@ -50,7 +50,7 @@ There are several approaches to integrate KYC verification with third-party chec
 
 ### 1. Pre-Order Validation Hook (Recommended)
 
-Use the `actionValidateOrder` hook to block order creation if KYC is not approved.
+Use the `actionValidateOrderBefore` hook to block order creation if KYC is not approved.
 
 **Pros:**
 - ✅ Works with any checkout module
@@ -217,7 +217,7 @@ The KYC module provides extension points for third-party modules:
 #### Issue: Customer can complete order without KYC approval
 
 **Possible causes:**
-1. `actionValidateOrder` hook not registered
+1. `actionValidateOrderBefore` hook not registered
 2. KYC required categories not configured
 3. Service error not properly handled
 
@@ -314,6 +314,6 @@ Found an issue or want to improve this guide?
 
 ---
 
-**Last Updated:** 2025-01-28
-**Module Version:** 1.1.2+
+**Last Updated:** 2026-02-01
+**Module Version:** 1.1.3
 **Tested with:** PrestaShop 8.1.x, 8.2.x
