@@ -702,7 +702,6 @@ class Pskyc extends Module
      * Blocks order creation if KYC verification is required but not approved
      *
      * @param array $params Contains ['cart', 'customer']
-     *
      */
     public function hookActionValidateOrderBefore($params)
     {

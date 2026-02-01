@@ -43,19 +43,18 @@ class PaymentModule extends PaymentModuleCore
         $currency_special = null,
         $dont_touch_amount = false,
         $secure_key = false,
-        Shop $shop = null,
-        ?string $order_reference = null
-    ){
-
+        ?Shop $shop = null,
+        ?string $order_reference = null,
+    ) {
         // Only for Prestashop 8: execute the pre-order validation hook
         if (version_compare(_PS_VERSION_, '9.0.0', '<')) {
-          Hook::exec('actionValidateOrderBefore', [
-              'cart' => $this->context->cart,
-              'customer' => $this->context->customer,
-              'currency' => $this->context->currency,
-              'id_order_state' => &$id_order_state,
-              'payment_method' => $payment_method
-          ]);
+            Hook::exec('actionValidateOrderBefore', [
+                'cart' => $this->context->cart,
+                'customer' => $this->context->customer,
+                'currency' => $this->context->currency,
+                'id_order_state' => &$id_order_state,
+                'payment_method' => $payment_method,
+            ]);
         }
 
         return parent::validateOrder(
@@ -73,4 +72,3 @@ class PaymentModule extends PaymentModuleCore
         );
     }
 }
-
