@@ -5,7 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.1.3] - 2026-02-01
+
+### Added
+- Enhanced checkout module compatibility for broader integration
+- AJAX status checking for improved customer experience during verification
+- Quick start guide for checkout integration
+- Implementation summary documentation
+- Prestashop 9 compatibility testing and validation
+
+### Changed
+- Updated README.md to reference integration guide
+- Enhanced hook documentation with detailed parameter information
+
+## [1.1.2] - 2025-09-17
 
 ### Added
 - Official PrestaShop 9 compatibility documentation and CI coverage

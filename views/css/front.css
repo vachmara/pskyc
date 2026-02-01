@@ -1,0 +1,95 @@
+/**
+ * MIT License
+ * Copyright (c) 2025 Valentin Chmara
+ *
+ * Frontend styles for KYC Secure Upload module
+ */
+
+/* KYC Checkout Warning */
+.pskyc-checkout-warning {
+    border-left: 4px solid #ff9800;
+}
+
+.pskyc-checkout-warning .alert-heading {
+    font-weight: 600;
+}
+
+/* KYC Customer Account Box */
+.pskyc-account-box {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+}
+
+.pskyc-account-box .status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    border-radius: 0.25rem;
+    font-weight: 600;
+}
+
+.pskyc-account-box .status-badge.approved {
+    background-color: #4caf50;
+    color: white;
+}
+
+.pskyc-account-box .status-badge.pending {
+    background-color: #ff9800;
+    color: white;
+}
+
+.pskyc-account-box .status-badge.rejected {
+    background-color: #f44336;
+    color: white;
+}
+
+.pskyc-account-box .status-badge.under_review {
+    background-color: #2196f3;
+    color: white;
+}
+
+/* KYC Verification Form */
+.pskyc-verification-form .form-group {
+    margin-bottom: 1rem;
+}
+
+.pskyc-verification-form .file-upload-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+}
+
+.pskyc-verification-form .file-upload-wrapper input[type=file] {
+    font-size: 100px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+}
+
+.pskyc-verification-form .file-upload-label {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: #007bff;
+    color: white;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+.pskyc-verification-form .file-upload-label:hover {
+    background-color: #0056b3;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .pskyc-checkout-warning {
+        font-size: 0.9rem;
+    }
+    
+    .pskyc-checkout-warning .btn {
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+}

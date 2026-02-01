@@ -147,9 +147,10 @@ class VerificationServiceTest extends MockeryTestCase
         $filters = ['status' => 'pending'];
         $limit = 10;
         $offset = 0;
+        $futureDate = date('Y-m-d H:i:s', strtotime('+1 year'));
         $verifications = [
             ['id_kyc_verification' => 1, 'date_expiry' => null, 'is_expired' => false],
-            ['id_kyc_verification' => 2, 'date_expiry' => '2025-12-31 23:59:59', 'is_expired' => false],
+            ['id_kyc_verification' => 2, 'date_expiry' => $futureDate, 'is_expired' => false],
         ];
         $totalCount = 25;
 
@@ -336,9 +337,10 @@ class VerificationServiceTest extends MockeryTestCase
     public function testGetVerificationsByCustomerIdSuccessfully()
     {
         $customerId = 1;
+        $futureDate = date('Y-m-d H:i:s', strtotime('+1 year'));
         $verifications = [
             ['id_kyc_verification' => 1, 'date_expiry' => null, 'is_expired' => false],
-            ['id_kyc_verification' => 2, 'date_expiry' => '2025-12-31 23:59:59', 'is_expired' => false],
+            ['id_kyc_verification' => 2, 'date_expiry' => $futureDate, 'is_expired' => false],
         ];
 
         $this->verificationRepositoryMock->shouldReceive('findAllByCustomerId')

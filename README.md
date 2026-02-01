@@ -56,6 +56,55 @@ This module uses standard PrestaShop-required PHP extensions:
 2. Upload to your PrestaShop back office (Modules > Module Manager > Upload)
 3. Configure in the modules section
 
+## Quick Start
+
+Get up and running in minutes with automatic integration.
+
+### Basic Setup
+
+1. **Install the module** via PrestaShop back office
+2. **Configure KYC categories:**
+   - Go to Modules → KYC Secure Upload → Configure
+   - Select product categories that require KYC verification
+3. **That's it!** The module works automatically with any checkout
+
+### How It Works
+
+- **Automatic blocking:** Orders for KYC-required products are blocked until verification is approved
+- **Server-side security:** Cannot be bypassed via frontend modifications
+- **Clear messaging:** Customers see helpful error messages and redirects
+
+### Testing Checklist
+
+1. **Configure categories** requiring KYC in module settings
+2. **Test as unverified customer:**
+   - Add KYC-required product to cart
+   - Complete checkout process
+   - ✅ Should see error and redirect to KYC verification
+3. **Test as verified customer:**
+   - Complete KYC verification (get admin approval)
+   - Add same product and checkout
+   - ✅ Order should process normally
+4. **Test non-KYC products:**
+   - Add regular product to cart
+   - ✅ No KYC check, order processes normally
+
+### Common Issues
+
+- **Orders going through without KYC:** Reinstall module to ensure hooks are registered
+- **No error messages:** Check PrestaShop logs at `var/logs/`
+- **Warnings not appearing:** Clear cache in Advanced Parameters → Performance
+
+## Third-Party Checkout Integration
+
+This module works seamlessly with PrestaShop's standard checkout and is compatible with third-party checkout modules like **Prestahero One Page Checkout**.
+
+📖 **[Complete Integration Guide](INTEGRATION.md)** - Comprehensive documentation for integrating with third-party checkout modules including:
+- Prestahero One Page Checkout
+- Custom checkout modules
+- Override examples and best practices
+- Troubleshooting and extension points
+
 ## Security
 
 - Files are stored encrypted with OpenSSL (`AES-256-CBC`)

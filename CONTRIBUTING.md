@@ -40,6 +40,21 @@ This module follows the PrestaShop ecosystem’s best practices and is written m
 
 ---
 
+## Testing
+
+You can test the module using the provided `docker-compose.yml` file in the root directory. Run `docker-compose up` to set up a local PrestaShop environment for testing.
+
+### Back office access information
+
+The default url/credentials to access to PrestaShop's back office defined in [`https://github.com/PrestaShop/prestashop-flashlight/blob/main/assets/hydrate.sh`](https://github.com/PrestaShop/prestashop-flashlight/blob/main/assets/hydrate.sh) and are set to:
+
+| Url      | {PS_DOMAIN}/admin-dev |
+| -------- | --------------------- |
+| Login    | admin@prestashop.com  |
+| Password | prestashop            |
+
+---
+
 ## License
 
 All files in this module are released under the [MIT License](LICENSE).
@@ -49,6 +64,7 @@ All files in this module are released under the [MIT License](LICENSE).
 ## Resources
 
 - [PrestaShop Module Development Docs](https://devdocs.prestashop-project.org/8/modules/)
+- [PrestaShop Flashlight](https://github.com/PrestaShop/prestashop-flashlight)
 - [GitHub Help](https://help.github.com/)
 - [Try Git](https://try.github.io/)
 
