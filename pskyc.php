@@ -187,7 +187,7 @@ class Pskyc extends Module
         $verificationUrl = '';
         try {
             $router = $this->get('router');
-            if ($router !== false) {
+            if (!$router) {
                 $verificationUrl = $router->generate('ps_pskyc_verification_index');
             }
         } catch (Exception $e) {
@@ -440,7 +440,7 @@ class Pskyc extends Module
 
         // Render the Twig template instead of Smarty
         $twig = $this->get('twig');
-        if ($twig === false) {
+        if (!$twig) {
             return;
         }
 
