@@ -14,7 +14,7 @@ namespace PrestaShop\Module\Pskyc\Service;
 if (!defined('_PS_VERSION_')) {
     exit;
 }
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class NotificationService
