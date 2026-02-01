@@ -18,7 +18,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class NotificationServiceTest extends MockeryTestCase
 {
-    /** @var \Symfony\Contracts\Translation\TranslatorInterface */
+    /** @var TranslatorInterface */
     private $translatorMock;
 
     /** @var EngineInterface */
