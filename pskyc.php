@@ -739,8 +739,6 @@ class Pskyc extends Module
         // Redirect to KYC verification page
         $kycUrl = $this->context->link->getModuleLink($this->name, 'verify', ['kyc_required' => 1], true);
         Tools::redirect($kycUrl);
-
-        return false;
     }
 
     /**
