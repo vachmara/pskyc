@@ -110,10 +110,9 @@ class DocumentController extends FrameworkBundleAdminController
      */
     public function updateStatusAction(int $verificationId, Request $request, CsrfTokenManagerInterface $csrfTokenManager)
     {
-        $documentsData = $request->request->has('documents')
-            ? $request->request->all('documents')
-            : [];
-
+        $documentsData = $request->request->get('documents'); 
+        $documentsData = is_array($documentsData) ? $documentsData : [];
+        
         $token = (string) $request->request->get('_token', '');
         if (!$csrfTokenManager->isTokenValid(new \Symfony\Component\Security\Csrf\CsrfToken('pskyc_document_update', $token))) {
             $this->addFlash('error', $this->trans('Invalid CSRF token.', 'Modules.Pskyc.Admin'));
