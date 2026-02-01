@@ -201,6 +201,7 @@ class Pskyc extends Module
 
         // Assign template variables
         $this->context->smarty->assign([
+            'module_version' => $this->version,
             'module_dir' => $this->_path,
             'form_html' => $this->renderForm(),
             'errors' => $errors,
