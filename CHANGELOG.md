@@ -27,6 +27,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Official PrestaShop 9 compatibility documentation and CI coverage
 
+### Added
+- Admin email notification when verification status changes
+
 ### Fixed
 - Fix remove admin note in status mail notification
 - Escape KYC form validation messages and loading labels for safe front-office JavaScript handling when two-sided IDs are required

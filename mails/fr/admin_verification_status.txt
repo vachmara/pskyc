@@ -1,0 +1,9 @@
+Le statut de la vérification #{verification_id} a été mis à jour en {status_label}.
+
+Client : {customer_name} ({customer_email})
+Identifiant client : #{customer_id}
+Message : {status_message}
+
+Examen dans le panneau d'administration : {admin_verification_url}
+
+Il s'agit d'une notification administrative automatisée.
